@@ -24,8 +24,6 @@
 
 .DS_Store
 
-/config/database.yml
-/config/secrets.yml
 /config/settings.yml
 .vagrant
 /coverage

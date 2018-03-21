@@ -1,0 +1,12 @@
+language: ruby
+bundler_args: --without debug
+script:
+- bundle exec rspec
+rvm:
+- 2.4.1
+before_install:
+- gem install bundler
+- bundle --version
+sudo: false
+services:
+- redis-server
