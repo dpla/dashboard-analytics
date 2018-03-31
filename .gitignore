@@ -25,5 +25,7 @@
 .DS_Store
 
 /config/settings.yml
+/config/google-analytics-key.json
+
 .vagrant
 /coverage
