@@ -9,25 +9,28 @@ class GaResponseBuilder
     scope: 'https://www.googleapis.com/auth/analytics.readonly')
 
   def initialize
+    @profile_id = Settings.google_analytics.profile_id
 
-    profile_id = Settings.google_analytics.profile_id
-
-    start_date = "2018-01-01"
-    end_date = "2018-01-31"
+    start_date = "2018-03-01"
+    end_date = "2018-03-31"
+    hub = "California Digital Library"
 
     analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
     analytics.authorization = token
 
-    dimensions = %w(ga:date)
-    metrics = %w(ga:sessions ga:users ga:newUsers)
-    sort = %w(ga:date)
+    dimensions = %w(ga:eventCategory)
+    metrics = %w(ga:totalEvents)
+    filters = %W(ga:eventCategory=@#{hub})
+    # sort = %w(ga:date)
 
-    result = analytics.get_ga_data(profile_id,
+    result = analytics.get_ga_data(@profile_id,
                                    start_date,
                                    end_date,
                                    metrics.join(','),
                                    dimensions: dimensions.join(','),
-                                   sort: sort.join(','))
+                                   filters: filters.join(',')
+                                   # sort: sort.join(',')
+                                   )
 
     data = []
     data.push(result.column_headers.map { |h| h.name })
@@ -36,6 +39,7 @@ class GaResponseBuilder
   end
 
   def token
+    # By default, the access token will expire after 1 hour.
     if(@@authorizer.access_token.nil? or @@authorizer.expired?)
       @@authorizer.fetch_access_token!
     end
