@@ -7,15 +7,17 @@
       js=d.createElement(s);fjs=d.getElementsByTagName(s)[0];
       js.src='https://apis.google.com/js/platform.js';
       fjs.parentNode.insertBefore(js,fjs);js.onload=function(){g.load('analytics')};
-    }(window,document,'script'));
+    }(window,document,'script')); 
 
     gapi.analytics.ready(function() {
+
+      // alert('checkpoint');
 
       // Step 3: Authorize the user.
 
       var access_token = document.getElementById("access-token").dataset.accessToken;
 
-      alert(access_token);
+      // alert(access_token);
 
       gapi.analytics.auth.authorize({
         'serverAuth': {
