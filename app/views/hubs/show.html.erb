@@ -1,4 +1,9 @@
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
+
 <h1><%= @hub %></h1>
+
 <% event_metrics = @ga.event_metrics %>
 <ul>
   <li>
@@ -15,3 +20,7 @@
   </li>
 </ul>
 
+<div data-access-token="#{<%= @ga.token %>}"/>
+<section id="auth-button"></section>
+<section id="view-selector"></section>
+<section id="timeline"></section>
