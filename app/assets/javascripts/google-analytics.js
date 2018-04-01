@@ -11,13 +11,9 @@
 
     gapi.analytics.ready(function() {
 
-      // alert('checkpoint');
-
       // Step 3: Authorize the user.
 
       var access_token = document.getElementById("access-token").dataset.accessToken;
-
-      // alert(access_token);
 
       gapi.analytics.auth.authorize({
         'serverAuth': {

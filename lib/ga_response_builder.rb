@@ -13,8 +13,8 @@ class GaResponseBuilder
     @hub = hub
     @analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
     @analytics.authorization = token
-    @start_date = "2018-03-01"
-    @end_date = "2018-03-31"
+    @start_date = "30daysAgo"
+    @end_date = "yesterday"
   end
 
   def token
