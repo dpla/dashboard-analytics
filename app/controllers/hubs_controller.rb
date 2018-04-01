@@ -6,6 +6,6 @@ class HubsController < ApplicationController
 
   def show
     @hub = params[:id]
-    @ga = GaResponseBuilder.new()
+    @ga = GaResponseBuilder.new(@hub)
   end
 end

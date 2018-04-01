@@ -8,34 +8,13 @@ class GaResponseBuilder
     json_key_io: File.open(Settings.google_analytics.service_account_json_key),
     scope: 'https://www.googleapis.com/auth/analytics.readonly')
 
-  def initialize
+  def initialize(hub)
     @profile_id = Settings.google_analytics.profile_id
-
-    start_date = "2018-03-01"
-    end_date = "2018-03-31"
-    hub = "California Digital Library"
-
-    analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
-    analytics.authorization = token
-
-    dimensions = %w(ga:eventCategory)
-    metrics = %w(ga:totalEvents)
-    filters = %W(ga:eventCategory=@#{hub})
-    # sort = %w(ga:date)
-
-    result = analytics.get_ga_data(@profile_id,
-                                   start_date,
-                                   end_date,
-                                   metrics.join(','),
-                                   dimensions: dimensions.join(','),
-                                   filters: filters.join(',')
-                                   # sort: sort.join(',')
-                                   )
-
-    data = []
-    data.push(result.column_headers.map { |h| h.name })
-    data.push(*result.rows)
-    self.data = data
+    @hub = hub
+    @analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
+    @analytics.authorization = token
+    @start_date = "2018-03-01"
+    @end_date = "2018-03-31"
   end
 
   def token
@@ -44,5 +23,24 @@ class GaResponseBuilder
       @@authorizer.fetch_access_token!
     end
     @@authorizer.access_token
+  end
+
+  def event_metrics
+    dimensions = %w(ga:eventCategory)
+    metrics = %w(ga:totalEvents)
+    filters = %W(ga:eventCategory=@#{@hub})
+
+    result = @analytics.get_ga_data(@profile_id,
+                                    @start_date,
+                                    @end_date,
+                                    metrics.join(','),
+                                    dimensions: dimensions.join(','),
+                                    filters: filters.join(','))
+
+    self.data = result
+
+    result.rows.collect{ |r| 
+      [r[0].split(' : ')[0].parameterize.underscore.to_sym, r[1]]
+    }.to_h
   end
 end
