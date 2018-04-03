@@ -11,27 +11,23 @@
 
     gapi.analytics.ready(function() {
 
-      // Step 3: Authorize the user.
-
-      var access_token = document.getElementById("access-token").dataset.accessToken;
+      // Authorization
+      var accessToken = document.getElementById("access-token").dataset.accessToken;
+      var profileId = document.getElementById("profile-id").dataset.profileId;
 
       gapi.analytics.auth.authorize({
         'serverAuth': {
-          'access_token': access_token
+          'access_token': accessToken
         }
       });
 
-      // Step 4: Create the view selector.
-
-      var viewSelector = new gapi.analytics.ViewSelector({
-        container: 'view-selector'
-      });
 
       // Step 5: Create the timeline chart.
 
       var timeline = new gapi.analytics.googleCharts.DataChart({
         reportType: 'ga',
         query: {
+          'ids': profileId,
           'dimensions': 'ga:date',
           'metrics': 'ga:sessions',
           'start-date': '30daysAgo',
@@ -46,17 +42,8 @@
       // Step 6: Hook up the components to work together.
 
       if (gapi.analytics.auth.isAuthorized()) {
-        viewSelector.execute();
+        timeline.execute();
       }
-
-      viewSelector.on('change', function(ids) {
-        var newIds = {
-          query: {
-            ids: ids
-          }
-        }
-        timeline.set(newIds).execute();
-      });
     });
   });
 })();
