@@ -4,21 +4,10 @@
 
 <h1><%= @hub %></h1>
 
-<% event_metrics = @ga.event_metrics %>
 <ul>
-  <li>
-    View item: <%= event_metrics[:view_item] %>
-  </li>
-  <li>
-    View exhibition item: <%= event_metrics[:view_exhibition_item] %>
-  </li>
-  <li>
-    View primary source: <%= event_metrics[:view_primary_source] %>
-  </li>
-  <li>
-    Click through: <%= event_metrics[:click_through] %>
-  </li>
-</ul>
+<% @ga.event_metrics.each do |key, value| %>
+  <li><%= key %> : <%= value %></li>
+<% end %>
 
 <div id="access-token" data-access-token="<%= @ga.token %>"/>
 <section id="auth-button"></section>

@@ -28,19 +28,19 @@ class GaResponseBuilder
   def event_metrics
     dimensions = %w(ga:eventCategory)
     metrics = %w(ga:totalEvents)
-    filters = %W(ga:eventCategory=@#{@hub})
+    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
 
     result = @analytics.get_ga_data(@profile_id,
                                     @start_date,
                                     @end_date,
                                     metrics.join(','),
-                                    dimensions: dimensions.join(','),
-                                    filters: filters.join(','))
+                                    dimensions: dimensions.join(','), #comma = "or"
+                                    filters: filters.join(';')) #semicolon = "and"
 
     self.data = result
 
     result.rows.collect{ |r| 
-      [r[0].split(' : ')[0].parameterize.underscore.to_sym, r[1]]
+      [r[0].split(' : ')[0], r[1]]
     }.to_h
   end
 end
