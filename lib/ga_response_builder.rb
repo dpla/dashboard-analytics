@@ -2,7 +2,6 @@ require 'google/apis/analytics_v3'
 require 'googleauth'
 
 class GaResponseBuilder
-  attr_accessor :data
 
   @@authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
     json_key_io: File.open(Settings.google_analytics.service_account_json_key),
@@ -25,9 +24,9 @@ class GaResponseBuilder
     @@authorizer.access_token
   end
 
-  def event_metrics
-    dimensions = %w(ga:eventCategory)
-    metrics = %w(ga:totalEvents)
+  def overall_metrics
+    metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
+    dimensions = %w()
     filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
 
     result = @analytics.get_ga_data(@profile_id,
@@ -37,7 +36,22 @@ class GaResponseBuilder
                                     dimensions: dimensions.join(','), #comma = "or"
                                     filters: filters.join(';')) #semicolon = "and"
 
-    self.data = result
+    result.totals_for_all_results.map do |key, value| 
+      [key.split(':')[1].underscore.humanize.titleize, value]
+    end.to_h
+  end
+
+  def event_metrics
+    metrics = %w(ga:totalEvents)
+    dimensions = %w(ga:eventCategory)
+    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
+
+    result = @analytics.get_ga_data(@profile_id,
+                                    @start_date,
+                                    @end_date,
+                                    metrics.join(','),
+                                    dimensions: dimensions.join(','), #comma = "or"
+                                    filters: filters.join(';')) #semicolon = "and"
 
     result.rows.collect{ |r| 
       [r[0].split(' : ')[0], r[1]]

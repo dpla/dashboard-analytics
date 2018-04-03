@@ -4,10 +4,19 @@
 
 <h1><%= @hub %></h1>
 
+<h2>Overall</h2>
+<ul>
+<% @ga.overall_metrics.each do |key, value| %>
+  <li><%= key %> : <%= value %></li>
+<% end %>
+</ul>
+
+<h2>Events</h2>
 <ul>
 <% @ga.event_metrics.each do |key, value| %>
   <li><%= key %> : <%= value %></li>
 <% end %>
+</ul> 
 
 <div id="access-token" data-access-token="<%= @ga.token %>"/>
 <section id="auth-button"></section>
