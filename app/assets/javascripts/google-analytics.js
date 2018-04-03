@@ -14,6 +14,7 @@
       // Authorization
       var accessToken = document.getElementById("access-token").dataset.accessToken;
       var profileId = document.getElementById("profile-id").dataset.profileId;
+      var hub = document.getElementById("hub").dataset.hub;
 
       gapi.analytics.auth.authorize({
         'serverAuth': {
@@ -21,28 +22,29 @@
         }
       });
 
+      // Create map
 
-      // Step 5: Create the timeline chart.
-
-      var timeline = new gapi.analytics.googleCharts.DataChart({
+      var map = new gapi.analytics.googleCharts.DataChart({
         reportType: 'ga',
         query: {
           'ids': profileId,
-          'dimensions': 'ga:date',
-          'metrics': 'ga:sessions',
+          'dimensions': 'ga:country',
+          'metrics': 'ga:users',
+          'filters': `ga:eventCategory=@${hub};ga:eventCategory!@Browse`,
           'start-date': '30daysAgo',
           'end-date': 'yesterday',
         },
         chart: {
-          type: 'LINE',
-          container: 'timeline'
+          type: 'GEO',
+          container: 'map'
         }
       });
       
-      // Step 6: Hook up the components to work together.
+      // Render visualiztions if authorization is successful.
+      // If the request fails, visualizations will not render.
 
       if (gapi.analytics.auth.isAuthorized()) {
-        timeline.execute();
+        map.execute();
       }
     });
   });

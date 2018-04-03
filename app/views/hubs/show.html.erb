@@ -18,6 +18,10 @@
 <% end %>
 </ul> 
 
+<!-- Data for google analytics javascript embed api -->
 <div id="access-token" data-access-token="<%= @ga.token %>" />
 <div id="profile-id" data-profile-id="<%= Settings.google_analytics.profile_id %>" />
-<section id="timeline"></section>
+<div id="hub" data-hub="<%= @hub %>" />
+
+<h2>User locations</h2>
+<section id="map">loading...</section>
