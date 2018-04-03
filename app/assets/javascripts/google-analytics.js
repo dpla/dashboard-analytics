@@ -2,6 +2,8 @@
   // This is the turbolinks equivalent to a page load.
   document.addEventListener("turbolinks:load", function(){
 
+    // Load google analytics api
+
     (function(w,d,s,g,js,fjs){
       g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(cb){this.q.push(cb)}};
       js=d.createElement(s);fjs=d.getElementsByTagName(s)[0];
@@ -11,10 +13,15 @@
 
     gapi.analytics.ready(function() {
 
-      // Authorization
+      // Read data from HTML
+
       var accessToken = document.getElementById("access-token").dataset.accessToken;
       var profileId = document.getElementById("profile-id").dataset.profileId;
       var hub = document.getElementById("hub").dataset.hub;
+      var startDate = document.getElementById("start-date").dataset.startDate;
+      var endDate = document.getElementById("end-date").dataset.endDate;
+
+      // Authorization
 
       gapi.analytics.auth.authorize({
         'serverAuth': {
@@ -31,8 +38,8 @@
           'dimensions': 'ga:country',
           'metrics': 'ga:users',
           'filters': `ga:eventCategory=@${hub};ga:eventCategory!@Browse`,
-          'start-date': '30daysAgo',
-          'end-date': 'yesterday',
+          'start-date': startDate,
+          'end-date': endDate,
         },
         chart: {
           type: 'GEO',

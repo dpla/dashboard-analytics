@@ -7,13 +7,13 @@ class GaResponseBuilder
     json_key_io: File.open(Settings.google_analytics.service_account_json_key),
     scope: 'https://www.googleapis.com/auth/analytics.readonly')
 
-  def initialize(hub)
+  def initialize(hub, start_date, end_date)
     @profile_id = Settings.google_analytics.profile_id
     @hub = hub
+    @start_date = start_date
+    @end_date = end_date
     @analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
     @analytics.authorization = token
-    @start_date = "30daysAgo"
-    @end_date = "yesterday"
   end
 
   ##
