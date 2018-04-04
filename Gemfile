@@ -22,6 +22,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'config', '1.7.0'
 gem 'google-api-client', '~> 0.11'
 gem 'googleauth', '~> 0.6'
+gem 'httparty', '~> 0.16.2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -2,3 +2,7 @@ google_analytics:
   # File path to the service account JSON key.
   service_account_json_key: <%= File.join Rails.root, 'config', 'google-analytics-key.json' %>
   profile_id: CHANGEME
+
+dpla_api:
+  base_uri: CHANGEME
+  key: CHANGEME

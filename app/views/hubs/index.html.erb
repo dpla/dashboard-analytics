@@ -1,16 +1,11 @@
 <h1>Hubs</h1>
 
+<% if @hubs.present? %>
 <ul>
-  <li>
-    <%= link_to "California Digital Library", controller: :hubs, action: :show, 
-                id: "California Digital Library" %>
-  </li>
-  <li>
-    <%= link_to "Minnesota Digital Library", controller: :hubs, action: :show, 
-                id: "Minneota Digital Library" %>
-  </li>
-  <li>
-    <%= link_to "Recollection Wisconsin", controller: :hubs, action: :show, 
-                id: "Recollection Wisconsin" %>
-  </li>
+<% @hubs.each do |hub| %>
+  <li><%= link_to hub, controller: :hubs, action: :show, id: hub %></li>
+<% end %>
 </ul>
+<% else %>
+  There was a problem retriving hubs from the DPLA API.
+<% end %>

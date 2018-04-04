@@ -2,6 +2,7 @@
 
 class HubsController < ApplicationController
   def index
+    @hubs = DplaResponseBuilder.new().hubs
   end
 
   def show
