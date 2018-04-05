@@ -2,6 +2,8 @@
   <%= javascript_include_tag 'google-analytics', 'data-turbolinks-track': 'reload', defer: 'defer' %>
 <% end %>
 
+<%= render partial: "shared/navigation" %>
+
 <h1><%= @contributor.name %></h1>
 
 <h2>Use Metrics</h2>
