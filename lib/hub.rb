@@ -75,10 +75,10 @@ class Hub
   private
 
   def overall_use_totals
-    @overall_use_totals ||= @ga.hub_overall_use_totals(name)
+    @overall_use_totals ||= @ga.overall_use_totals(name)
   end
 
   def event_totals
-    @event_totals ||= @ga.hub_event_totals(name)
+    @event_totals ||= @ga.event_totals(name)
   end
 end

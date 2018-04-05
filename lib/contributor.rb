@@ -69,13 +69,13 @@ class Contributor
     event_totals['Click Through'] || 0
   end
 
-  # private
+  private
 
   def overall_use_totals
-    @overall_use_totals ||= @ga.contributor_overall_use_totals(name, hub)
+    @overall_use_totals ||= @ga.overall_use_totals(hub, name)
   end
 
   def event_totals
-    @event_totals ||= @ga.contributor_event_totals(name, hub)
+    @event_totals ||= @ga.event_totals(hub, name)
   end
 end
