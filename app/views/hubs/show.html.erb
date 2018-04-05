@@ -6,25 +6,18 @@
 
 <h2>Use Metrics</h2>
 
+<%= render partial: "shared/use_metrics", locals: { target: @hub } %>
+
+<%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
+  hub: @hub.name } %>
+
+<h2>Contributors</h2>
 <ul>
-  <li>Total events: <%= @hub.total_events %></li>
-  <ul>
-    <li>View item: <%= @hub.total_item_events %></li>
-    <li>View exhibition item: <%= @hub.total_exhibit_events %></li>
-    <li>View primary source: <%= @hub.total_pss_events %></li>
-    <li>Click through: <%= @hub.total_click_throughs %></li>
-  </ul>
-  <li>Unique events: <%= @hub.unique_events %></li>
-  <li>Sessions: <%= @hub.sessions %></li>
-  <li>Users: <%= @hub.users %></li>
+<% @hub.contributors.each do |contributor| %>
+  <li>
+    <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+      <%= contributor %>
+    </a>
+  </li>
+<% end %>
 </ul>
-
-<!-- Data for google analytics javascript embed api -->
-<div id="access-token" data-access-token="<%= @hub.ga_token %>" />
-<div id="profile-id" data-profile-id="<%= Settings.google_analytics.profile_id %>" />
-<div id="hub" data-hub="<%= @hub.name %>" />
-<div id="start-date" data-start-date="<%= @start_date %>" />
-<div id="end-date" data-end-date="<%= @end_date %>" />
-
-<h2>User locations</h2>
-<section id="map">loading...</section>

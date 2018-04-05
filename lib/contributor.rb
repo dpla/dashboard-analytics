@@ -1,14 +1,6 @@
-class Hub
+class Contributor
 
   @@dpla_api = DplaApiResponseBuilder.new()
-
-  ##
-  # Get all the hub names from the DPLA API
-  # @return [Array<String>]
-  #
-  def self.all
-    @@dpla_api.hubs.sort
-  end
 
   ##
   # Initialize a single hub
@@ -17,8 +9,9 @@ class Hub
   # @param start_date [String]
   # @param end_date [String]
   #
-  def initialize(name, start_date, end_date)
+  def initialize(name, hub, start_date, end_date)
     @name = name
+    @hub = hub
     @start_date = start_date
     @end_date = end_date
     @ga = GaResponseBuilder.new(start_date, end_date)
@@ -28,6 +21,10 @@ class Hub
     @name
   end
 
+  def hub
+    @hub
+  end
+
   def ga_token
     @ga.token
   end
@@ -35,7 +32,7 @@ class Hub
   ##
   # Get all the contributors that belong to this hub instance
   #
-  # @return [Array<String>]
+  # @retrun [Array<String>]
   #
   def contributors
     @@dpla_api.contributors(name).sort
@@ -76,10 +73,10 @@ class Hub
   private
 
   def overall_use_totals
-    @overall_use_totals ||= @ga.overall_use_totals(name)
+    @overall_use_totals ||= @ga.overall_use_totals(hub, name)
   end
 
   def event_totals
-    @event_totals ||= @ga.event_totals(name)
+    @event_totals ||= @ga.event_totals(hub, name)
   end
 end

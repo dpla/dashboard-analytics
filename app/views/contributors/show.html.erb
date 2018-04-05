@@ -1,0 +1,12 @@
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
+
+<h1><%= @contributor.name %></h1>
+
+<h2>Use Metrics</h2>
+
+<%= render partial: "shared/use_metrics", locals: {target: @contributor} %>
+
+<%= render partial: "shared/map", locals: { ga_token: @contributor.ga_token,
+  hub: @contributor.hub, contributor: @contributor.name } %>
