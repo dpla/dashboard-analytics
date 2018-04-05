@@ -6,17 +6,10 @@
 
 <h2>Use Metrics</h2>
 
-<%= render partial: "shared/use_metrics", locals: {target: @hub} %>
+<%= render partial: "shared/use_metrics", locals: { target: @hub } %>
 
-<!-- Data for google analytics javascript embed api -->
-<div id="access-token" data-access-token="<%= @hub.ga_token %>" />
-<div id="profile-id" data-profile-id="<%= Settings.google_analytics.profile_id %>" />
-<div id="hub" data-hub="<%= @hub.name %>" />
-<div id="start-date" data-start-date="<%= @start_date %>" />
-<div id="end-date" data-end-date="<%= @end_date %>" />
-
-<h2>User locations</h2>
-<section id="map">loading...</section>
+<%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
+  hub: @hub.name } %>
 
 <h2>Contributors</h2>
 <ul>

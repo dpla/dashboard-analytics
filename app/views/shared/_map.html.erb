@@ -1,0 +1,13 @@
+<!-- Data for google analytics javascript embed api -->
+<div id="access-token" data-access-token="<%= ga_token %>" />
+<div id="profile-id" data-profile-id="<%= Settings.google_analytics.profile_id %>" />
+<div id="hub" data-hub="<%= hub %>" />
+<!-- contributor is optional -->
+<% contributor ||= "" %>
+<div id="contributor" data-contributor="<%= contributor %>" />
+<div id="start-date" data-start-date="<%= @start_date %>" />
+<div id="end-date" data-end-date="<%= @end_date %>" />
+
+
+<h2>User locations</h2>
+<section id="map">If map does not load after a few seconds, try refreshing page.</section>

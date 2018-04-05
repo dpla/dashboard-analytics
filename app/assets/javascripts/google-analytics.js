@@ -18,6 +18,7 @@
       var accessToken = document.getElementById("access-token").dataset.accessToken;
       var profileId = document.getElementById("profile-id").dataset.profileId;
       var hub = document.getElementById("hub").dataset.hub;
+      var contributor = document.getElementById("contributor").dataset.contributor;
       var startDate = document.getElementById("start-date").dataset.startDate;
       var endDate = document.getElementById("end-date").dataset.endDate;
 
@@ -31,13 +32,26 @@
 
       // Create map
 
+      var mapFilters = function(){
+        var filters = [`ga:eventCategory=@${hub}`, `ga:eventCategory!@Browse`];
+
+        if (contributor !== "") {
+          filters = filters.concat(`ga:eventAction==${contributor}`);
+        }
+
+        console.log(filters);
+
+        return filters.join(';');
+      }
+
+
       var map = new gapi.analytics.googleCharts.DataChart({
         reportType: 'ga',
         query: {
           'ids': profileId,
           'dimensions': 'ga:country',
           'metrics': 'ga:users',
-          'filters': `ga:eventCategory=@${hub};ga:eventCategory!@Browse`,
+          'filters': mapFilters(),
           'start-date': startDate,
           'end-date': endDate,
         },

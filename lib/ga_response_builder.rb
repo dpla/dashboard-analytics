@@ -37,7 +37,7 @@ class GaResponseBuilder
     dimensions = %w()
     filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
-    filters.concat %W(ga:eventAction=@#{contributor}) if contributor
+    filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
       response(metrics, dimensions, filters).totals_for_all_results
@@ -57,7 +57,7 @@ class GaResponseBuilder
     dimensions = %w(ga:eventCategory)
     filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
-    filters.concat %W(ga:eventAction=@#{contributor}) if contributor
+    filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
       response(metrics, dimensions, filters).rows.collect{ |row| 
