@@ -35,7 +35,8 @@ class Hub
   ##
   # Get all the contributors that belong to this hub instance
   #
-  # @retrun [Array<String>]
+  # @return [Array<String>]
+  #
   def contributors
     @@dpla_api.contributors(name).sort
   end

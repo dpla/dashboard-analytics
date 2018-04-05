@@ -39,8 +39,6 @@
           filters = filters.concat(`ga:eventAction==${contributor}`);
         }
 
-        console.log(filters);
-
         return filters.join(';');
       }
 

@@ -28,8 +28,6 @@ class DplaApiResponseBuilder
   # @return [Array<String>]
   #
   def contributors(hub)
-    # page_size=0&facets=dataProvider&provider.name=OKHub
-
     options = { query: { :api_key => API_KEY,
                          :facets => 'dataProvider',
                          :page_size => 0, 
