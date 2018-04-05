@@ -7,9 +7,9 @@ class GaResponseBuilder
     json_key_io: File.open(Settings.google_analytics.service_account_json_key),
     scope: 'https://www.googleapis.com/auth/analytics.readonly')
 
-  def initialize(hub, start_date, end_date)
-    @profile_id = Settings.google_analytics.profile_id
-    @hub = hub
+  PROFILE_ID = Settings.google_analytics.profile_id
+
+  def initialize(start_date, end_date)
     @start_date = start_date
     @end_date = end_date
     @analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
@@ -18,6 +18,7 @@ class GaResponseBuilder
 
   ##
   # @return [String]
+  #
   def token
     # By default, the access token will expire after 1 hour.
     if(@@authorizer.access_token.nil? or @@authorizer.expired?)
@@ -27,35 +28,41 @@ class GaResponseBuilder
   end
 
   ##
+  # @param [String] Hub name
   # @return [Hash]
-  def overall_metrics
+  #
+  def hub_overall_use_totals(hub)
     metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
     dimensions = %w()
-    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
+    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
-    r = result(metrics, dimensions, filters)
-
-    # Create human-readable key-value pairs
-    # Example: change "ga:totalEvents" to "Total Events"
-    r.totals_for_all_results.map do |key, value| 
-      [key.split(':')[1].underscore.humanize.titleize, value]
-    end.to_h
+    begin
+      response(metrics, dimensions, filters).totals_for_all_results
+    rescue
+      # TODO: Log error
+      Hash.new
+    end
   end
 
   ##
+  # @param [String] Hub name
   # @return [Hash]
-  def event_metrics
+  #
+  def hub_event_totals(hub)
     metrics = %w(ga:totalEvents)
     dimensions = %w(ga:eventCategory)
-    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
+    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
-    r = result(metrics, dimensions, filters)
-
-    # Create human-readable key-value pairs
-    # Example: change "Click Through : ArtStor" to "Click Through"
-    r.rows.collect{ |row| 
-      [row[0].split(' : ')[0], row[1]]
-    }.to_h
+    begin
+      response(metrics, dimensions, filters).rows.collect{ |row| 
+        # Create human-readable key-value pairs
+        # Example: change "Click Through : ArtStor" to "Click Through"
+        [row[0].split(' : ')[0], row[1]]
+      }.to_h
+    rescue
+      # TODO: Log error message
+      Hash.new
+    end
   end
 
   ##
@@ -71,9 +78,10 @@ class GaResponseBuilder
   # @raise [Google::Apis::ClientError] The request is invalid and should not be retried without modification
   # @raise [Google::Apis::AuthorizationError] Authorization is required
   #
-  # TODO: handle failed request
-  def result(metrics, dimensions, filters)
-    @analytics.get_ga_data(@profile_id,
+  # TODO: Retry failed request if appropriate?
+  #
+  def response(metrics, dimensions, filters)
+    @analytics.get_ga_data(PROFILE_ID,
                            @start_date,
                            @end_date,
                            metrics.join(','), #comma = "or"

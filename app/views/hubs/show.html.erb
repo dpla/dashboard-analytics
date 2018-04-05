@@ -2,26 +2,27 @@
   <%= javascript_include_tag 'google-analytics', 'data-turbolinks-track': 'reload', defer: 'defer' %>
 <% end %>
 
-<h1><%= @hub %></h1>
+<h1><%= @hub.name %></h1>
 
-<h2>Overall</h2>
+<h2>Use Metrics</h2>
+
 <ul>
-<% @ga.overall_metrics.each do |key, value| %>
-  <li><%= key %> : <%= value %></li>
-<% end %>
+  <li>Total events: <%= @hub.total_events %></li>
+  <ul>
+    <li>View item: <%= @hub.total_item_events %></li>
+    <li>View exhibition item: <%= @hub.total_exhibit_events %></li>
+    <li>View primary source: <%= @hub.total_pss_events %></li>
+    <li>Click through: <%= @hub.total_click_throughs %></li>
+  </ul>
+  <li>Unique events: <%= @hub.unique_events %></li>
+  <li>Sessions: <%= @hub.sessions %></li>
+  <li>Users: <%= @hub.users %></li>
 </ul>
 
-<h2>Events</h2>
-<ul>
-<% @ga.event_metrics.each do |key, value| %>
-  <li><%= key %> : <%= value %></li>
-<% end %>
-</ul> 
-
 <!-- Data for google analytics javascript embed api -->
-<div id="access-token" data-access-token="<%= @ga.token %>" />
+<div id="access-token" data-access-token="<%= @hub.ga_token %>" />
 <div id="profile-id" data-profile-id="<%= Settings.google_analytics.profile_id %>" />
-<div id="hub" data-hub="<%= @hub %>" />
+<div id="hub" data-hub="<%= @hub.name %>" />
 <div id="start-date" data-start-date="<%= @start_date %>" />
 <div id="end-date" data-end-date="<%= @end_date %>" />
 

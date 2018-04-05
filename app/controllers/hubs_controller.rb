@@ -2,13 +2,12 @@
 
 class HubsController < ApplicationController
   def index
-    @hubs = DplaResponseBuilder.new().hubs
+    @hubs = Hub.all
   end
 
   def show
-    @hub = params[:id]
     @start_date = "30daysAgo"
     @end_date = "yesterday"
-    @ga = GaResponseBuilder.new(@hub, @start_date, @end_date)
+    @hub = Hub.new(params[:id], @start_date, @end_date)
   end
 end
