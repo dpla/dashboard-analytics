@@ -2,15 +2,4 @@
 
 <h2>Use Metrics</h2>
 
-<ul>
-  <li>Total events: <%= @contributor.total_events %></li>
-    <ul>
-      <li>View item: <%= @contributor.total_item_events %></li>
-      <li>View exhibition item: <%= @contributor.total_exhibit_events %></li>
-      <li>View primary source: <%= @contributor.total_pss_events %></li>
-      <li>Click through: <%= @contributor.total_click_throughs %></li>
-    </ul>
-  <li>Unique events: <%= @contributor.unique_events %></li>
-  <li>Sessions: <%= @contributor.sessions %></li>
-  <li>Users: <%= @contributor.users %></li>
-</ul>
+<%= render partial: "shared/use_metrics", locals: {target: @contributor} %>

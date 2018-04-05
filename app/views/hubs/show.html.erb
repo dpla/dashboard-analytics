@@ -6,18 +6,7 @@
 
 <h2>Use Metrics</h2>
 
-<ul>
-  <li>Total events: <%= @hub.total_events %></li>
-    <ul>
-      <li>View item: <%= @hub.total_item_events %></li>
-      <li>View exhibition item: <%= @hub.total_exhibit_events %></li>
-      <li>View primary source: <%= @hub.total_pss_events %></li>
-      <li>Click through: <%= @hub.total_click_throughs %></li>
-    </ul>
-  <li>Unique events: <%= @hub.unique_events %></li>
-  <li>Sessions: <%= @hub.sessions %></li>
-  <li>Users: <%= @hub.users %></li>
-</ul>
+<%= render partial: "shared/use_metrics", locals: {target: @hub} %>
 
 <!-- Data for google analytics javascript embed api -->
 <div id="access-token" data-access-token="<%= @hub.ga_token %>" />
