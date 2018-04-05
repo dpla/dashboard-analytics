@@ -32,6 +32,10 @@
 <h2>Contributors</h2>
 <ul>
 <% @hub.contributors.each do |contributor| %>
-  <li><%= contributor %></li>
+  <li>
+    <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+      <%= contributor %>
+    </a>
+  </li>
 <% end %>
 </ul>
