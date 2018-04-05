@@ -41,44 +41,44 @@ class Hub
   end
 
   def total_events
-    overall_use_totals['ga:totalEvents']
+    overall_use_totals['ga:totalEvents'] || 0
   end
 
   def unique_events
-    overall_use_totals['ga:uniqueEvents']
+    overall_use_totals['ga:uniqueEvents'] || 0
   end
 
   def sessions
-    overall_use_totals['ga:sessions']
+    overall_use_totals['ga:sessions'] || 0
   end
 
   def users
-   overall_use_totals['ga:users']
+   overall_use_totals['ga:users'] || 0
   end
 
   def total_item_events
-    event_totals['View Item']
+    event_totals['View Item'] || 0
   end
 
   def total_exhibit_events
-    event_totals['View Exhibition Item']
+    event_totals['View Exhibition Item'] || 0
   end
 
   def total_pss_events
-    event_totals['View Primary Source']
+    event_totals['View Primary Source'] || 0
   end
 
   def total_click_throughs
-    event_totals['Click Through']
+    event_totals['Click Through'] || 0
   end
 
   private
 
   def overall_use_totals
-    @overall_use_totals ||= @ga.hub_overall_use_totals(@name)
+    @overall_use_totals ||= @ga.hub_overall_use_totals(name)
   end
 
   def event_totals
-    @event_totals ||= @ga.hub_event_totals(@name)
+    @event_totals ||= @ga.hub_event_totals(name)
   end
 end
