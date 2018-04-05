@@ -32,9 +32,12 @@ class Hub
     @ga.token
   end
 
+  ##
   # Get all the contributors that belong to this hub instance
+  #
+  # @retrun [Array<String>]
   def contributors
-    # Get all contributors for this hub
+    @@dpla_api.contributors(name).sort
   end
 
   def total_events

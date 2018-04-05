@@ -28,3 +28,10 @@
 
 <h2>User locations</h2>
 <section id="map">loading...</section>
+
+<h2>Contributors</h2>
+<ul>
+<% @hub.contributors.each do |contributor| %>
+  <li><%= contributor %></li>
+<% end %>
+</ul>

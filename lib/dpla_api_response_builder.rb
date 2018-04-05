@@ -23,8 +23,30 @@ class DplaApiResponseBuilder
     end
   end
 
+  ##
+  # @param [String]
+  # @return [Array<String>]
+  #
+  def contributors(hub)
+    # page_size=0&facets=dataProvider&provider.name=OKHub
+
+    options = { query: { :api_key => API_KEY,
+                         :facets => 'dataProvider',
+                         :page_size => 0, 
+                         :facet_size => 2000,
+                         :'provider.name' => hub } }
+
+    begin
+      json_response('/items', options)['facets']['dataProvider']['terms']
+        .map{ |f| f['term'] }
+    rescue Exception => e
+      # TODO: Log error message
+      Array.new
+    end
+  end
+
   def json_response(path, options)
-    JSON.parse(response(path, options)).to_json
+    JSON.parse(response(path, options).to_json)
   end
 
   ##
