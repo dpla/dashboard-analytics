@@ -6,5 +6,6 @@
     <% end %>
     <li><%= link_to "Change password", edit_user_registration_path %></li>
     <li><%= link_to "Log out", destroy_user_session_path, method: 'delete' %></li>
+    <li><%= current_user.email %></li>
   </ul>
 </nav>
