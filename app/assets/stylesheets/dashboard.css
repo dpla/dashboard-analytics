@@ -8,12 +8,12 @@ nav li {
   margin-right: 1em;
 }
 
-#users table, th, td {
+table, th, td {
   border: 1px solid gray;
   border-collapse: collapse;
   text-align: left;
 }
 
-#users th, td {
+th, td {
   padding: 10px;
 }

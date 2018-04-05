@@ -12,7 +12,12 @@
   </head>
 
   <body>
-    <%= render partial: "shared/navigation" %>
-    <%= yield %>
+    <header>
+      <%= render partial: "shared/navigation" %>
+    </header>
+
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>
