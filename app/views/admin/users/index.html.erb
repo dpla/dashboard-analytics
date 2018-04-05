@@ -1,20 +1,28 @@
 <h1>Users</h1>
 
+<p>
+  "Create new user"
+</p>
+
 <table>
   <tr>
     <th>Email</th>
     <th>Permissions</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th>Tasks</th>
   </tr>
   <% @users.each do |user| %>
   <tr>
     <td><%= user.email %></td>
     <td><%= "Admin" if user.admin %></td>
-    <td><%= link_to "View", admin_user_path(user.id) %></td>
-    <td></td>
-    <td></td>
+    <td>
+      <nav>
+        <ul>
+          <li><%= link_to "View", admin_user_path(user.id) %></li>
+          <li>Edit</li>
+          <li>Delete</li>
+        </ul>
+      </nav>
+    </td>
   </tr>
   <% end %>
 </table>
