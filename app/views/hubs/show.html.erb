@@ -2,22 +2,26 @@
   <%= javascript_include_tag 'google-analytics', 'data-turbolinks-track': 'reload', defer: 'defer' %>
 <% end %>
 
-<h1><%= @hub.name %></h1>
+<main id="hub">
 
-<h2>Use Metrics</h2>
+  <h1><%= @hub.name %></h1>
 
-<%= render partial: "shared/use_metrics", locals: { target: @hub } %>
+  <h2>Use Metrics</h2>
 
-<%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
-  hub: @hub.name } %>
+  <%= render partial: "shared/use_metrics", locals: { target: @hub } %>
 
-<h2>Contributors</h2>
-<ul>
-<% @hub.contributors.each do |contributor| %>
-  <li>
-    <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-      <%= contributor %>
-    </a>
-  </li>
-<% end %>
-</ul>
+  <%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
+    hub: @hub.name } %>
+
+  <h2>Contributors</h2>
+  <ul>
+  <% @hub.contributors.each do |contributor| %>
+    <li>
+      <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+        <%= contributor %>
+      </a>
+    </li>
+  <% end %>
+  </ul>
+
+</main>

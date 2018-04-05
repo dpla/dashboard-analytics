@@ -1,11 +1,15 @@
-<h1>Hubs</h1>
+<main id="hubs">
 
-<% if @hubs.present? %>
-<ul>
-<% @hubs.each do |hub| %>
-  <li><%= link_to hub, controller: :hubs, action: :show, id: hub %></li>
-<% end %>
-</ul>
-<% else %>
-  There was a problem retriving hubs from the DPLA API.
-<% end %>
+  <h1>Hubs</h1>
+
+  <% if @hubs.present? %>
+  <ul>
+  <% @hubs.each do |hub| %>
+    <li><%= link_to hub, controller: :hubs, action: :show, id: hub %></li>
+  <% end %>
+  </ul>
+  <% else %>
+    There was a problem retriving hubs from the DPLA API.
+  <% end %>
+
+</main>
