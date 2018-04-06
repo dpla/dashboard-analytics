@@ -7,13 +7,15 @@
 <table>
   <tr>
     <th>Email</th>
+    <th>Hub</th>
     <th>Permissions</th>
     <th>Tasks</th>
   </tr>
   <% @users.each do |user| %>
   <tr>
     <td><%= user.email %></td>
-    <td><%= "Admin" if user.admin %></td>
+    <td><%= user.hub %></td>
+    <td><%= user.admin ? "Admin" : "User" %></td>
     <td>
       <%= button_to "Edit", edit_admin_user_path(user), method: :get %>
       <%= button_to "Delete", admin_user_path(user), method: :delete, 

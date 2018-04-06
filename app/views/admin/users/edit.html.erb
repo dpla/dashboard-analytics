@@ -22,6 +22,11 @@
   </div>
 
   <div>
+    <%= f.label :hub %>
+    <%= f.select :hub, Hub.all.unshift("All") %>
+  </div>
+
+  <div>
     <%= f.label :admin %>
     <%= f.check_box :admin %>
   </div>
