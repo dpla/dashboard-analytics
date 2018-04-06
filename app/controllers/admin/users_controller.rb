@@ -12,13 +12,18 @@ module Admin
       if current_user.admin
         redirect_to admin_users_path
       elsif @user.email != current_user.email
+        flash[:notice] = "You don't have access to that user profile."
         redirect_to admin_user_path(current_user)
       end
     end
 
     def new
       @user = User.new
-      redirect_to admin_user_path(current_user) unless current_user.admin
+
+      unless current_user.admin
+        flash[:notice] = "You don't have permission to create a new user."
+        redirect_to admin_user_path(current_user)
+      end
     end
 
     def edit
