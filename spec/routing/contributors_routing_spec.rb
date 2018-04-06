@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "controllers routing", type: :routing do
+describe "contributors routing", type: :routing do
 
   it "routes /hubs/hname/contributors/cname to contributors#show for cname" do
     expect(get: "hubs/hname/contributors/cname").to route_to(
