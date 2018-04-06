@@ -9,11 +9,11 @@ describe "hubs routing", type: :routing do
     )
   end
 
-  it "routes /hubs/hubname to hubs#show for hubname" do
-    expect(get: "hubs/hubname").to route_to(
+  it "routes /hubs/foo to hubs#show for foo" do
+    expect(get: "hubs/foo").to route_to(
       controller: "hubs",
       action: "show",
-      id: "hubname"
+      id: "foo"
     )
   end
 end

@@ -3,11 +3,16 @@
 class HubsController < ApplicationController
   def index
     @hubs = Hub.all
+    redirect_to hub_path(current_user.hub) unless current_user.hub == "All"
   end
 
   def show
     @start_date = "30daysAgo"
     @end_date = "yesterday"
     @hub = Hub.new(params[:id], @start_date, @end_date)
+
+    unless current_user.hub == params[:id] || current_user.hub == "All"
+      redirect_to hub_path(current_user.hub)
+    end
   end
 end
