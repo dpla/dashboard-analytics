@@ -11,6 +11,10 @@
     <%= yield :head_script %>
   </head>
 
+  <header>
+    <%= render partial: "shared/header" %>
+  </header>
+
   <body>
     <p class="notice"><%= notice %></p>
     <p class="alert"><%= alert %></p>
