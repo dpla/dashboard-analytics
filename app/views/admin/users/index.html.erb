@@ -19,7 +19,8 @@
     <td>
       <%= button_to "Edit permissions", edit_admin_user_path(user), method: :get %>
       <% if user == current_user %>
-      <%= button_to "Change password", edit_user_registration_path, method: :get %>
+      <%= button_to "Change password", edit_user_registration_path(current_user),
+        method: :get %>
       <% end %>
       <%= button_to "Delete", admin_user_path(user), method: :delete, 
         data: { confirm: "Are you sure you want to delete #{user.email}?" } %>
