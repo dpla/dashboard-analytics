@@ -7,9 +7,8 @@
     <% end %>
     <% if current_user.admin? %>
     <li><%= link_to "Manage users", admin_users_path %></li>
-    <% else %>
-    <li><%= link_to "Account settings", admin_user_path(current_user) %></li>
     <% end %>
+    <li><%= link_to "My account", admin_user_path(current_user) %></li>
     <li><%= link_to "Log out", destroy_user_session_path, method: :delete %></li>
   </ul>
 </nav>

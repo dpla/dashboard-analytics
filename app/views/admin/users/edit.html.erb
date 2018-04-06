@@ -1,4 +1,4 @@
-<h1>Edit user</h1>
+<h1>Edit permissions for <%= @user.email %></h1>
 
 <%= form_for([:admin, @user]) do |f| %>
  
@@ -15,11 +15,6 @@
     </ul>
   </div>
   <% end %>
-
-  <div>
-    <%= f.label :email %>
-    <%= f.text_field :email %>
-  </div>
 
   <div>
     <%= f.label :hub %>

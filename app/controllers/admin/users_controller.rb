@@ -9,9 +9,7 @@ module Admin
     def show
       @user = User.find(params[:id])
 
-      if current_user.admin
-        redirect_to admin_users_path
-      elsif @user.email != current_user.email
+      if @user.email != current_user.email
         flash[:notice] = "You don't have access to that user profile."
         redirect_to admin_user_path(current_user)
       end

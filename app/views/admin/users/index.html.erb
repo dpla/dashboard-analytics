@@ -7,8 +7,8 @@
 <table>
   <tr>
     <th>Email</th>
-    <th>Hub</th>
-    <th>Permissions</th>
+    <th>Hub permissions</th>
+    <th>User permissions</th>
     <th>Tasks</th>
   </tr>
   <% @users.each do |user| %>
@@ -17,7 +17,10 @@
     <td><%= user.hub %></td>
     <td><%= user.admin ? "Admin" : "User" %></td>
     <td>
-      <%= button_to "Edit", edit_admin_user_path(user), method: :get %>
+      <%= button_to "Edit permissions", edit_admin_user_path(user), method: :get %>
+      <% if user == current_user %>
+      <%= button_to "Change password", edit_user_registration_path, method: :get %>
+      <% end %>
       <%= button_to "Delete", admin_user_path(user), method: :delete, 
         data: { confirm: "Are you sure you want to delete #{user.email}?" } %>
     </td>
