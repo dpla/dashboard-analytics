@@ -23,3 +23,12 @@ label {
   display: inline-block;
   margin-bottom: 10px;
 }
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-left: 0;
+  margin-bottom: 10px;
+}
