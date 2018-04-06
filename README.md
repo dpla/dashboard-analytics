@@ -20,6 +20,12 @@ Configuration:
 
 Copy `config/settings.yml.example` to `config/settings.yml` and set appropriate values.
 
+Inital user:
+
+Create an initial user account from the rails console:
+
+    User.create(email: "user@example.com", admin: true, hub: "All", password: "password", password_confimration: "password")
+
 ## Testing
 
 To run rspec tests in your console:
