@@ -1,6 +1,8 @@
 class Contributor
 
-  @@dpla_api = DplaApiResponseBuilder.new()
+  def self.dpla_api
+    @@dpla_api ||= DplaApiResponseBuilder.new()
+  end
 
   ##
   # Initialize a single hub
@@ -42,7 +44,7 @@ class Contributor
   # @retrun [Array<String>]
   #
   def contributors
-    @@dpla_api.contributors(name).sort
+    self.class.dpla_api.contributors(name).sort
   end
 
   def total_events

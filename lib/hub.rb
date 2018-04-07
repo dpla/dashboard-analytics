@@ -1,13 +1,15 @@
 class Hub
 
-  @@dpla_api = DplaApiResponseBuilder.new()
+  def self.dpla_api
+    @@dpla_api ||= DplaApiResponseBuilder.new()
+  end
 
   ##
   # Get all the hub names from the DPLA API
   # @return [Array<String>]
   #
   def self.all
-    @@dpla_api.hubs.sort
+    dpla_api.hubs.sort
   end
 
   ##
@@ -45,7 +47,7 @@ class Hub
   # @return [Array<String>]
   #
   def contributors
-    @@dpla_api.contributors(name).sort
+    self.class.dpla_api.contributors(name).sort
   end
 
   def total_events

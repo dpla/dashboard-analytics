@@ -1,16 +1,16 @@
 <nav>
   <ul>
     <% if current_user.hub == "All" %>
-    <li><%= link_to "Hubs", hubs_path %></li>
+        <li><%= link_to "Hubs", hubs_path %></li>
     <% else %>
-    <li><%= link_to "Overview", hub_path(current_user.hub) %>
-    <li><%= link_to "Contributors", hub_contributors_path(current_user.hub) %>
+        <li><%= link_to "Overview", hub_path(current_user.hub) %>
+        <li><%= link_to "Contributors", hub_contributors_path(current_user.hub) %>
     <% end %>
   </ul>
   <span class="divider">|</span>
   <ul>
     <% if current_user.admin? %>
-    <li><%= link_to "Users", admin_users_path %></li>
+        <li><%= link_to "Users", admin_users_path %></li>
     <% end %>
     <li><%= link_to "My account", admin_user_path(current_user) %></li>
     <li><%= link_to "Log out", destroy_user_session_path, method: :delete %></li>
