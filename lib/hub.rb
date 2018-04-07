@@ -1,9 +1,5 @@
 class Hub
 
-  def self.dpla_api
-    @@dpla_api ||= DplaApiResponseBuilder.new()
-  end
-
   ##
   # Get all the hub names from the DPLA API
   # @return [Array<String>]
@@ -80,6 +76,12 @@ class Hub
 
   def total_click_throughs
     event_totals['Click Through'] || 0
+  end
+
+  protected
+
+  def self.dpla_api
+    @@dpla_api ||= DplaApiResponseBuilder.new()
   end
 
   private
