@@ -1,9 +1,22 @@
-+# Service account JSON key to access a Google Analytics account.
-+# The key can be generated at https://console.developers.google.com.
-+# 
-+# The key does not have to be stored at this file path.
-+# Set the file path in config/settings.yml under google_analytics.service_account_json_key
-+#
-+# The service account JSON key should be kept private at all times.
-+#
-+# More information: https://developers.google.com/identity/protocols/OAuth2ServiceAccount
+# Service account JSON key to access a Google Analytics account.
+# The key can be generated at https://console.developers.google.com.
+# 
+# The key does not have to be stored at this file path.
+# Set the file path in config/settings.yml under google_analytics.service_account_json_key
+#
+# The service account JSON key should be kept private at all times.
+#
+# More information: https://developers.google.com/identity/protocols/OAuth2ServiceAccount
+
+{
+  "type": "service_account",
+  "project_id": "CHANGEME",
+  "private_key_id": "CHANGEME",
+  "private_key": "CHANGEME",
+  "client_email": "CHANGEME",
+  "client_id": "CHANGEME",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "CHANGEME"
+}
