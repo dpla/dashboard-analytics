@@ -2,6 +2,10 @@ language: ruby
 bundler_args: --without debug
 script:
 - bundle exec rspec
+- cp config/database.yml.example config/database.yml
+- cp config/settings.local.yml.example config/settings.yml
+- bundle exec rake db:migrate
+- bundle exec rake spec
 rvm:
 - 2.4.1
 before_install:
@@ -10,3 +14,4 @@ before_install:
 sudo: false
 services:
 - redis-server
+
