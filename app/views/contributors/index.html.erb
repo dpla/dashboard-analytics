@@ -1,11 +1,16 @@
-<h1>Contributors</h1>
+<%= render partial: "shared/sub_navigation",
+  locals: { hub: @hub.name } %>
 
-<ul>
-<% @contributors.each do |contributor| %>
-  <li>
-    <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-      <%= contributor %>
-    </a>
-  </li>
-<% end %>
-</ul>
+<main>
+  <h1>Contributors</h1>
+
+  <ul>
+  <% @contributors.each do |contributor| %>
+    <li>
+      <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+        <%= contributor %>
+      </a>
+    </li>
+  <% end %>
+  </ul>
+</main>
