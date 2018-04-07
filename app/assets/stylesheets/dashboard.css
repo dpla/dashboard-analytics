@@ -138,3 +138,11 @@ dd {
   margin-left: 0;
   margin-bottom: 10px;
 }
+
+input[type="submit"] {
+  margin-bottom: 8px;
+}
+
+table input[type="submit"] {
+  margin: 0;
+}
