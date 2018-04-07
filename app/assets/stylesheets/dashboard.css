@@ -42,26 +42,44 @@ nav {
 nav ul {
   padding: 0;
   padding-top: 18px;
+  display: inline-block;
 }
 
 nav li {
   display: inline;
   list-style: none;
-  margin-left: 1em;
+  margin-left: 14px;
+}
+
+nav ul:first-of-type a {
+  color: #dadfe0;
+  text-decoration: none;
+}
+
+nav ul:first-of-type a:visited {
+  color: #dadfe0;
+}
+
+nav ul:first-of-type a:hover {
+  color: #dadfe0;
 }
 
 nav a {
-  color: #fff;
+  color: #b6bfc3;
   text-decoration: none;
-  opacity: .85;
 }
 
 nav a:visited {
-  color: #fff;
+  color: #b6bfc3;
 }
 
 nav a:hover {
-  color: #fff;
+  color: #b6bfc3;
+}
+
+nav .divider {
+  color: #dadfe0;
+  margin-left: 14px;
 }
 
 main {

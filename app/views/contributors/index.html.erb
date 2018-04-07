@@ -1,0 +1,11 @@
+<h1>Contributors</h1>
+
+<ul>
+<% @contributors.each do |contributor| %>
+  <li>
+    <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+      <%= contributor %>
+    </a>
+  </li>
+<% end %>
+</ul>

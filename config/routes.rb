@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   end
 
   resources :hubs, only: [:index, :show] do
-    resources :contributors, only: :show  
+    resources :contributors, only: [:index, :show]  
   end
 
   root 'hubs#index'
