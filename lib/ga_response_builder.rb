@@ -28,11 +28,15 @@ class GaResponseBuilder
   # @return [String]
   #
   def token
-    # By default, the access token will expire after 1 hour.
-    if(self.class.authorizer.access_token.nil? or self.class.authorizer.expired?)
-      self.class.authorizer.fetch_access_token!
+    begin
+      # By default, the access token will expire after 1 hour.
+      if(self.class.authorizer.access_token.nil? or self.class.authorizer.expired?)
+        self.class.authorizer.fetch_access_token!
+      end
+      self.class.authorizer.access_token
+    rescue
+      String.new
     end
-    self.class.authorizer.access_token
   end
 
   ##
@@ -79,6 +83,8 @@ class GaResponseBuilder
     end
   end
 
+  private
+
   ##
   # Get result for a google analytics query.
   #
@@ -102,8 +108,6 @@ class GaResponseBuilder
                           dimensions: dimensions.join(','), #comma = "or"
                           filters: filters.join(';')) #semicolon = "and"
   end
-
-  private
 
   def analytics
     @analytics ||= Google::Apis::AnalyticsV3::AnalyticsService.new
