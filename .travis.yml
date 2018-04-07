@@ -1,6 +1,10 @@
 language: ruby
 bundler_args: --without debug
 script:
+- cp config/database.yml.example config/database.yml
+- cp config/settings.yml.example config/settings.yml
+- cp config/google-analytics-key.json.example config/google-analytics-key.json
+- bundle exec rake db:migrate
 - bundle exec rspec
 rvm:
 - 2.4.1
@@ -10,3 +14,4 @@ before_install:
 sudo: false
 services:
 - redis-server
+

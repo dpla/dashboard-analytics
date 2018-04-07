@@ -26,6 +26,7 @@
 
 /config/settings.yml
 /config/google-analytics-key.json
+/config/database.yml
 
 .vagrant
 /coverage
