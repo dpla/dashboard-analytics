@@ -4,13 +4,11 @@ class DplaApiResponseBuilder
   include HTTParty
   base_uri Settings.dpla_api.base_uri
 
-  API_KEY = Settings.dpla_api.key
-
   ##
   # @return [Array<String>]
   #
   def hubs
-    options = { query: { api_key: API_KEY,
+    options = { query: { api_key: api_key,
                          facets: 'provider.name',
                          page_size: 0 } }
 
@@ -28,7 +26,7 @@ class DplaApiResponseBuilder
   # @return [Array<String>]
   #
   def contributors(hub)
-    options = { query: { :api_key => API_KEY,
+    options = { query: { :api_key => api_key,
                          :facets => 'dataProvider',
                          :page_size => 0, 
                          :facet_size => 2000,
@@ -41,6 +39,12 @@ class DplaApiResponseBuilder
       # TODO: Log error message
       Array.new
     end
+  end
+
+  private
+
+  def api_key
+    Settings.dpla_api.key
   end
 
   def json_response(path, options)

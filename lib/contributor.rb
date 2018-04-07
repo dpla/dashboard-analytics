@@ -1,9 +1,5 @@
 class Contributor
 
-  def self.dpla_api
-    @@dpla_api ||= DplaApiResponseBuilder.new()
-  end
-
   ##
   # Initialize a single hub
   # 
@@ -77,6 +73,12 @@ class Contributor
 
   def total_click_throughs
     event_totals['Click Through'] || 0
+  end
+
+  protected
+
+  def self.dpla_api
+    @@dpla_api ||= DplaApiResponseBuilder.new()
   end
 
   private

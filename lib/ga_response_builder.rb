@@ -3,14 +3,6 @@ require 'googleauth'
 
 class GaResponseBuilder
 
-  PROFILE_ID = Settings.google_analytics.profile_id
-
-  def self.authorizer
-    @@authorizer ||= Google::Auth::ServiceAccountCredentials.make_creds(
-      json_key_io: File.open(Settings.google_analytics.service_account_json_key),
-      scope: 'https://www.googleapis.com/auth/analytics.readonly')
-  end
-
   def initialize(start_date, end_date)
     @start_date = start_date
     @end_date = end_date
@@ -84,7 +76,19 @@ class GaResponseBuilder
     end
   end
 
+  protected
+
+  def self.authorizer
+    @@authorizer ||= Google::Auth::ServiceAccountCredentials.make_creds(
+      json_key_io: File.open(Settings.google_analytics.service_account_json_key),
+      scope: 'https://www.googleapis.com/auth/analytics.readonly')
+  end
+
   private
+
+  def profile_id
+    Settings.google_analytics.profile_id
+  end
 
   ##
   # Get result for a google analytics query.
@@ -102,7 +106,7 @@ class GaResponseBuilder
   # TODO: Retry failed request if appropriate?
   #
   def response(metrics, dimensions, filters)
-    analytics.get_ga_data(PROFILE_ID,
+    analytics.get_ga_data(profile_id,
                           start_date,
                           end_date,
                           metrics.join(','), #comma = "or"
