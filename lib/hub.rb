@@ -21,15 +21,22 @@ class Hub
     @name = name
     @start_date = start_date
     @end_date = end_date
-    @ga = GaResponseBuilder.new(start_date, end_date)
   end
 
   def name
     @name
   end
 
+  def start_date
+    @start_date
+  end
+
+  def end_date
+    @end_date
+  end
+
   def ga_token
-    @ga.token
+    ga.token
   end
 
   ##
@@ -75,11 +82,15 @@ class Hub
 
   private
 
+  def ga
+    @ga ||= GaResponseBuilder.new(start_date, end_date)
+  end
+
   def overall_use_totals
-    @overall_use_totals ||= @ga.overall_use_totals(name)
+    @overall_use_totals ||= ga.overall_use_totals(name)
   end
 
   def event_totals
-    @event_totals ||= @ga.event_totals(name)
+    @event_totals ||= ga.event_totals(name)
   end
 end
