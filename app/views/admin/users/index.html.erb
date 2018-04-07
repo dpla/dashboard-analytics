@@ -1,30 +1,35 @@
-<h1>Users</h1>
+<main>
+  <h1>Users</h1>
 
-<p>
-  <%= button_to "New user", new_admin_user_path, method: :get %>
-</p>
+  <p>
+    <%= button_to "New user", new_admin_user_path, method: :get %>
+  </p>
 
-<table>
-  <tr>
-    <th>Email</th>
-    <th>Hub permissions</th>
-    <th>User permissions</th>
-    <th>Tasks</th>
-  </tr>
-  <% @users.each do |user| %>
-  <tr>
-    <td><%= user.email %></td>
-    <td><%= user.hub %></td>
-    <td><%= user.admin ? "Admin" : "User" %></td>
-    <td>
-      <%= button_to "Edit permissions", edit_admin_user_path(user), method: :get %>
-      <% if user == current_user %>
-      <%= button_to "Change password", edit_user_registration_path(current_user),
-        method: :get %>
-      <% end %>
-      <%= button_to "Delete", admin_user_path(user), method: :delete, 
-        data: { confirm: "Are you sure you want to delete #{user.email}?" } %>
-    </td>
-  </tr>
-  <% end %>
-</table>
+  <table>
+    <tr>
+      <th>Email</th>
+      <th>Hub permissions</th>
+      <th>User permissions</th>
+      <th>Tasks</th>
+    </tr>
+    <% @users.each do |user| %>
+    <tr>
+      <td><%= user.email %></td>
+      <td><%= user.hub %></td>
+      <td><%= user.admin ? "Admin" : "User" %></td>
+      <td>
+        <%= button_to "Edit permissions", edit_admin_user_path(user), 
+          method: :get %>
+
+        <% if user == current_user %>
+        <%= button_to "Change password", edit_user_registration_path(current_user),
+          method: :get %>
+        <% end %>
+        
+        <%= button_to "Delete", admin_user_path(user), method: :delete, 
+          data: { confirm: "Are you sure you want to delete #{user.email}?" } %>
+      </td>
+    </tr>
+    <% end %>
+  </table>
+</main>

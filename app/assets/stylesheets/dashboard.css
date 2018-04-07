@@ -3,7 +3,7 @@ body {
 }
 
 body, button, input, label, select, textarea {
-  font-family: -apple-system,system-ui, BlinkMacSystemFont, Segoe UI, Roboto,
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, Segoe UI, Roboto,
                Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, Helvetica,
                sans-serif
 }
@@ -39,29 +39,52 @@ nav {
   float: right;
 }
 
-nav ul {
+header nav ul {
   padding: 0;
   padding-top: 18px;
+  display: inline-block;
 }
 
 nav li {
   display: inline;
   list-style: none;
-  margin-left: 1em;
+  margin-left: 14px;
+}
+
+nav ul:first-of-type a {
+  color: #dadfe0;
+}
+
+nav ul:first-of-type a:visited {
+  color: #dadfe0;
+}
+
+nav ul:first-of-type a:hover {
+  color: #dadfe0;
 }
 
 nav a {
-  color: #fff;
-  text-decoration: none;
-  opacity: .85;
+  color: #b6bfc3;
 }
 
 nav a:visited {
-  color: #fff;
+  color: #b6bfc3;
 }
 
 nav a:hover {
-  color: #fff;
+  color: #b6bfc3;
+}
+
+nav .divider {
+  color: #dadfe0;
+  margin-left: 14px;
+}
+
+.submenu {
+  background-color: #2c7da0;
+  width: 100%;
+  overflow: auto;
+  padding: 7px 40px 10px 40px;
 }
 
 main {
@@ -70,6 +93,7 @@ main {
 
 h1 {
   margin: 10px 0;
+  clear: both;
 }
 
 h2 {
@@ -113,4 +137,12 @@ dt {
 dd {
   margin-left: 0;
   margin-bottom: 10px;
+}
+
+input[type="submit"] {
+  margin-bottom: 8px;
+}
+
+table input[type="submit"] {
+  margin: 0;
 }

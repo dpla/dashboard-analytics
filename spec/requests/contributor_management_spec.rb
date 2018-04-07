@@ -22,6 +22,11 @@ RSpec.describe "Contributor management", :type => :request do
 
   context "user not logged in" do
 
+    it "redirects index to login page" do
+      get "/hubs/foo/contributors"
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
     it "redirects show to login page" do
       get "/hubs/foo/contributors/bat"
       expect(response).to redirect_to(new_user_session_path)
@@ -32,6 +37,11 @@ RSpec.describe "Contributor management", :type => :request do
 
     before(:each) do
       sign_in admin
+    end
+
+    it "does not redirect index" do
+      get "/hubs/foo/contributors"
+      expect(response).not_to have_http_status(302)
     end
 
     it "does not redirect show" do
@@ -45,6 +55,11 @@ RSpec.describe "Contributor management", :type => :request do
       sign_in user_foo
     end
 
+    it "does not redirect index" do
+      get "/hubs/foo/contributors"
+      expect(response).not_to have_http_status(302)
+    end
+
     it "does not redirect show" do
       get "/hubs/foo/contributors/bat"
       expect(response).not_to have_http_status(302)
@@ -54,6 +69,11 @@ RSpec.describe "Contributor management", :type => :request do
   context "user with incorrect hub permission logged in" do
     before(:each) do
       sign_in user_bar
+    end
+
+    it "redirects index to show for correct user" do
+      get "/hubs/foo/contributors"
+      expect(response).to redirect_to(hub_contributors_path('bar'))
     end
 
     it "redirects to show for correct user" do

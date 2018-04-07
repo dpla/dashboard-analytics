@@ -1,23 +1,15 @@
-<% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics', 'data-turbolinks-track': 'reload', defer: 'defer' %>
-<% end %>
+<%= render partial: "shared/sub_navigation", locals: { hub: @hub.name } %>
 
-<h1><%= @hub.name %></h1>
+<main>
+  <% content_for :head_script do %>
+    <%= javascript_include_tag 'google-analytics', 
+      'data-turbolinks-track': 'reload', defer: 'defer' %>
+  <% end %>
 
-<h2>Use Metrics</h2>
+  <h1><%= @hub.name %></h1>
 
-<%= render partial: "shared/use_metrics", locals: { target: @hub } %>
+  <%= render partial: "shared/use_metrics", locals: { target: @hub } %>
 
-<%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
-  hub: @hub.name } %>
-
-<h2>Contributors</h2>
-<ul>
-<% @hub.contributors.each do |contributor| %>
-  <li>
-    <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-      <%= contributor %>
-    </a>
-  </li>
-<% end %>
-</ul>
+  <%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
+    hub: @hub.name } %>
+</main>
