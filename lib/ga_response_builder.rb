@@ -35,6 +35,7 @@ class GaResponseBuilder
       end
       self.class.authorizer.access_token
     rescue
+      # TODO: Log error
       String.new
     end
   end
