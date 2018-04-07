@@ -3,17 +3,25 @@ require 'googleauth'
 
 class GaResponseBuilder
 
-  @@authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-    json_key_io: File.open(Settings.google_analytics.service_account_json_key),
-    scope: 'https://www.googleapis.com/auth/analytics.readonly')
-
   PROFILE_ID = Settings.google_analytics.profile_id
+
+  def self.authorizer
+    @@authorizer ||= Google::Auth::ServiceAccountCredentials.make_creds(
+      json_key_io: File.open(Settings.google_analytics.service_account_json_key),
+      scope: 'https://www.googleapis.com/auth/analytics.readonly')
+  end
 
   def initialize(start_date, end_date)
     @start_date = start_date
     @end_date = end_date
-    @analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
-    @analytics.authorization = token
+  end
+
+  def start_date
+    @start_date
+  end
+
+  def end_date
+    @end_date
   end
 
   ##
@@ -21,10 +29,10 @@ class GaResponseBuilder
   #
   def token
     # By default, the access token will expire after 1 hour.
-    if(@@authorizer.access_token.nil? or @@authorizer.expired?)
-      @@authorizer.fetch_access_token!
+    if(self.class.authorizer.access_token.nil? or self.class.authorizer.expired?)
+      self.class.authorizer.fetch_access_token!
     end
-    @@authorizer.access_token
+    self.class.authorizer.access_token
   end
 
   ##
@@ -87,11 +95,19 @@ class GaResponseBuilder
   # TODO: Retry failed request if appropriate?
   #
   def response(metrics, dimensions, filters)
-    @analytics.get_ga_data(PROFILE_ID,
-                           @start_date,
-                           @end_date,
-                           metrics.join(','), #comma = "or"
-                           dimensions: dimensions.join(','), #comma = "or"
-                           filters: filters.join(';')) #semicolon = "and"
+    analytics.get_ga_data(PROFILE_ID,
+                          start_date,
+                          end_date,
+                          metrics.join(','), #comma = "or"
+                          dimensions: dimensions.join(','), #comma = "or"
+                          filters: filters.join(';')) #semicolon = "and"
+  end
+
+  private
+
+  def analytics
+    @analytics ||= Google::Apis::AnalyticsV3::AnalyticsService.new
+    @analytics.authorization = token
+    @analytics
   end
 end
