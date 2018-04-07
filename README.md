@@ -19,6 +19,9 @@ Subsequent development:
 Configuration:
 
 Copy `config/settings.yml.example` to `config/settings.yml` and set appropriate values.
+Copy `config/database.yml.example` to `config/database.yml` and set appropriate values.
+
+Get a service account key from Google Analytics.  See `config/google-analytics-key.json.example` for more information.
 
 Inital user:
 
