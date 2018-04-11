@@ -1,12 +1,12 @@
-<%# Local variables: hub [String] %>
+<%# Local variables: hub [Hub] %>
 
 <% if current_user.hub == "All" %>
 <div class="submenu">
   <nav>
     <ul>
-      <li><%= link_to hub, hub_path(hub) %></li>
-      <% if Hub.new(hub, "", "").contributors.count > 1 %>
-        <li><%= link_to "Contributors", hub_contributors_path(hub) %></li>
+      <li><%= link_to hub.name, hub_path(hub.name) %></li>
+      <% if hub.contributors.count > 1 %>
+        <li><%= link_to "Contributors", hub_contributors_path(hub.name) %></li>
       <% end %>
     </ul>
   </nav>
