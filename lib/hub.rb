@@ -43,7 +43,8 @@ class Hub
   # @return [Array<String>]
   #
   def contributors
-    self.class.dpla_api.contributors(name).sort
+    @contributors ||= self.class.dpla_api.contributors(name).sort
+    @contributors
   end
 
   def total_events
