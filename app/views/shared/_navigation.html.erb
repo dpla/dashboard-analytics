@@ -4,7 +4,8 @@
         <li><%= link_to "Hubs", hubs_path %></li>
     <% else %>
         <li><%= link_to "Overview", hub_path(current_user.hub) %>
-        <% if Hub.new(current_user.hub, "", "").contributors.count > 1 %>
+        <% @hub ||= Hub.new(current_user.hub, "", "") %>
+        <% if @hub.contributors.count > 1 %>
           <li><%= link_to "Contributors", hub_contributors_path(current_user.hub) %>
         <% end %>
     <% end %>

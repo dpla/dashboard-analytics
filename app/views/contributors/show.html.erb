@@ -12,5 +12,5 @@
   <%= render partial: "shared/use_metrics", locals: { target: @contributor } %>
 
   <%= render partial: "shared/map", locals: { ga_token: @contributor.ga_token,
-    hub: @contributor.hub, contributor: @contributor.name } %>
+    hub: @contributor.hub.name, contributor: @contributor.name } %>
 </main>

@@ -1,15 +1,16 @@
 class Contributor
 
   ##
-  # Initialize a single hub
+  # Initialize a single contributor
   # 
   # @param name [String]
+  # @param hub_name [String]
   # @param start_date [String]
   # @param end_date [String]
   #
-  def initialize(name, hub, start_date, end_date)
+  def initialize(name, hub_name, start_date, end_date)
     @name = name
-    @hub = hub
+    @hub = Hub.new(hub_name, start_date, end_date)
     @start_date = start_date
     @end_date = end_date
   end
@@ -88,10 +89,10 @@ class Contributor
   end
 
   def overall_use_totals
-    @overall_use_totals ||= ga.overall_use_totals(hub, name)
+    @overall_use_totals ||= ga.overall_use_totals(hub.name, name)
   end
 
   def event_totals
-    @event_totals ||= ga.event_totals(hub, name)
+    @event_totals ||= ga.event_totals(hub.name, name)
   end
 end
