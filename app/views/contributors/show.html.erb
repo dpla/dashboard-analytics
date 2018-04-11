@@ -1,5 +1,5 @@
 <%= render partial: "shared/sub_navigation",
-  locals: { hub: @contributor.hub } %>
+  locals: { hub: @contributor.hub.name } %>
 
 <main>
   <% content_for :head_script do %>
@@ -12,5 +12,5 @@
   <%= render partial: "shared/use_metrics", locals: { target: @contributor } %>
 
   <%= render partial: "shared/map", locals: { ga_token: @contributor.ga_token,
-    hub: @contributor.hub, contributor: @contributor.name } %>
+    hub: @contributor.hub.name, contributor: @contributor.name } %>
 </main>
