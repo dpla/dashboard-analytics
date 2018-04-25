@@ -40,10 +40,29 @@
         }
 
         return filters.join(';');
-      }
+      };
 
+      var usMap = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:region',
+          'metrics': 'ga:users',
+          'filters': mapFilters(),
+          'start-date': startDate,
+          'end-date': endDate,
+        },
+        chart: {
+          type: 'GEO',
+          container: 'us-map',
+          options: {
+            region: 'US',
+            resolution: 'provinces'
+          }
+        }
+      });
 
-      var map = new gapi.analytics.googleCharts.DataChart({
+      var worldMap = new gapi.analytics.googleCharts.DataChart({
         reportType: 'ga',
         query: {
           'ids': profileId,
@@ -55,7 +74,7 @@
         },
         chart: {
           type: 'GEO',
-          container: 'map'
+          container: 'world-map'
         }
       });
       
@@ -63,7 +82,8 @@
       // If the request fails, visualizations will not render.
 
       if (gapi.analytics.auth.isAuthorized()) {
-        map.execute();
+        usMap.execute();
+        worldMap.execute();
       }
     });
   });
