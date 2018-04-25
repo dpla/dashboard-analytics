@@ -98,6 +98,7 @@ h1 {
 
 h2 {
   margin: 10px 0;
+  color: #2c7da0;
 }
 
 a {
@@ -122,6 +123,32 @@ table, th, td {
 
 th, td {
   padding: 10px;
+}
+
+.metrics {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.metrics:first-of-type {
+  margin-right: 50px;
+}
+
+.metrics table, .metrics th, .metrics td {
+  border: none;
+  color: #515354;
+}
+
+.metrics table, .metrics th, .metrics td {
+  padding: 4px 0;
+}
+
+.metrics td:first-child {
+  padding-right: 20px;
+}
+
+.metrics td:last-child {
+  text-align: right;
 }
 
 label {

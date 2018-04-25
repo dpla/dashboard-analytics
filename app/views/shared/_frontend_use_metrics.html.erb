@@ -1,16 +1,33 @@
 <%# Local variables: target [Hub|Contributor] %>
+<div class="metrics">
 
-<h2>Website use</h2>
+  <h2>Website use</h2>
 
-<ul>
-  <li>Total events: <%= target.total_frontend_events %></li>
-    <ul>
-      <li>View item: <%= target.total_item_events %></li>
-      <li>View exhibition item: <%= target.total_exhibit_events %></li>
-      <li>View primary source: <%= target.total_pss_events %></li>
-      <li>Click through: <%= target.total_click_throughs %></li>
-    </ul>
-  <li>Unique events: <%= target.unique_frontend_events %></li>
-  <li>Sessions: <%= target.frontend_sessions %></li>
-  <li>Users: <%= target.frontend_users %></li>
-</ul>
+  <table class>
+    <tr>
+      <td>View item metadata page</td>
+      <td><%= target.total_item_events %></td>
+    </tr>
+    <tr>
+      <td>View item in exhibition</td>
+      <td><%= target.total_exhibit_events %></td>
+    </tr>
+    <tr>
+      <td>View item in primary source set</td>
+      <td><%= target.total_pss_events %></td>
+    </tr>
+    <tr>
+      <td>Click through to provider website</td>
+      <td><%= target.total_click_throughs %></td>
+    </tr>
+    <tr>
+      <td>Users</td>
+      <td><%= target.frontend_users %></td>
+    </tr>
+    <tr>
+      <td>Sessions</td>
+      <td><%= target.frontend_sessions %></td>
+    </tr>
+  </table>
+
+</div>
