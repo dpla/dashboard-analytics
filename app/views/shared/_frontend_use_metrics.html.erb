@@ -1,16 +1,16 @@
 <%# Local variables: target [Hub|Contributor] %>
 
-<h2>Use Metrics</h2>
+<h2>Website use</h2>
 
 <ul>
-  <li>Total events: <%= target.total_events %></li>
+  <li>Total events: <%= target.total_frontend_events %></li>
     <ul>
       <li>View item: <%= target.total_item_events %></li>
       <li>View exhibition item: <%= target.total_exhibit_events %></li>
       <li>View primary source: <%= target.total_pss_events %></li>
       <li>Click through: <%= target.total_click_throughs %></li>
     </ul>
-  <li>Unique events: <%= target.unique_events %></li>
-  <li>Sessions: <%= target.sessions %></li>
-  <li>Users: <%= target.users %></li>
+  <li>Unique events: <%= target.unique_frontend_events %></li>
+  <li>Sessions: <%= target.frontend_sessions %></li>
+  <li>Users: <%= target.frontend_users %></li>
 </ul>

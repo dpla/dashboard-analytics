@@ -9,7 +9,9 @@
 
   <h1><%= @contributor.name %></h1>
 
-  <%= render partial: "shared/use_metrics", locals: { target: @contributor } %>
+  <%= render partial: "shared/frontend_use_metrics", locals: { target: @contributor } %>
+
+  <%= render partial: "shared/api_use_metrics", locals: { target: @contributor } %>
 
   <%= render partial: "shared/map", locals: { ga_token: @contributor.ga_token,
     hub: @contributor.hub.name, contributor: @contributor.name } %>

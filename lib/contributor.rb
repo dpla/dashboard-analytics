@@ -32,7 +32,7 @@ class Contributor
   end
 
   def ga_token
-    @ga.token
+    @frontend_ga.token
   end
 
   ##
@@ -44,36 +44,44 @@ class Contributor
     self.class.dpla_api.contributors(name).sort
   end
 
-  def total_events
-    overall_use_totals['ga:totalEvents'] || 0
+  def total_frontend_events
+    frontend_use_totals['ga:totalEvents'] || 0
   end
 
-  def unique_events
-    overall_use_totals['ga:uniqueEvents'] || 0
+  def unique_frontend_events
+    frontend_use_totals['ga:uniqueEvents'] || 0
   end
 
-  def sessions
-    overall_use_totals['ga:sessions'] || 0
+  def frontend_sessions
+    frontend_use_totals['ga:sessions'] || 0
   end
 
-  def users
-   overall_use_totals['ga:users'] || 0
+  def frontend_users
+   frontend_use_totals['ga:users'] || 0
   end
 
   def total_item_events
-    event_totals['View Item'] || 0
+    frontend_event_totals['View Item'] || 0
   end
 
   def total_exhibit_events
-    event_totals['View Exhibition Item'] || 0
+    frontend_event_totals['View Exhibition Item'] || 0
   end
 
   def total_pss_events
-    event_totals['View Primary Source'] || 0
+    frontend_event_totals['View Primary Source'] || 0
   end
 
   def total_click_throughs
-    event_totals['Click Through'] || 0
+    frontend_event_totals['Click Through'] || 0
+  end
+
+  def total_api_events
+    api_use_totals['ga:totalEvents'] || 0
+  end
+
+  def api_users
+    api_use_totals['ga:users'] || 0
   end
 
   protected
@@ -84,15 +92,23 @@ class Contributor
 
   private
 
-  def ga
-    @ga ||= GaResponseBuilder.new(start_date, end_date)
+  def frontend_ga
+    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
   end
 
-  def overall_use_totals
-    @overall_use_totals ||= ga.overall_use_totals(hub.name, name)
+  def api_ga
+    @api_ga ||= ApiAnalytics.new(start_date, end_date)
   end
 
-  def event_totals
-    @event_totals ||= ga.event_totals(hub.name, name)
+  def frontend_use_totals
+    @frontend_use_totals ||= frontend_ga.overall_use_totals(hub.name, name)
+  end
+
+  def frontend_event_totals
+    @frontend_event_totals ||= frontend_ga.event_totals(hub.name, name)
+  end
+
+  def api_use_totals
+    @api_use_totals ||= api_ga.overall_use_totals(hub.name, name)
   end
 end
