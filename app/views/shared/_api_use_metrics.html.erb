@@ -1,8 +1,18 @@
 <%# Local variables: target [Hub|Contributor] %>
 
-<h2>API Use</h2>
+<div class="metrics">
 
-<ul>
-  <li>View item metadata: <%= target.total_api_events %></li>
-  <li>Registered users or apps: <%= target.api_users %></li>
-</ul>
+  <h2>API use</h2>
+
+  <table class>
+    <tr>
+      <td>View item metadata</td>
+      <td><%= target.total_api_events %></td>
+    </tr>
+    <tr>
+      <td>Registered users or apps</td>
+      <td><%= target.api_users %></td>
+    </tr>
+  </table>
+
+</div>
