@@ -173,3 +173,8 @@ input[type="submit"] {
 table input[type="submit"] {
   margin: 0;
 }
+
+#us-map, #world-map {
+  display: inline-block;
+  width: 500px;
+}
