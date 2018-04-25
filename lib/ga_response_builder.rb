@@ -1,6 +1,7 @@
 require 'google/apis/analytics_v3'
 require 'googleauth'
 
+## Superclass
 class GaResponseBuilder
 
   def initialize(start_date, end_date)
@@ -32,62 +33,18 @@ class GaResponseBuilder
     end
   end
 
-  ##
-  # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash]
-  #
-  def overall_use_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
-    dimensions = %w()
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    begin
-      response(metrics, dimensions, filters).totals_for_all_results
-    rescue
-      # TODO: Log error
-      Hash.new
-    end
-  end
-
-  ##
-  # @param [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash]
-  #
-  def event_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventCategory)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    begin
-      response(metrics, dimensions, filters).rows.collect{ |row| 
-        # Create human-readable key-value pairs
-        # Example: change "Click Through : ArtStor" to "Click Through"
-        [row[0].split(' : ')[0], row[1]]
-      }.to_h
-    rescue
-      # TODO: Log error message
-      Hash.new
-    end
-  end
-
   protected
+
+  ##
+  # Abstract method - must be implemented in subclasses.
+  def profile_id
+    raise NotImplementedError
+  end
 
   def self.authorizer
     @@authorizer ||= Google::Auth::ServiceAccountCredentials.make_creds(
       json_key_io: File.open(Settings.google_analytics.service_account_json_key),
       scope: 'https://www.googleapis.com/auth/analytics.readonly')
-  end
-
-  private
-
-  def profile_id
-    Settings.google_analytics.profile_id
   end
 
   ##

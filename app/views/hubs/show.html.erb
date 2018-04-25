@@ -8,7 +8,9 @@
 
   <h1><%= @hub.name %></h1>
 
-  <%= render partial: "shared/use_metrics", locals: { target: @hub } %>
+  <%= render partial: "shared/frontend_use_metrics", locals: { target: @hub } %>
+
+  <%= render partial: "shared/api_use_metrics", locals: { target: @hub } %>
 
   <%= render partial: "shared/map", locals: { ga_token: @hub.ga_token, 
     hub: @hub.name } %>
