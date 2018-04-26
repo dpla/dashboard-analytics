@@ -7,8 +7,8 @@ class HubsController < ApplicationController
   end
 
   def show
-    @start_date = "30daysAgo"
-    @end_date = "yesterday"
+    @start_date = Date.today.last_month.beginning_of_month.iso8601
+    @end_date = Date.today.last_month.end_of_month.iso8601
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
     unless current_user.hub == params[:id] || current_user.hub == "All"
