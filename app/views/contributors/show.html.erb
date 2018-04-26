@@ -9,6 +9,8 @@
 
   <h1><%= @contributor.name %></h1>
 
+  <%= render partial: "shared/date_menu" %>
+
   <%= render partial: "shared/frontend_use_metrics", locals: { target: @contributor } %>
 
   <%= render partial: "shared/api_use_metrics", locals: { target: @contributor } %>

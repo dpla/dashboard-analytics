@@ -8,6 +8,8 @@
 
   <h1><%= @hub.name %></h1>
 
+  <%= render partial: "shared/date_menu" %>
+
   <%= render partial: "shared/frontend_use_metrics", locals: { target: @hub } %>
 
   <%= render partial: "shared/api_use_metrics", locals: { target: @hub } %>
