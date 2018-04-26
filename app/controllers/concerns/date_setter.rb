@@ -6,7 +6,8 @@ module DateSetter
   end
 
   def max_date
-    Date.today.last_month.end_of_month
+    # For last month: Date.today.last_month.end_of_month
+    Date.today
   end
 
   def start_date(params)
@@ -16,7 +17,8 @@ module DateSetter
       raise ArgumentError if starting < min_date
       starting
     rescue
-      Date.today.last_month.beginning_of_month
+      # For last month: Date.today.last_month.beginning_of_month
+      Date.today.beginning_of_month
     end
   end
 
@@ -27,7 +29,8 @@ module DateSetter
       raise ArugumentError if ending > max_date
       ending
     rescue
-      Date.today.last_month.end_of_month
+      # For last month: Date.today.last_month.end_of_month
+      Date.today
     end
   end
 end
