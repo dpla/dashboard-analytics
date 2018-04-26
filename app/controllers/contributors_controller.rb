@@ -14,7 +14,7 @@ class ContributorsController < ApplicationController
   end
 
   def show
-    @start_date = get_start_date(params)
+    @start_date = get_start_date(params[:month], params[:year])
     @end_date = get_end_date(@start_date)
     @contributor = Contributor.new(params[:id],
                                    params[:hub_id],

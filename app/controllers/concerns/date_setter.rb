@@ -14,9 +14,10 @@ module DateSetter
   # Get the first day of a given month and year.
   # If month and day are missing or invalid, return first day of current month.
   #
-  # @param Hash
+  # @param month String | Int
+  # @param year String | Int
   # @return Date
-  def get_start_date(params)
+  def get_start_date(month, year)
     begin
       # will raise exception if params are missing or invalid
       start_date = Date.new(params[:year].to_i, params[:month].to_i)
