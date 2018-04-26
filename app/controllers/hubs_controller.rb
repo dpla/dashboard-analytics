@@ -9,8 +9,8 @@ class HubsController < ApplicationController
   end
 
   def show
-    @start_date = start_date(params).iso8601
-    @end_date = end_date(params).iso8601
+    @start_date = get_start_date(params)
+    @end_date = get_end_date(@start_date)
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
     unless current_user.hub == params[:id] || current_user.hub == "All"

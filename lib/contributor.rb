@@ -24,11 +24,11 @@ class Contributor
   end
 
   def start_date
-    @start_date
+    @start_date.iso8601
   end
 
   def end_date
-    @end_date
+    @end_date.iso8601
   end
 
   def ga_token
