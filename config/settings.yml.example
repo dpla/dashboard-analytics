@@ -11,3 +11,8 @@ google_analytics:
 dpla_api:
   base_uri: api.dp.la/v2/
   key: CHANGEME
+
+# Minimum date for which usage data is available
+min_date:
+  month: 01
+  year: 2018

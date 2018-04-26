@@ -2,7 +2,7 @@ module DateSetter
   extend ActiveSupport::Concern
 
   def min_date
-    Date.new(2018, 01)
+    Date.new(Settings.min_date.year, Settings.min_date.month)
   end
 
   def max_date
