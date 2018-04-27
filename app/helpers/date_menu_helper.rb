@@ -2,7 +2,7 @@ module DateMenuHelper
   def date_form_options
     available_dates.map do |date|
       label = "#{Date::ABBR_MONTHNAMES[date.month]} #{date.year}"
-      value = date.month
+      value = date.strftime("%Y-%m") # YYYY-MM
       [label, value]
     end
   end
@@ -22,6 +22,6 @@ module DateMenuHelper
 
   def selected_date
     return unless @start_date
-    @start_date.month
+    @start_date.strftime("%Y-%m") # YYYY-MM
   end
 end

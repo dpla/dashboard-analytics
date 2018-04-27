@@ -17,10 +17,10 @@ module DateSetter
   # @param month String | Int
   # @param year String | Int
   # @return Date
-  def get_start_date(month, year)
+  def get_start_date(year, month)
     begin
       # will raise exception if params are missing or invalid
-      start_date = Date.new(params[:year].to_i, params[:month].to_i)
+      start_date = Date.new(year.to_i, month.to_i)
       raise ArgumentError if start_date < min_date
       raise ArgumentError if start_date > max_date
       start_date

@@ -1,18 +1,6 @@
-<select>
-  <% available_dates.each do |date| %>
-  <option <%= "selected=selected" if date==@start_date %> value="test">
-    <%= Date::ABBR_MONTHNAMES[date.month] %> <%= date.year %>
-  </option>
-  <% end %>
-</select>
-
-<br/><br/>
-
 <%= form_tag(request.path, method: :get) do %>
   <%= label_tag(:date, 'Month:') %>
   <%= select_tag(:date, options_for_select(date_form_options, selected_date)) %>
 
   <%= submit_tag 'Refresh' %>
 <% end %>
-
-<br/>
