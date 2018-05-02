@@ -51,7 +51,7 @@ class FrontendAnalytics < GaResponseBuilder
   def overall_use_by_contributor(hub)
     metrics = %w(ga:sessions ga:users)
     dimensions = %w(ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub})
+    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
     begin
       res = response(metrics, dimensions, filters)
