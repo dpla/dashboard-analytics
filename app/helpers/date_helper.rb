@@ -1,4 +1,4 @@
-module DateMenuHelper
+module DateHelper
   def date_form_options
     available_dates.map do |date|
       label = "#{Date::ABBR_MONTHNAMES[date.month]} #{date.year}"

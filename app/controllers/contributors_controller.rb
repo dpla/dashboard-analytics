@@ -2,7 +2,7 @@
 
 class ContributorsController < ApplicationController
   include DateSetter
-  include DateMenuHelper
+  include DateHelper
 
   def index
     @start_date = "30daysAgo"

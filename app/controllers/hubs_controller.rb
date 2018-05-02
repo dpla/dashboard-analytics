@@ -2,7 +2,7 @@
 
 class HubsController < ApplicationController
   include DateSetter
-  include DateMenuHelper
+  include DateHelper
 
   def index
     @hubs = Hub.all
