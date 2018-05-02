@@ -1,8 +1,12 @@
+##
+# The service account must have read permissions for the views.
+# Segments must be shared.
 google_analytics:
   # File path to the service account JSON key.
   service_account_json_key: <%= File.join Rails.root, 'config', 'google-analytics-key.json' %>
   frontend_profile_id: ga:XXXXXXXX
   api_profile_id: ga:XXXXXXXX
+  api_segment: gaid::XXX
 
 dpla_api:
   base_uri: api.dp.la/v2/

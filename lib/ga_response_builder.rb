@@ -41,6 +41,11 @@ class GaResponseBuilder
     raise NotImplementedError
   end
 
+  ##
+  # Can be overwritten in subclass.
+  def segment
+  end
+
   def self.authorizer
     @@authorizer ||= Google::Auth::ServiceAccountCredentials.make_creds(
       json_key_io: File.open(Settings.google_analytics.service_account_json_key),
@@ -68,7 +73,8 @@ class GaResponseBuilder
                           end_date,
                           metrics.join(','), #comma = "or"
                           dimensions: dimensions.join(','), #comma = "or"
-                          filters: filters.join(';')) #semicolon = "and"
+                          filters: filters.join(';'), #semicolon = "and"
+                          segment: segment) 
   end
 
   def analytics

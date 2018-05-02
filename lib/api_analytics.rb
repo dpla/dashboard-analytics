@@ -12,8 +12,6 @@ class ApiAnalytics < GaResponseBuilder
 
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
-    # TODO: Filter out use from internal API keys
-
     begin
       response(metrics, dimensions, filters).totals_for_all_results
     rescue
@@ -23,6 +21,10 @@ class ApiAnalytics < GaResponseBuilder
   end
 
   protected
+
+  def segment
+    Settings.google_analytics.api_segment
+  end
 
   def profile_id
     Settings.google_analytics.api_profile_id
