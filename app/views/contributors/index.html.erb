@@ -4,13 +4,16 @@
 <main>
   <h1>Contributors</h1>
 
-  <ul>
-  <% @hub.contributors.each do |contributor| %>
-    <li>
-      <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-        <%= contributor %>
-      </a>
-    </li>
-  <% end %>
-  </ul>
+  <div class="clear">
+
+    <ul>
+    <% @hub.contributors.each do |contributor| %>
+      <li>
+        <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+          <%= contributor %>
+        </a>
+      </li>
+    <% end %>
+    </ul>
+  </div>
 </main>

@@ -1,11 +1,20 @@
 body {
   line-height: 1.25;
+  color: #515354;
 }
 
 body, button, input, label, select, textarea {
   font-family: -apple-system, system-ui, BlinkMacSystemFont, Segoe UI, Roboto,
                Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, Helvetica,
                sans-serif
+}
+
+.hidden {
+  display: none;
+}
+
+.clear {
+  clear: both;
 }
 
 header {
@@ -94,6 +103,9 @@ main {
 h1 {
   margin: 10px 0;
   clear: both;
+  color: #000;
+  display: inline-block;
+  float: left;
 }
 
 h2 {
@@ -136,7 +148,6 @@ th, td {
 
 .metrics table, .metrics th, .metrics td {
   border: none;
-  color: #515354;
 }
 
 .metrics table, .metrics th, .metrics td {
@@ -149,6 +160,16 @@ th, td {
 
 .metrics td:last-child {
   text-align: right;
+}
+
+.metrics .no-data {
+  display: table;
+}
+
+.date-select {
+  display: inline-block;
+  float: right;
+  margin: 10px 0;
 }
 
 label {

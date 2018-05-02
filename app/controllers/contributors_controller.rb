@@ -1,6 +1,8 @@
 # Handles HTTP requests for contributors
 
 class ContributorsController < ApplicationController
+  include DateSetter
+  include DateHelper
 
   def index
     @start_date = "30daysAgo"
@@ -13,8 +15,10 @@ class ContributorsController < ApplicationController
   end
 
   def show
-    @start_date = "30daysAgo"
-    @end_date = "yesterday"
+    year = params[:date].split("-").first rescue nil
+    month = params[:date].split("-").last rescue nil
+    @start_date = get_start_date(year, month)
+    @end_date = get_end_date(@start_date)
     @contributor = Contributor.new(params[:id],
                                    params[:hub_id],
                                    @start_date,

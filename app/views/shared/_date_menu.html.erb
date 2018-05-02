@@ -1,0 +1,7 @@
+<div class="date-select">
+  <%= form_tag(request.path, method: :get) do %>
+    <%= label_tag(:date, 'Month', class: 'hidden') %>
+    <%= select_tag(:date, options_for_select(date_form_options, selected_date)) %>
+    <%= submit_tag 'Refresh' %>
+  <% end %>
+</div>

@@ -4,15 +4,21 @@
 
   <h2>API use</h2>
 
-  <table class>
-    <tr>
-      <td>View item metadata</td>
-      <td><%= target.total_api_events %></td>
-    </tr>
-    <tr>
-      <td>Registered users or apps</td>
-      <td><%= target.api_users %></td>
-    </tr>
-  </table>
+  <% if api_data_for_date_range? %>
+
+    <table>
+      <tr>
+        <td>View item metadata</td>
+        <td><%= target.total_api_events %></td>
+      </tr>
+      <tr>
+        <td>Registered users or apps</td>
+        <td><%= target.api_users %></td>
+      </tr>
+    </table>
+
+  <% else %>
+      <div class="no-data">Data not available</div>
+  <% end %>
 
 </div>

@@ -8,8 +8,8 @@
 <div id="hub" data-hub="<%= hub %>" />
 <% contributor ||= "" %>
 <div id="contributor" data-contributor="<%= contributor %>" />
-<div id="start-date" data-start-date="<%= @start_date %>" />
-<div id="end-date" data-end-date="<%= @end_date %>" />
+<div id="start-date" data-start-date="<%= @start_date.iso8601 %>" />
+<div id="end-date" data-end-date="<%= @end_date.iso8601 %>" />
 
 <h2>Website user locations</h2>
 <section id="us-map">
