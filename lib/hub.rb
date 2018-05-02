@@ -48,8 +48,6 @@ class Hub
   end
 
   def contributor_totals
-    frontend_use_by_contributor
-
     data = {}
 
     contributors.map do |c|
