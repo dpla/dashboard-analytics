@@ -9,6 +9,14 @@ body, button, input, label, select, textarea {
                sans-serif
 }
 
+.hidden {
+  display: none;
+}
+
+.clear {
+  clear: both;
+}
+
 header {
   padding: 0 40px;
   background-color: #000;
@@ -96,6 +104,8 @@ h1 {
   margin: 10px 0;
   clear: both;
   color: #000;
+  display: inline-block;
+  float: left;
 }
 
 h2 {
@@ -154,6 +164,12 @@ th, td {
 
 .metrics .no-data {
   display: table;
+}
+
+.date-select {
+  display: inline-block;
+  float: right;
+  margin: 10px 0;
 }
 
 label {
