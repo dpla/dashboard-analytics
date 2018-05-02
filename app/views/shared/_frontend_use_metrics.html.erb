@@ -5,15 +5,19 @@
 
   <table class>
     <tr>
-      <td>View item metadata page</td>
+      <td>View item</td>
+      <td><%= target.total_view_events %></td>
+    </tr>
+    <tr class="subitem">
+      <td>Metadata record</td>
       <td><%= target.total_item_events %></td>
     </tr>
-    <tr>
-      <td>View item in exhibition</td>
+    <tr class="subitem">
+      <td>Exhibition</td>
       <td><%= target.total_exhibit_events %></td>
     </tr>
-    <tr>
-      <td>View item in primary source set</td>
+    <tr class="subitem">
+      <td>Primary source set</td>
       <td><%= target.total_pss_events %></td>
     </tr>
     <tr>
