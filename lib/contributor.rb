@@ -60,16 +60,20 @@ class Contributor
    frontend_use_totals['ga:users'] || 0
   end
 
+  def total_view_events
+    total_item_events + total_exhibit_events + total_pss_events
+  end
+
   def total_item_events
-    frontend_event_totals['View Item'] || 0
+    frontend_event_totals['View Item'].to_i rescue 0
   end
 
   def total_exhibit_events
-    frontend_event_totals['View Exhibition Item'] || 0
+    frontend_event_totals['View Exhibition Item'].to_i rescue 0
   end
 
   def total_pss_events
-    frontend_event_totals['View Primary Source'] || 0
+    frontend_event_totals['View Primary Source'].to_i rescue 0
   end
 
   def total_click_throughs
