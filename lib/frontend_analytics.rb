@@ -44,6 +44,33 @@ class FrontendAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # @param hub [String] Hub name
+  # @return [Array<Hash>]
+  #
+  def overall_use_by_contributor(hub)
+    metrics = %w(ga:sessions ga:users)
+    dimensions = %w(ga:eventAction)
+    filters = %W(ga:eventCategory=@#{hub})
+
+    begin
+      res = response(metrics, dimensions, filters)
+
+      # Create hash of key-value pairs
+      # e.g. [{"ga:eventAction"=>"Library", "ga:sessions"=>"8", "ga:users"=>"4"}]
+      res.rows.map do |r|
+        data = {}
+        res.column_headers.each_with_index.map do |c, i|
+          data[c.name] = r[i]
+        end
+        data
+      end
+    rescue
+      # TODO: Log error
+      Hash.new
+    end
+  end
+
   protected
 
   def profile_id

@@ -47,6 +47,15 @@ class Hub
     @contributors
   end
 
+  def contributor_totals
+    frontend_use_by_contributor.to_s
+
+    # frontend_use_by_contributor.to_h.to_s
+    # frontend_use_by_contributor.column_headers[0].name
+
+
+  end
+
   def total_frontend_events
     frontend_use_totals['ga:totalEvents'] || 0
   end
@@ -113,6 +122,10 @@ class Hub
 
   def frontend_event_totals
     @frontend_event_totals ||= frontend_ga.event_totals(name)
+  end
+
+  def frontend_use_by_contributor
+    @frontend_use_by_contributor ||= frontend_ga.overall_use_by_contributor(name)
   end
 
   def api_use_totals

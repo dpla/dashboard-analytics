@@ -35,15 +35,6 @@ class Contributor
     @frontend_ga.token
   end
 
-  ##
-  # Get all the contributors that belong to this hub instance
-  #
-  # @retrun [Array<String>]
-  #
-  def contributors
-    self.class.dpla_api.contributors(name).sort
-  end
-
   def total_frontend_events
     frontend_use_totals['ga:totalEvents'] || 0
   end
