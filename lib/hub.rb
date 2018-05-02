@@ -48,12 +48,15 @@ class Hub
   end
 
   def contributor_totals
-    frontend_use_by_contributor.to_s
+    frontend_use_by_contributor
 
-    # frontend_use_by_contributor.to_h.to_s
-    # frontend_use_by_contributor.column_headers[0].name
+    data = {}
 
+    contributors.map do |c|
+      data[c] = frontend_use_by_contributor[c] || {}
+    end
 
+    data
   end
 
   def total_frontend_events

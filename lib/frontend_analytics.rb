@@ -56,19 +56,28 @@ class FrontendAnalytics < GaResponseBuilder
     begin
       res = response(metrics, dimensions, filters)
 
-      # Create hash of key-value pairs
-      # e.g. [{"ga:eventAction"=>"Library", "ga:sessions"=>"8", "ga:users"=>"4"}]
+      # Create Array of Hashes
+      # e.g. "The Library" => { "frontend_sessions" => 4, "frontend_users" => 2 }
+      columns = res.column_headers.map { |c| c.name }
+      data = {}
+
       res.rows.map do |r|
-        data = {}
-        res.column_headers.each_with_index.map do |c, i|
-          data[c.name] = r[i]
-        end
-        data
+        contributor = r[columns.index("ga:eventAction")]
+        sessions = r[columns.index("ga:sessions")]
+        users = r[columns.index("ga:users")]
+        data[contributor] = { 'frontend_sessions' => sessions,
+                              'frontend_users' => users }
       end
+
+      data
     rescue
       # TODO: Log error
-      Hash.new
+      Array.new
     end
+  end
+
+  def events_by_contributor(hub)
+
   end
 
   protected
