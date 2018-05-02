@@ -12,7 +12,12 @@ dpla_api:
   base_uri: api.dp.la/v2/
   key: CHANGEME
 
-# Minimum date for which usage data is available
+# Minimum date for which any dashboard data is available
 min_date:
   month: 01
+  year: 2018
+
+# Minimum date for which api usage data is available
+api_min_date:
+  month: 05
   year: 2018

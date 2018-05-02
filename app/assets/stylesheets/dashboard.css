@@ -1,5 +1,6 @@
 body {
   line-height: 1.25;
+  color: #515354;
 }
 
 body, button, input, label, select, textarea {
@@ -94,6 +95,7 @@ main {
 h1 {
   margin: 10px 0;
   clear: both;
+  color: #000;
 }
 
 h2 {
@@ -136,7 +138,6 @@ th, td {
 
 .metrics table, .metrics th, .metrics td {
   border: none;
-  color: #515354;
 }
 
 .metrics table, .metrics th, .metrics td {
@@ -149,6 +150,10 @@ th, td {
 
 .metrics td:last-child {
   text-align: right;
+}
+
+.metrics .no-data {
+  display: table;
 }
 
 label {

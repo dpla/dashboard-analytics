@@ -24,4 +24,15 @@ module DateMenuHelper
     return unless @start_date
     @start_date.strftime("%Y-%m") # YYYY-MM
   end
+
+  def api_data_for_date_range?
+    api_min_date = Date.new(Settings.api_min_date.year, 
+                            Settings.api_min_date.month)
+
+    if (@start_date && @start_date >= api_min_date)
+      true
+    else 
+      false
+    end
+  end
 end
