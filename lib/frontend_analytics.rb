@@ -46,7 +46,7 @@ class FrontendAnalytics < GaResponseBuilder
 
   ##
   # @param hub [String] Hub name
-  # @return [Array<Hash>]
+  # @return [Hash]
   #
   def overall_use_by_contributor(hub)
     metrics = %w(ga:sessions ga:users)
@@ -56,8 +56,8 @@ class FrontendAnalytics < GaResponseBuilder
     begin
       res = response(metrics, dimensions, filters)
 
-      # Create Array of Hashes
-      # e.g. "The Library" => { "frontend_sessions" => 4, "frontend_users" => 2 }
+      # Create Hash of data
+      # e.g. "The Library" => { "Sessions" => 4, "Users" => 2 }
       columns = res.column_headers.map { |c| c.name }
       data = {}
 
@@ -72,13 +72,13 @@ class FrontendAnalytics < GaResponseBuilder
       data
     rescue
       # TODO: Log error
-      Array.new
+      Hash.new
     end
   end
 
   ##
   # @param hub [String] Hub name
-  # @return [Array<Hash>]
+  # @return [Hash]
   #
   def events_by_contributor(hub)
     metrics = %w(ga:totalEvents)
@@ -88,7 +88,7 @@ class FrontendAnalytics < GaResponseBuilder
     begin
       res = response(metrics, dimensions, filters)
 
-      # Create Array of Hashes
+      # Create Hash of data
       # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
       data = {}
 
@@ -106,7 +106,7 @@ class FrontendAnalytics < GaResponseBuilder
       data
     rescue
       # TODO: Log error
-      Array.new
+      Hash.new
     end
   end
 

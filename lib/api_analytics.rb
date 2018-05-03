@@ -20,6 +20,10 @@ class ApiAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # @param hub [String] Hub name
+  # @return [Hash]
+  #
   def overall_use_by_contributor(hub)
     metrics = %w(ga:totalEvents ga:users)
     dimensions = %w(ga:eventAction)
@@ -28,8 +32,8 @@ class ApiAnalytics < GaResponseBuilder
     begin
       res = response(metrics, dimensions, filters)
 
-      # Create Array of Hashes
-      # e.g. "The Library" => { "frontend_sessions" => 4, "frontend_users" => 2 }
+      # Create Hash of data
+      # e.g. { "The Library" => { "Views" => 4, "Users" => 2 } }
       columns = res.column_headers.map { |c| c.name }
       data = {}
 
