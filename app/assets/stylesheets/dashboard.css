@@ -178,7 +178,11 @@ th, td {
   margin: 10px 0;
 }
 
-label {
+.date-select label {
+  margin-right: 10px;
+}
+
+.users label {
   width: 200px;
   display: inline-block;
   margin-bottom: 10px;
