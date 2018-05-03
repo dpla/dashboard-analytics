@@ -65,8 +65,8 @@ class FrontendAnalytics < GaResponseBuilder
         contributor = r[columns.index("ga:eventAction")]
         sessions = r[columns.index("ga:sessions")]
         users = r[columns.index("ga:users")]
-        data[contributor] = { 'frontend_sessions' => sessions,
-                              'frontend_users' => users }
+        data[contributor] = { 'Sessions' => sessions,
+                              'Users' => users }
       end
 
       data
@@ -76,8 +76,38 @@ class FrontendAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # @param hub [String] Hub name
+  # @return [Array<Hash>]
+  #
   def events_by_contributor(hub)
+    metrics = %w(ga:totalEvents)
+    dimensions = %w(ga:eventCategory ga:eventAction)
+    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
+    begin
+      res = response(metrics, dimensions, filters)
+
+      # Create Array of Hashes
+      # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
+      data = {}
+
+      res.rows.map do |r|
+        event = r[0].split(" : ").first
+        contributor = r[1]
+        count = r[2].to_i rescue 0
+
+        data[contributor] ||= { "Views" => 0 }
+        # data[contributor][event] = count
+        data[contributor]["Click Throughs"] = count if event == "Click Through"
+        data[contributor]["Views"] += count if event.start_with?("View")
+      end
+
+      data
+    rescue
+      # TODO: Log error
+      Array.new
+    end
   end
 
   protected
