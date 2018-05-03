@@ -6,16 +6,27 @@
 
   <div class="clear">
 
-    <%= @hub.contributor_totals %>
+    <table>
+      <tr>
+        <th>Contributor</th>
+        <th>Website Item Views</th>
+        <th>Website Click Throughs</th>
+        <th>Website Sessions</th>
+        <th>Website Users</th>
+        <% @hub.contributor_totals.each do |contributor, totals| %>
+        <tr>
+          <td>
+            <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+              <%= contributor %>
+            </a>
+          </td>
+          <td><%= totals["Website"]["Views"] %></td>
+          <td><%= totals["Website"]["Click Throughs"] %></td>
+          <td><%= totals["Website"]["Sessions"] %></td>
+          <td><%= totals["Website"]["Users"] %></td>
+        </tr>
+        <% end %>
+    </table>
 
-    <ul>
-    <% @hub.contributors.each do |contributor| %>
-      <li>
-        <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-          <%= contributor %>
-        </a>
-      </li>
-    <% end %>
-    </ul>
   </div>
 </main>
