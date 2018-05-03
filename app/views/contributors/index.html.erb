@@ -4,16 +4,39 @@
 <main>
   <h1>Contributors</h1>
 
+  <%= render partial: "shared/date_menu" %>
+
   <div class="clear">
 
-    <ul>
-    <% @hub.contributors.each do |contributor| %>
-      <li>
-        <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-          <%= contributor %>
-        </a>
-      </li>
-    <% end %>
-    </ul>
+    <table>
+      <tr>
+        <th>Contributor</th>
+        <th>Website Views</th>
+        <th>Website Click Throughs</th>
+        <th>Website Sessions</th>
+        <th>Website Users</th>
+        <% if api_data_for_date_range? %>
+        <th>API Views</th>
+        <th>API Users/Apps</th>
+        <% end %>
+        <% @hub.contributor_totals.each do |contributor, totals| %>
+        <tr>
+          <td>
+            <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
+              <%= contributor %>
+            </a>
+          </td>
+          <td><%= totals["Website"]["Views"] %></td>
+          <td><%= totals["Website"]["Click Throughs"] %></td>
+          <td><%= totals["Website"]["Sessions"] %></td>
+          <td><%= totals["Website"]["Users"] %></td>
+          <% if api_data_for_date_range? %>
+          <td><%= totals["Api"]["Views"] %></td>
+          <td><%= totals["Api"]["Users"] %></td>
+          <% end %>
+        </tr>
+        <% end %>
+    </table>
+
   </div>
 </main>

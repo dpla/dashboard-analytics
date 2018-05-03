@@ -47,6 +47,26 @@ class Hub
     @contributors
   end
 
+  ##
+  # Get all contributors and their associated key metrics.
+  # @return [Hash]
+  # e.g. { "The Library" => { "Website" => { "Users" => 4 },
+  #                           "Api" => { "Users" => 6 } } }
+  def contributor_totals
+    data = {}
+
+    contributors.map do |c|
+      f_use = frontend_use_by_contributor[c] || {}
+      f_events = frontend_events_by_contributor[c] || {}
+      # TODO: only call API if date range applies
+      a_use = api_use_by_contributor[c] || {}
+      data[c] = { "Website" => f_use.merge(f_events),
+                  "Api" => a_use }
+    end
+
+    data
+  end
+
   def total_frontend_events
     frontend_use_totals['ga:totalEvents'] || 0
   end
@@ -115,7 +135,19 @@ class Hub
     @frontend_event_totals ||= frontend_ga.event_totals(name)
   end
 
+  def frontend_use_by_contributor
+    @frontend_use_by_contributor ||= frontend_ga.overall_use_by_contributor(name)
+  end
+
+  def frontend_events_by_contributor
+    @frontend_events_by_contributor ||= frontend_ga.events_by_contributor(name)
+  end
+
   def api_use_totals
     @api_use_totals ||= api_ga.overall_use_totals(name)
+  end
+
+  def api_use_by_contributor
+    @api_use_by_contributor ||= api_ga.overall_use_by_contributor(name)
   end
 end

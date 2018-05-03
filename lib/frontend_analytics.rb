@@ -44,6 +44,72 @@ class FrontendAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # @param hub [String] Hub name
+  # @return [Hash]
+  #
+  def overall_use_by_contributor(hub)
+    metrics = %w(ga:sessions ga:users)
+    dimensions = %w(ga:eventAction)
+    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
+
+    begin
+      res = response(metrics, dimensions, filters)
+
+      # Create Hash of data
+      # e.g. "The Library" => { "Sessions" => 4, "Users" => 2 }
+      columns = res.column_headers.map { |c| c.name }
+      data = {}
+
+      res.rows.map do |r|
+        contributor = r[columns.index("ga:eventAction")]
+        sessions = r[columns.index("ga:sessions")]
+        users = r[columns.index("ga:users")]
+        data[contributor] = { 'Sessions' => sessions,
+                              'Users' => users }
+      end
+
+      data
+    rescue
+      # TODO: Log error
+      Hash.new
+    end
+  end
+
+  ##
+  # @param hub [String] Hub name
+  # @return [Hash]
+  #
+  def events_by_contributor(hub)
+    metrics = %w(ga:totalEvents)
+    dimensions = %w(ga:eventCategory ga:eventAction)
+    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
+
+    begin
+      res = response(metrics, dimensions, filters)
+
+      # Create Hash of data
+      # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
+      data = {}
+
+      res.rows.map do |r|
+        event = r[0].split(" : ").first
+        contributor = r[1]
+        count = r[2].to_i rescue 0
+
+        data[contributor] ||= { "Views" => 0 }
+        # data[contributor][event] = count
+        data[contributor]["Click Throughs"] = count if event == "Click Through"
+        data[contributor]["Views"] += count if event.start_with?("View")
+      end
+
+      data
+    rescue
+      # TODO: Log error
+      Hash.new
+    end
+  end
+
   protected
 
   def profile_id

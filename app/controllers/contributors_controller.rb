@@ -5,8 +5,10 @@ class ContributorsController < ApplicationController
   include DateHelper
 
   def index
-    @start_date = "30daysAgo"
-    @end_date = "yesterday"
+    year = params[:date].split("-").first rescue nil
+    month = params[:date].split("-").last rescue nil
+    @start_date = get_start_date(year, month)
+    @end_date = get_end_date(@start_date)
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
