@@ -47,6 +47,11 @@ class Hub
     @contributors
   end
 
+  ##
+  # Get all contributors and their associated key metrics.
+  # @return [Hash]
+  # e.g. { "The Library" => { "Website" => { "Users" => 4 },
+  #                           "Api" => { "Users" => 6 } } }
   def contributor_totals
     data = {}
 
