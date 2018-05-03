@@ -58,6 +58,7 @@ class Hub
     contributors.map do |c|
       f_use = frontend_use_by_contributor[c] || {}
       f_events = frontend_events_by_contributor[c] || {}
+      # TODO: only call API if date range applies
       a_use = api_use_by_contributor[c] || {}
       data[c] = { "Website" => f_use.merge(f_events),
                   "Api" => a_use }
