@@ -53,7 +53,9 @@ class Hub
     contributors.map do |c|
       f_use = frontend_use_by_contributor[c] || {}
       f_events = frontend_events_by_contributor[c] || {}
-      data[c] = { "Website" => f_use.merge(f_events) }
+      a_use = api_use_by_contributor[c] || {}
+      data[c] = { "Website" => f_use.merge(f_events),
+                  "Api" => a_use }
     end
 
     data
@@ -137,5 +139,9 @@ class Hub
 
   def api_use_totals
     @api_use_totals ||= api_ga.overall_use_totals(name)
+  end
+
+  def api_use_by_contributor
+    @api_use_by_contributor ||= api_ga.overall_use_by_contributor(name)
   end
 end
