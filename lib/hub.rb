@@ -103,6 +103,10 @@ class Hub
     frontend_event_totals['Click Through'] || 0
   end
 
+  def unique_item_view_events
+    frontend_unique_item_view_events
+  end
+
   def total_api_events
     api_use_totals['ga:totalEvents'] || 0
   end
@@ -141,6 +145,11 @@ class Hub
 
   def frontend_events_by_contributor
     @frontend_events_by_contributor ||= frontend_ga.events_by_contributor(name)
+  end
+
+  def frontend_unique_item_view_events
+    @frontend_unique_item_view_events ||= 
+      frontend_ga.unique_events("View Item", name)
   end
 
   def api_use_totals

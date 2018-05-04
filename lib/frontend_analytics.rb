@@ -110,6 +110,47 @@ class FrontendAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # @param event [String] event name, e.g. "Click Through" 
+  # @param hub [String] Hub name
+  # @param contributor [String] Contributor name
+  # @return [Hash]
+  #
+  def unique_events(event, hub, contributor = nil)
+    event_category = "#{event} : #{hub}"
+
+    metrics = %w(ga:uniqueEvents)
+    dimensions = %w(ga:eventLabel ga:eventAction)
+    filters = %W(ga:eventCategory==#{event_category})
+    sort = %w(-ga:uniqueEvents) # Descending
+
+    filters.concat %W(ga:eventAction==#{contributor}) if contributor
+
+    begin
+      res = response(metrics, dimensions, filters, options={ sort: sort } )
+
+      # Create a Hash of data
+      # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
+      columns = res.column_headers.map { |c| c.name }
+      data = {}
+
+      res.rows.map do |r|
+        contributor = r[columns.index("ga:eventAction")]
+        id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
+        title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
+        count = r[columns.index("ga:uniqueEvents")]
+
+        { contributor: contributor,
+          id: id, 
+          title: title,
+          count: count }
+      end
+    rescue
+      # TODO: Handle error
+      Hash.new
+    end
+  end
+
   protected
 
   def profile_id
