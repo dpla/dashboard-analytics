@@ -1,8 +1,8 @@
 # Handles HTTP requests for hubs
 
 class HubsController < ApplicationController
-  include DateSetter
-  include DateHelper
+  include DateSetter # Controller concern
+  include DateHelper # View helper
 
   def index
     @hubs = Hub.all
@@ -10,10 +10,7 @@ class HubsController < ApplicationController
   end
 
   def show
-    year = params[:date].split("-").first rescue nil
-    month = params[:date].split("-").last rescue nil
-    @start_date = get_start_date(year, month)
-    @end_date = get_end_date(@start_date)
+    assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
     unless current_user.hub == params[:id] || current_user.hub == "All"
