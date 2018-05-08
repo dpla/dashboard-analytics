@@ -75,6 +75,26 @@ class Contributor
     api_use_totals['ga:totalEvents'] || 0
   end
 
+  def view_item_events
+    frontend_ga.individual_event_counts("View Item", hub.name, name) rescue {}
+  end
+
+  def view_exhibit_events
+    frontend_ga.individual_event_counts("View Exhibition Item", hub.name, name) rescue {}
+  end
+
+  def view_pss_events
+    frontend_ga.individual_event_counts("View Primary Source", hub.name, name) rescue {}
+  end
+
+  def click_through_events
+    frontend_ga.individual_event_counts("Click Through", hub.name, name) rescue {}
+  end
+
+  def view_api_item_events
+    api_ga.individual_event_counts(hub.name, name) rescue {}
+  end
+
   def api_users
     api_use_totals['ga:users'] || 0
   end

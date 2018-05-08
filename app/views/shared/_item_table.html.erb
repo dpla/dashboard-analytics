@@ -1,11 +1,18 @@
-<%# Local variables: items [Hash] with keys :id, :title, :contributor, :count 
-                     base_url [String] %>
+<%# Local variables: items [Hash] with keys :id, :title, :contributor, :count
+                     table_name [String]
+                     contributor [Boolean]
+                     action [String] %>
+
+<% if items %>
+<h2><%= table_name %></h2>
 
 <table>
   <tr>
     <th>Item</th>
+    <% unless contributor %>
     <th>Contributor</th>
-    <th>Total</th>
+    <% end %>
+    <th><%= action %></th>
   </tr>
   <% items.each do |e| %>
   <tr>
@@ -14,8 +21,11 @@
         <%= e[:title] %>
       </a>
     </td>
+    <% unless contributor %>
     <td><%= e[:contributor] %></td>
+    <% end %>
     <td><%= e[:count] %></td>
   </tr>
   <% end %>
 </table>
+<% end %>

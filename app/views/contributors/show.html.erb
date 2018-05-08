@@ -24,4 +24,8 @@
              locals: { ga_token: @contributor.ga_token,          
                        hub: @contributor.hub.name,
                        contributor: @contributor.name } %>
+
+  <div class = "clear" />
+
+  <%= render partial: "shared/top_ten", locals: { target: @contributor } %>
 </main>

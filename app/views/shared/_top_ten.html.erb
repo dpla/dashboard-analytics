@@ -1,30 +1,35 @@
 <%# Local variables: target [Hub|Contributor] %>
 
-<h2>Top 10 metadata records viewed on website</h2>
+<%= render partial: 'shared/item_table',
+           locals: { items: target.view_item_events[0..9],
+                     table_name: "Top metadata records viewed on website",
+                     contributor: target.is_a?(Contributor),
+                     action: "Views" } %>
 
 <%= render partial: 'shared/item_table',
-           locals: { items: target.view_item_events[1..10] } %>
-
-<h2>Top 10 exhibition items viewed on website</h2>
-
-<%= render partial: 'shared/item_table',
-           locals: { items: target.view_exhibit_events[1..10] } %>
-
-<h2>Top 10 primary source set items viewed on website</h2>
+           locals: { items: target.view_exhibit_events[0..9],
+                     table_name: "Top exhibition items viewed on website",
+                     contributor: target.is_a?(Contributor),
+                     action: "Views" } %>
 
 <%= render partial: 'shared/item_table',
-           locals: { items: target.view_pss_events[1..10] } %>
-
-<h2>Top 10 items clicked through on website</h2>
+           locals: { items: target.view_pss_events[0..9],
+                     table_name: "Top primary source set items viewed on website",
+                     contributor: target.is_a?(Contributor),
+                     action: "Views" } %>
 
 <%= render partial: 'shared/item_table',
-           locals: { items: target.click_through_events[1..10] } %>
+           locals: { items: target.click_through_events[0..9],
+                     table_name: "Top items clicked through on website",
+                     contributor: target.is_a?(Contributor),
+                     action: "Click Throughs" } %>
 
 <% if api_data_for_date_range? %>
 
-<h2>Top 10 items viewed on API</h2>
-
-<%= render partial: 'shared/item_table',
-           locals: { items: target.view_api_item_events[1..10] } %>
+  <%= render partial: 'shared/item_table',
+             locals: { items: target.view_api_item_events[0..9],
+                       table_name: "Top items viewed on API",
+                       contributor: target.is_a?(Contributor),
+                       action: "Views" } %>
 
 <% end %>
