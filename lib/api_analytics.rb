@@ -51,11 +51,10 @@ class ApiAnalytics < GaResponseBuilder
     end
   end
 
-    ##
-  # @param event [String] event name, e.g. "Click Through" 
+  ##
   # @param hub [String] Hub name
   # @param contributor [String] Contributor name
-  # @return [Hash]
+  # @return [Hash] | nil
   #
   def individual_event_counts(hub, contributor = nil)
     event_category = "View API Item : #{hub}"
@@ -73,7 +72,6 @@ class ApiAnalytics < GaResponseBuilder
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
       columns = res.column_headers.map { |c| c.name }
-      data = {}
 
       res.rows.map do |r|
         contributor = r[columns.index("ga:eventAction")]
@@ -86,6 +84,9 @@ class ApiAnalytics < GaResponseBuilder
           title: title,
           count: count }
       end
+
+      # TODO: if there are no results, this returns nil.
+      # Would be better to return an empty Hash.
     rescue
       # TODO: Handle error
       Hash.new

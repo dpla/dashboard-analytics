@@ -76,23 +76,23 @@ class Contributor
   end
 
   def view_item_events
-    frontend_ga.individual_event_counts("View Item", hub.name, name) rescue {}
+    frontend_ga.individual_event_counts("View Item", hub.name, name)
   end
 
   def view_exhibit_events
-    frontend_ga.individual_event_counts("View Exhibition Item", hub.name, name) rescue {}
+    frontend_ga.individual_event_counts("View Exhibition Item", hub.name, name)
   end
 
   def view_pss_events
-    frontend_ga.individual_event_counts("View Primary Source", hub.name, name) rescue {}
+    frontend_ga.individual_event_counts("View Primary Source", hub.name, name)
   end
 
   def click_through_events
-    frontend_ga.individual_event_counts("Click Through", hub.name, name) rescue {}
+    frontend_ga.individual_event_counts("Click Through", hub.name, name)
   end
 
   def view_api_item_events
-    api_ga.individual_event_counts(hub.name, name) rescue {}
+    api_ga.individual_event_counts(hub.name, name)
   end
 
   def api_users

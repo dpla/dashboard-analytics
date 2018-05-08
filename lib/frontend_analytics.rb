@@ -114,7 +114,7 @@ class FrontendAnalytics < GaResponseBuilder
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
   # @param contributor [String] Contributor name
-  # @return [Hash]
+  # @return [Hash] | nil
   #
   def individual_event_counts(event, hub, contributor = nil)
     event_category = "#{event} : #{hub}"
@@ -145,6 +145,9 @@ class FrontendAnalytics < GaResponseBuilder
           title: title,
           count: count }
       end
+
+      # TODO: if there are no results, this returns nil.
+      # Would be better to return an empty Hash.
     rescue
       # TODO: Handle error
       Hash.new

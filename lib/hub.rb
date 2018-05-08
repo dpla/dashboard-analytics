@@ -108,23 +108,23 @@ class Hub
   end
 
   def view_item_events
-    frontend_ga.individual_event_counts("View Item", name) rescue {}
+    frontend_ga.individual_event_counts("View Item", name)
   end
 
   def view_exhibit_events
-    frontend_ga.individual_event_counts("View Exhibition Item", name) rescue {}
+    frontend_ga.individual_event_counts("View Exhibition Item", name)
   end
 
   def view_pss_events
-    frontend_ga.individual_event_counts("View Primary Source", name) rescue {}
+    frontend_ga.individual_event_counts("View Primary Source", name)
   end
 
   def click_through_events
-    frontend_ga.individual_event_counts("Click Through", name) rescue {}
+    frontend_ga.individual_event_counts("Click Through", name)
   end
 
   def view_api_item_events
-    api_ga.individual_event_counts(name) rescue {}
+    api_ga.individual_event_counts(name)
   end
 
   def api_users
