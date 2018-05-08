@@ -208,4 +208,35 @@ table input[type="submit"] {
 #us-map, #world-map {
   display: inline-block;
   width: 500px;
+  margin-bottom: 20px;
+}
+
+.data-section {
+  clear: both;
+  margin-top: 20px 0;
+}
+
+.item-table table {
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.item-table th {
+  background-color: #2c7da0;
+  color: #fff;
+  border: none;
+}
+
+.item-table tr:nth-child(odd) {
+  background-color: #f1f3f3;
+}
+
+.item-table td {
+  border: none;
+  padding: 8px;
+}
+
+.item-table td:last-child {
+  text-align: right;
+  padding-right: 14px;
 }

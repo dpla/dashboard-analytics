@@ -4,28 +4,30 @@
                      action [String] %>
 
 <% if items %>
-<h2><%= table_name %></h2>
+<div class="item-table">
+  <h2><%= table_name %></h2>
 
-<table>
-  <tr>
-    <th>Item</th>
-    <% unless contributor %>
-    <th>Contributor</th>
+  <table>
+    <tr>
+      <th>Item</th>
+      <% unless contributor %>
+      <th>Contributor</th>
+      <% end %>
+      <th><%= action %></th>
+    </tr>
+    <% items.each do |e| %>
+    <tr>
+      <td>
+        <a href="<%= "#{Settings.dpla.base_uri}item/#{e[:id]}" %>">
+          <%= e[:title] %>
+        </a>
+      </td>
+      <% unless contributor %>
+      <td><%= e[:contributor] %></td>
+      <% end %>
+      <td><%= e[:count] %></td>
+    </tr>
     <% end %>
-    <th><%= action %></th>
-  </tr>
-  <% items.each do |e| %>
-  <tr>
-    <td>
-      <a href="<%= "#{Settings.dpla.base_uri}item/#{e[:id]}" %>">
-        <%= e[:title] %>
-      </a>
-    </td>
-    <% unless contributor %>
-    <td><%= e[:contributor] %></td>
-    <% end %>
-    <td><%= e[:count] %></td>
-  </tr>
-  <% end %>
-</table>
+  </table>
+</div>
 <% end %>

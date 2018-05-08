@@ -10,18 +10,25 @@
 
   <%= render partial: "shared/date_menu" %>
 
-  <div class="clear" />
+  <div class="data-section">
 
-  <%= render partial: "shared/frontend_use_metrics",
-             locals: { target: @hub } %>
+    <%= render partial: "shared/frontend_use_metrics",
+               locals: { target: @hub } %>
 
-  <%= render partial: "shared/api_use_metrics",
-             locals: { target: @hub } %>
+    <%= render partial: "shared/api_use_metrics",
+               locals: { target: @hub } %>
 
-  <%= render partial: "shared/map",
-             locals: { ga_token: @hub.ga_token, hub: @hub.name } %>
+  </div>
 
-  <div class = "clear" />
+  <div class="data-section">
 
-  <%= render partial: "shared/top_ten", locals: { target: @hub } %>
+    <%= render partial: "shared/map",
+               locals: { ga_token: @hub.ga_token, hub: @hub.name } %>
+  </div>
+
+  <div class = "data-section">
+
+    <%= render partial: "shared/top_ten", locals: { target: @hub } %>
+
+  </div>
 </main>
