@@ -104,19 +104,19 @@ class Hub
   end
 
   def view_item_events
-    frontend_item_view_events
+    frontend_ga.individual_event_counts("View Item", name) rescue {}
   end
 
   def view_exhibit_events
-    frontend_exhibit_view_events
+    frontend_ga.individual_event_counts("View Exhibition Item", name) rescue {}
   end
 
   def view_pss_events
-    frontend_pss_view_events
+    frontend_ga.individual_event_counts("View Primary Source", name) rescue {}
   end
 
   def click_through_events
-    frontend_click_through_events
+    frontend_ga.individual_event_counts("Click Through", name) rescue {}
   end
 
   def total_api_events
@@ -128,7 +128,7 @@ class Hub
   end
 
   def view_api_item_events
-    api_item_view_events
+    api_ga.individual_event_counts(name) rescue {}
   end
 
   protected
@@ -163,35 +163,11 @@ class Hub
     @frontend_events_by_contributor ||= frontend_ga.events_by_contributor(name)
   end
 
-  def frontend_item_view_events
-    @frontend_item_view_events ||= 
-      frontend_ga.individual_event_counts("View Item", name)
-  end
-
-  def frontend_exhibit_view_events
-    @frontend_exhibit_view_events ||=
-      frontend_ga.individual_event_counts("View Exhibition Item", name)
-  end
-
-  def frontend_pss_view_events
-    @frontend_pss_view_events ||=
-      frontend_ga.individual_event_counts("View Primary Source", name)
-  end
-
-  def frontend_click_through_events
-    @frontend_click_through_events ||=
-      frontend_ga.individual_event_counts("Click Through", name)
-  end
-
   def api_use_totals
     @api_use_totals ||= api_ga.overall_use_totals(name)
   end
 
   def api_use_by_contributor
     @api_use_by_contributor ||= api_ga.overall_use_by_contributor(name)
-  end
-
-  def api_item_view_events
-    @view_api_item_events ||= api_ga.individual_event_counts(name)
   end
 end
