@@ -103,8 +103,20 @@ class Hub
     frontend_event_totals['Click Through'] || 0
   end
 
-  def item_view_events
+  def view_item_events
     frontend_item_view_events
+  end
+
+  def view_exhibit_events
+    frontend_exhibit_view_events
+  end
+
+  def view_pss_events
+    frontend_pss_view_events
+  end
+
+  def click_through_events
+    frontend_click_through_events
   end
 
   def total_api_events
@@ -150,6 +162,21 @@ class Hub
   def frontend_item_view_events
     @frontend_item_view_events ||= 
       frontend_ga.individual_event_counts("View Item", name)
+  end
+
+  def frontend_exhibit_view_events
+    @frontend_exhibit_view_events ||=
+      frontend_ga.individual_event_counts("View Exhibition Item", name)
+  end
+
+  def frontend_pss_view_events
+    @frontend_pss_view_events ||=
+      frontend_ga.individual_event_counts("View Primary Source", name)
+  end
+
+  def frontend_click_through_events
+    @frontend_click_through_events ||=
+      frontend_ga.individual_event_counts("Click Through", name)
   end
 
   def api_use_totals
