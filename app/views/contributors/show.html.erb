@@ -11,7 +11,8 @@
 
   <%= render partial: "shared/date_menu" %>
 
-  <div class="clear">
+  <div class="data-section">
+
     <%= render partial: "shared/frontend_use_metrics",
                locals: { target: @contributor } %>
 
@@ -20,8 +21,18 @@
 
   </div>
 
-  <%= render partial: "shared/map",
-             locals: { ga_token: @contributor.ga_token,          
-                       hub: @contributor.hub.name,
-                       contributor: @contributor.name } %>
+  <div class="data-section">
+
+    <%= render partial: "shared/map",
+               locals: { ga_token: @contributor.ga_token,          
+                         hub: @contributor.hub.name,
+                         contributor: @contributor.name } %>
+
+  </div>
+
+  <div class="data-section">
+
+    <%= render partial: "shared/top_ten", locals: { target: @contributor } %>
+
+  </div>
 </main>

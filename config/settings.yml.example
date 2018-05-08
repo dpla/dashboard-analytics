@@ -9,8 +9,13 @@ google_analytics:
   api_segment: gaid::XXX
 
 dpla_api:
+  # include trailing backslash
   base_uri: api.dp.la/v2/
   key: CHANGEME
+
+dpla:
+  # include trailing backslash
+  base_uri: https://dp.la/
 
 # Minimum date for which any dashboard data is available
 min_date:
