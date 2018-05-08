@@ -10,18 +10,29 @@
 
   <%= render partial: "shared/date_menu" %>
 
-  <div class="clear">
+  <div class="clear" />
 
-    <%= @hub.unique_item_view_events %>
+  <%= render partial: "shared/frontend_use_metrics",
+             locals: { target: @hub } %>
 
-    <%= render partial: "shared/frontend_use_metrics",
-               locals: { target: @hub } %>
-
-    <%= render partial: "shared/api_use_metrics",
-               locals: { target: @hub } %>
-
-  </div>
+  <%= render partial: "shared/api_use_metrics",
+             locals: { target: @hub } %>
 
   <%= render partial: "shared/map",
              locals: { ga_token: @hub.ga_token, hub: @hub.name } %>
+
+  <div class = "clear" />
+
+  <h2>Top 10 metadata records on website</h2>
+
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Contributor</th>
+      <th>URL</th>
+      <th>Views</th>
+    </tr>
+  </table>
+
+  <%= @hub.item_view_events %>
 </main>

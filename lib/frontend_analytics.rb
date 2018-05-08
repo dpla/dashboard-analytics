@@ -116,13 +116,13 @@ class FrontendAnalytics < GaResponseBuilder
   # @param contributor [String] Contributor name
   # @return [Hash]
   #
-  def unique_events(event, hub, contributor = nil)
+  def individual_event_counts(event, hub, contributor = nil)
     event_category = "#{event} : #{hub}"
 
-    metrics = %w(ga:uniqueEvents)
+    metrics = %w(ga:totalEvents)
     dimensions = %w(ga:eventLabel ga:eventAction)
     filters = %W(ga:eventCategory==#{event_category})
-    sort = %w(-ga:uniqueEvents) # Descending
+    sort = %w(-ga:totalEvents) # Descending
 
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
@@ -138,7 +138,7 @@ class FrontendAnalytics < GaResponseBuilder
         contributor = r[columns.index("ga:eventAction")]
         id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
         title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-        count = r[columns.index("ga:uniqueEvents")]
+        count = r[columns.index("ga:totalEvents")]
 
         { contributor: contributor,
           id: id, 
