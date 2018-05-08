@@ -227,6 +227,10 @@ table input[type="submit"] {
   border: none;
 }
 
+.item-table th:last-child {
+  text-align: right;
+}
+
 .item-table tr:nth-child(odd) {
   background-color: #f1f3f3;
 }
