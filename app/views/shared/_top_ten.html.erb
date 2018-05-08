@@ -1,0 +1,7 @@
+<%# Local variables: target [Hub|Contributor] %>
+
+<h2>Top 10 metadata record views on website</h2>
+
+<%= render partial: 'shared/item_table',
+           locals: { items: target.item_view_events[1..10] } %>
+

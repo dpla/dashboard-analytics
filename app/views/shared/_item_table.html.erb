@@ -1,0 +1,20 @@
+<%# Local variables: items [Hash] with keys :id, :title, :contributor, :count %>
+
+<table>
+  <tr>
+    <th>Item</th>
+    <th>Contributor</th>
+    <th>Views</th>
+  </tr>
+  <% items.each do |e| %>
+  <tr>
+    <td>
+      <a href="<%= "#{Settings.dpla.base_uri}#{e[:id]}" %>">
+        <%= e[:title] %>
+      </a>
+    </td>
+    <td><%= e[:contributor] %></td>
+    <td><%= e[:count] %></td>
+  </tr>
+  <% end %>
+</table>

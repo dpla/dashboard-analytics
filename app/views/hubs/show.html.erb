@@ -23,22 +23,5 @@
 
   <div class = "clear" />
 
-  <h2>Top 10 metadata records on website</h2>
-
-  <table>
-    <tr>
-      <th>Title</th>
-      <th>Contributor</th>
-      <th>URL</th>
-      <th>Views</th>
-    </tr>
-    <% @hub.item_view_events[1..10].each do |e| %>
-    <tr>
-      <td><%= e[:title] %></td>
-      <td><%= e[:contributor] %></td>
-      <td><%= e[:id] %></td>
-      <td><%= e[:count] %></td>
-    </tr>
-    <% end %>
-  </table>
+  <%= render partial: "shared/top_ten", locals: { target: @hub } %>
 </main>
