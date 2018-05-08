@@ -51,6 +51,47 @@ class ApiAnalytics < GaResponseBuilder
     end
   end
 
+    ##
+  # @param event [String] event name, e.g. "Click Through" 
+  # @param hub [String] Hub name
+  # @param contributor [String] Contributor name
+  # @return [Hash]
+  #
+  def individual_event_counts(hub, contributor = nil)
+    event_category = "View API Item : #{hub}"
+
+    metrics = %w(ga:totalEvents)
+    dimensions = %w(ga:eventLabel ga:eventAction)
+    filters = %W(ga:eventCategory==#{event_category})
+    sort = %w(-ga:totalEvents) # Descending
+
+    filters.concat %W(ga:eventAction==#{contributor}) if contributor
+
+    begin
+      res = response(metrics, dimensions, filters, options={ sort: sort } )
+
+      # Create a Hash of data
+      # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
+      columns = res.column_headers.map { |c| c.name }
+      data = {}
+
+      res.rows.map do |r|
+        contributor = r[columns.index("ga:eventAction")]
+        id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
+        title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
+        count = r[columns.index("ga:totalEvents")]
+
+        { contributor: contributor,
+          id: id, 
+          title: title,
+          count: count }
+      end
+    rescue
+      # TODO: Handle error
+      Hash.new
+    end
+  end
+
   protected
 
   def segment

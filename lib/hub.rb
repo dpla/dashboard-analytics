@@ -127,6 +127,10 @@ class Hub
     api_use_totals['ga:users'] || 0
   end
 
+  def view_api_item_events
+    api_item_view_events
+  end
+
   protected
 
   def self.dpla_api
@@ -185,5 +189,9 @@ class Hub
 
   def api_use_by_contributor
     @api_use_by_contributor ||= api_ga.overall_use_by_contributor(name)
+  end
+
+  def api_item_view_events
+    @view_api_item_events ||= api_ga.individual_event_counts(name)
   end
 end

@@ -1,5 +1,7 @@
-<%# Local variables: items [Hash] with keys :id, :title, :contributor, :count %>
+<%# Local variables: items [Hash] with keys :id, :title, :contributor, :count 
+                     base_url [String] %>
 
+<% if items %>
 <table>
   <tr>
     <th>Item</th>
@@ -9,7 +11,7 @@
   <% items.each do |e| %>
   <tr>
     <td>
-      <a href="<%= "#{Settings.dpla.base_uri}#{e[:id]}" %>">
+      <a href="<%= "#{Settings.dpla.base_uri}item/#{e[:id]}" %>">
         <%= e[:title] %>
       </a>
     </td>
@@ -18,3 +20,6 @@
   </tr>
   <% end %>
 </table>
+<% else %>
+  <div>Data not available</div>
+<% end%>
