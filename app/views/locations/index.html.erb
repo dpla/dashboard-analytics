@@ -1,0 +1,29 @@
+<%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
+
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 
+    'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
+
+<main>
+
+<h1><%= @target.name %></h1>
+
+  <%= render partial: "shared/date_menu" %>
+
+  <%= render partial: "shared/data_menu", locals: { target: @target } %>
+
+  <div class="data-content">
+
+    <div class="data-section">
+
+      <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
+
+      <%= render partial: "shared/map",
+                 locals: { ga_token: @target.ga_token,          
+                           hub: @hub.name,
+                           contributor: contributor } %>
+
+    </div>
+  </div>
+</main>
