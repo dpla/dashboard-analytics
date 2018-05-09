@@ -12,8 +12,10 @@ Rails.application.routes.draw do
   resources :hubs, only: [:index, :show] do
     resources :contributors, only: [:index, :show] do
       resources :events, only: [:show]
+      resources :locations, only: [:show]
     end
     resources :events, only: [:show]
+    resources :locations, only: [:index]
   end
 
   root 'hubs#index'

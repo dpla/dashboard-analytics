@@ -4,6 +4,10 @@
   <ul>
     <% if target.is_a? Hub %>
       <li><%= link_to "Overview", hub_path(target.name) %></li>
+      <li> 
+        <%= link_to "Website user locations",
+                    hub_locations_path(target.name) %>
+      </li>
       <li>
         <%= link_to "Metadata record views",
                     hub_event_path(target.name, 'view_item') %>
@@ -26,7 +30,12 @@
       </li>
     <% elsif target.is_a? Contributor %>
       <li>
-        <%= link_to "Overview", hub_contributor_path(target.hub.name, target.name) %>
+        <%= link_to "Overview",
+                    hub_contributor_path(target.hub.name, target.name) %>
+      </li>
+      <li>
+        <%= link_to "Website user locations",
+                    hub_locations_path(target.hub.name, target.name) %>
       </li>
       <li>
         <%= link_to "View metadata record",

@@ -25,13 +25,5 @@
                  locals: { target: @contributor } %>
 
     </div>
-
-    <div class="data-section">
-
-      <%= render partial: "shared/map",
-                 locals: { ga_token: @contributor.ga_token,          
-                           hub: @contributor.hub.name,
-                           contributor: @contributor.name } %>
-    </div>
   </div>
 </main>
