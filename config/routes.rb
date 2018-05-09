@@ -13,7 +13,7 @@ Rails.application.routes.draw do
     resources :contributors, only: [:index, :show] do
       resources :events, only: [:show]
     end
-    resources :events, only: [:show]
+    resources :events, only: [:index, :show]
   end
 
   root 'hubs#index'
