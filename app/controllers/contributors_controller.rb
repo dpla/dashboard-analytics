@@ -3,6 +3,7 @@
 class ContributorsController < ApplicationController
   include DateSetter # Controller concern
   include DateHelper # View helper
+  include EventsHelper # View helper
 
   def index
     assign_start_and_end_dates

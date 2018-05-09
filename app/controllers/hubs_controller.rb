@@ -3,6 +3,7 @@
 class HubsController < ApplicationController
   include DateSetter # Controller concern
   include DateHelper # View helper
+  include EventsHelper # View helper
 
   def index
     @hubs = Hub.all
