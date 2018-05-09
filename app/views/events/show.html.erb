@@ -1,29 +1,34 @@
-<%= render partial: "shared/sub_navigation",
-  locals: { hub: @hub } %>
+<%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
+
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 
+    'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
 
 <main>
-  <% content_for :head_script do %>
-    <%= javascript_include_tag 'google-analytics', 
-      'data-turbolinks-track': 'reload', defer: 'defer' %>
-  <% end %>
 
-  <h1><%= @target.name %></h1>
+<h1><%= @target.name %></h1>
 
   <%= render partial: "shared/date_menu" %>
 
-  <div class="data-section">
+  <%= render partial: "shared/data_menu", locals: { target: @target } %>
 
-    <% if @event_id == "api_view" %>
+  <div class="data-content">
 
-      <% if api_data_for_date_range? %>
-        <%= render_event_data(@event_id, @target) %>
+    <div class="data-section">
+
+      <% if @event_id == "api_view" %>
+
+        <% if api_data_for_date_range? %>
+          <%= render_event_data(@event_id, @target) %>
+        <% else %>
+          Data is not available for this date range.
+        <% end %>
+        
       <% else %>
-        Data is not available for this date range.
+        <%= render_event_data(@event_id, @target) %>
       <% end %>
-      
-    <% else %>
-      <%= render_event_data(@event_id, @target) %>
-    <% end %>
 
+    </div>
   </div>
 </main>
