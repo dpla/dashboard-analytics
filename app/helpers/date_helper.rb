@@ -69,7 +69,7 @@ module DateHelper
   end
 
   def selected_date
-    params[:date]
+    params[:date] ? params[:date] : @start_date.strftime("%Y-%m")
   end
 
   def api_data_for_date_range?
