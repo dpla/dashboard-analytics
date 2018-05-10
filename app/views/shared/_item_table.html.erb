@@ -3,9 +3,10 @@
                      contributor [Boolean]
                      action [String] %>
 
-<% if items %>
 <div class="item-table">
   <h2><%= table_name %></h2>
+
+  <% if items && items.count > 0 %>
 
   <table>
     <tr>
@@ -29,5 +30,7 @@
     </tr>
     <% end %>
   </table>
+  <% else %>
+    No activity to report from this time period.
+  <% end %>
 </div>
-<% end %>

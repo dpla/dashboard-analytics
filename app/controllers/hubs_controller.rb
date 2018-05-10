@@ -1,8 +1,12 @@
 # Handles HTTP requests for hubs
 
 class HubsController < ApplicationController
-  include DateSetter # Controller concern
-  include DateHelper # View helper
+  # Controller concerns
+  include DateSetter
+  # View helpers
+  include DataMenuHelper
+  include DateHelper
+  include EventsHelper
 
   def index
     @hubs = Hub.all

@@ -1,12 +1,19 @@
 <%= render partial: "shared/sub_navigation",
   locals: { hub: @hub } %>
 
-<main>
-  <h1>Contributors</h1>
+<div class="heading">
+
+  <h1><%= @hub.name %></h1>
 
   <%= render partial: "shared/date_menu" %>
 
+</div>
+
+<main>
+
   <div class="clear">
+
+    <h2>Contributors</h2>
 
     <table>
       <tr>

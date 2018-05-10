@@ -1,34 +1,32 @@
 <%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
 
-<main>
-  <% content_for :head_script do %>
-    <%= javascript_include_tag 'google-analytics', 
-      'data-turbolinks-track': 'reload', defer: 'defer' %>
-  <% end %>
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 
+    'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
 
-  <h1><%= @hub.name %></h1>
+  <div class="heading">
 
-  <%= render partial: "shared/date_menu" %>
+    <h1><%= @hub.name %></h1>
 
-  <div class="data-section">
-
-    <%= render partial: "shared/frontend_use_metrics",
-               locals: { target: @hub } %>
-
-    <%= render partial: "shared/api_use_metrics",
-               locals: { target: @hub } %>
+    <%= render partial: "shared/date_menu" %>
 
   </div>
 
-  <div class="data-section">
+  <main>
 
-    <%= render partial: "shared/map",
-               locals: { ga_token: @hub.ga_token, hub: @hub.name } %>
-  </div>
+  <%= render partial: "shared/data_menu", locals: { target: @hub } %>
 
-  <div class = "data-section">
+  <div class="data-content">
 
-    <%= render partial: "shared/top_ten", locals: { target: @hub } %>
+    <div class="data-section">
 
+      <%= render partial: "shared/frontend_use_metrics",
+                 locals: { target: @hub } %>
+
+      <%= render partial: "shared/api_use_metrics",
+                 locals: { target: @hub } %>
+
+    </div>
   </div>
 </main>

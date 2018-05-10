@@ -1,0 +1,38 @@
+<%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
+
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 
+    'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
+
+<div class="heading">
+
+  <h1><%= @target.name %></h1>
+
+  <%= render partial: "shared/date_menu" %>
+
+</div>
+
+<main>
+
+  <%= render partial: "shared/data_menu", locals: { target: @target } %>
+
+  <div class="data-content">
+
+    <div class="data-section">
+
+      <% if @event_id == "api_view" %>
+
+        <% if api_data_for_date_range? %>
+          <%= render_event_data(@event_id, @target) %>
+        <% else %>
+          Data is not available for this date range.
+        <% end %>
+        
+      <% else %>
+        <%= render_event_data(@event_id, @target) %>
+      <% end %>
+
+    </div>
+  </div>
+</main>

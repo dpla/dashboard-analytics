@@ -96,8 +96,59 @@ nav .divider {
   padding: 7px 40px 10px 40px;
 }
 
-main {
+.heading {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: #f9f6f0;
+  height: 80px;
+  border-bottom: 1px solid #e9dec8;
   padding: 10px 40px;
+}
+
+.data-menu {
+  clear: both;
+  float: left;
+  width: 20%;
+  display: inline-block;
+  background-color: #f9f6f0;
+}
+
+.data-menu ul {
+  border: 1px solid #e9dec8;
+  border-bottom: none;
+  margin: 1px;
+}
+
+.data-menu a {
+  color: #515354;
+  border-bottom: 1px solid #e9dec8;
+  display: block;
+  padding: 10px;
+}
+
+.data-menu a.selected, .data-menu a.selected:hover {
+  background-color: #e9dec8;
+}
+
+.data-menu a:visited {
+  color: #515354;
+}
+
+.data-menu a:hover {
+  color: #515354;
+  text-decoration: none;
+  background-color: #d7ebf4
+}
+
+.data-content {
+  float: right;
+  width: 80%;
+  display: inline-block;
+  padding-left: 40px;
+}
+
+main {
+  margin: 40px;
 }
 
 h1 {
@@ -106,6 +157,7 @@ h1 {
   color: #000;
   display: inline-block;
   float: left;
+  margin-bottom: 40px;
 }
 
 h2 {
@@ -175,11 +227,15 @@ th, td {
 .date-select {
   display: inline-block;
   float: right;
-  margin: 10px 0;
+  margin-top: 20px;
 }
 
 .date-select label {
   margin-right: 10px;
+}
+
+.date-select select {
+  background-color: white;
 }
 
 .users label {

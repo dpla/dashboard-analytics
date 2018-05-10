@@ -1,8 +1,12 @@
 # Handles HTTP requests for contributors
 
 class ContributorsController < ApplicationController
-  include DateSetter # Controller concern
-  include DateHelper # View helper
+  # Controller concerns
+  include DateSetter
+  # View helpers
+  include DataMenuHelper
+  include DateHelper
+  include EventsHelper
 
   def index
     assign_start_and_end_dates
