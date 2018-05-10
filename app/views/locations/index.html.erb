@@ -5,11 +5,15 @@
     'data-turbolinks-track': 'reload', defer: 'defer' %>
 <% end %>
 
-<main>
+<div class="heading">
 
-<h1><%= @target.name %></h1>
+  <h1><%= @target.name %></h1>
 
   <%= render partial: "shared/date_menu" %>
+  
+</div>
+
+<main>
 
   <%= render partial: "shared/data_menu", locals: { target: @target } %>
 
@@ -20,7 +24,7 @@
       <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
 
       <%= render partial: "shared/map",
-                 locals: { ga_token: @target.ga_token,          
+                 locals: { ga_token: @hub.ga_token,          
                            hub: @hub.name,
                            contributor: contributor } %>
 

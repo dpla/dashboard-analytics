@@ -1,8 +1,11 @@
 # Handles HTTP requests for events
 
 class LocationsController < ApplicationController
-  include DateSetter # Controller concern
-  include DateHelper # View helper
+  # Controller concerns
+  include DateSetter
+  # View helpers
+  include DataMenuHelper
+  include DateHelper
 
   def index
     assign_start_and_end_dates

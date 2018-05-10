@@ -5,11 +5,15 @@
     'data-turbolinks-track': 'reload', defer: 'defer' %>
 <% end %>
 
-<main>
+  <div class="heading">
 
-  <h1><%= @hub.name %></h1>
+    <h1><%= @hub.name %></h1>
 
-  <%= render partial: "shared/date_menu" %>
+    <%= render partial: "shared/date_menu" %>
+
+  </div>
+
+  <main>
 
   <%= render partial: "shared/data_menu", locals: { target: @hub } %>
 

@@ -96,6 +96,15 @@ nav .divider {
   padding: 7px 40px 10px 40px;
 }
 
+.heading {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: #f9f6f0;
+  height: 80px;
+  border-bottom: 1px solid #e9dec8;
+  padding: 10px 40px;
+}
+
 .data-menu {
   clear: both;
   float: left;
@@ -105,16 +114,20 @@ nav .divider {
 }
 
 .data-menu ul {
-  border: 1px solid #b6bfc3;
+  border: 1px solid #e9dec8;
   border-bottom: none;
   margin: 1px;
 }
 
 .data-menu a {
   color: #515354;
-  border-bottom: 1px solid #b6bfc3;
+  border-bottom: 1px solid #e9dec8;
   display: block;
   padding: 10px;
+}
+
+.data-menu a.selected, .data-menu a.selected:hover {
+  background-color: #e9dec8;
 }
 
 .data-menu a:visited {
@@ -124,7 +137,7 @@ nav .divider {
 .data-menu a:hover {
   color: #515354;
   text-decoration: none;
-  background-color: #f3f7f8;
+  background-color: #d7ebf4
 }
 
 .data-content {
@@ -135,7 +148,7 @@ nav .divider {
 }
 
 main {
-  padding: 10px 40px;
+  margin: 40px;
 }
 
 h1 {
@@ -214,11 +227,15 @@ th, td {
 .date-select {
   display: inline-block;
   float: right;
-  margin: 10px 0;
+  margin-top: 20px;
 }
 
 .date-select label {
   margin-right: 10px;
+}
+
+.date-select select {
+  background-color: white;
 }
 
 .users label {

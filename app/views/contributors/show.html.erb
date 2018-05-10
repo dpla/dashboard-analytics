@@ -6,11 +6,15 @@
     'data-turbolinks-track': 'reload', defer: 'defer' %>
 <% end %>
 
-<main>
+<div class="heading">
 
   <h1><%= @contributor.name %></h1>
 
   <%= render partial: "shared/date_menu" %>
+
+</div>
+
+<main>
 
   <%= render partial: "shared/data_menu", locals: { target: @contributor } %>
 

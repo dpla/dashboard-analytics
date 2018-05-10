@@ -1,9 +1,12 @@
 # Handles HTTP requests for events
 
 class EventsController < ApplicationController
-  include DateSetter # Controller concern
-  include DateHelper # View helper
-  include EventsHelper # View helper
+  # Controller concerns
+  include DateSetter
+  # View helpers
+  include DataMenuHelper
+  include DateHelper
+  include EventsHelper
 
   def show
     assign_start_and_end_dates

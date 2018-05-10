@@ -2,71 +2,26 @@
 
 <div class="data-menu">
   <ul>
-    <% if target.is_a? Hub %>
-      <li><%= link_to "Overview", hub_path(target.name) %></li>
-      <li> 
-        <%= link_to "Website user locations",
-                    hub_locations_path(target.name) %>
-      </li>
-      <li>
-        <%= link_to "Metadata record views",
-                    hub_event_path(target.name, 'view_item') %>
-      </li>
-      <li>
-        <%= link_to "Exhibition views",
-                    hub_event_path(target.name, 'view_exhibit') %>
-      </li>
-      <li>
-        <%= link_to "Primary source set views",
-                    hub_event_path(target.name, 'view_pss') %>
-      </li>
-      <li>
-        <%= link_to "Click throughs",
-                    hub_event_path(target.name, 'click_through') %>
-      </li>
-      <li>
-        <%= link_to "API item views",
-                    hub_event_path(target.name, 'view_api') %>
-      </li>
-    <% elsif target.is_a? Contributor %>
-      <li>
-        <%= link_to "Overview",
-                    hub_contributor_path(target.hub.name, target.name) %>
-      </li>
-      <li>
-        <%= link_to "Website user locations",
-                    hub_locations_path(target.hub.name, target.name) %>
-      </li>
-      <li>
-        <%= link_to "View metadata record",
-                    hub_contributor_event_path(target.hub.name,
-                                               target.name,
-                                               'view_item') %>
-      </li>
-      <li>
-        <%= link_to "Exhibition views",
-                    hub_contributor_event_path(target.hub.name,
-                                               target.name, 
-                                               'view_exhibit') %>
-      </li>
-      <li>
-        <%= link_to "Primary source set views",
-                    hub_contributor_event_path(target.hub.name,
-                                               target.name,
-                                               'view_pss') %>
-      </li>
-      <li>
-        <%= link_to "Click throughs",
-                    hub_contributor_event_path(target.hub.name,
-                                               target.name,
-                                               'click_through') %>
-      </li>
-      <li>
-        <%= link_to "API item views",
-                    hub_contributor_event_path(target.hub.name,
-                                               target.name,
-                                               'view_api') %>
-      </li>
-    <% end %>
+    <li>
+      <%= render_overview_link(target) %>
+    </li>
+    <li> 
+      <%= render_locations_link(target) %>
+    </li>
+    <li>
+      <%= render_view_item_link(target) %>
+    </li>
+    <li>
+      <%= render_view_exhibit_link(target) %>
+    </li>
+    <li>
+      <%= render_view_pss_link(target) %>
+    </li>
+    <li>
+      <%= render_click_through_link(target) %>
+    </li>
+    <li>
+      <%= render_view_api_link(target) %>
+    </li>
   </ul>
 </div>
