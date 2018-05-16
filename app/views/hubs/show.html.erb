@@ -27,6 +27,9 @@
       <%= render partial: "shared/api_use_metrics",
                  locals: { target: @hub } %>
 
+      <%= render partial: "shared/metadata_completeness",
+                 locals: { metadata_completeness: @hub.metadata_completeness } %>
+
     </div>
   </div>
 </main>

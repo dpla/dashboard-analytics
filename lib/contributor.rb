@@ -35,6 +35,10 @@ class Contributor
     @frontend_ga.token
   end
 
+  def metadata_completeness
+    MetadataCompleteness.new(self)
+  end
+
   def total_frontend_events
     frontend_use_totals['ga:totalEvents'] || 0
   end
