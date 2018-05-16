@@ -7,6 +7,10 @@ class MetadataCompleteness
     @target = target
   end
 
+  def target
+    @target
+  end
+
   def data
     @data ||= get_data
   end
@@ -18,16 +22,16 @@ class MetadataCompleteness
   private
 
   def get_data
-    if @target.is_a?(Hub)
+    if target.is_a?(Hub)
       get_hub_data
-    elsif @target.is_a?(Contributor)
+    elsif target.is_a?(Contributor)
       get_contributor_data
     end
   end
 
   # @return Hash
   def get_hub_data
-    hub_name = @target.name rescue nil
+    hub_name = target.name rescue nil
     data = nil
 
     begin
@@ -44,7 +48,7 @@ class MetadataCompleteness
   end
 
   def get_contributor_data
-    contributor_name = @target.name rescue nil
+    contributor_name = target.name rescue nil
     hub_name = @target.hub.name rescue nil
     data = nil
 
@@ -64,10 +68,10 @@ class MetadataCompleteness
   end
 
   def hub_filepath
-    "/Users/audreyaltman/Desktop/provider-scores-20180504.csv"
+    Rails.root.join("public", "spreadsheets", "provider-scores-20180504.csv")
   end
 
   def contributor_filepath
-    "/Users/audreyaltman/Desktop/contributor-scores-20180504.csv"
+    Rails.root.join("public", "spreadsheets", "contributor-scores-20180504.csv")
   end
 end
