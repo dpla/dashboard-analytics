@@ -30,9 +30,13 @@ class MetadataCompleteness
     hub_name = @target.name rescue nil
     data = nil
 
-    CSV.foreach(hub_filepath, headers: true) do |row|
-      break if data != nil
-      data = row if row["provider"] == hub_name
+    begin
+      CSV.foreach(hub_filepath, headers: true) do |row|
+        break if data != nil
+        data = row if row["provider"] == hub_name
+      end
+    rescue => e
+      # TODO: log error
     end
 
     return {} if data == nil
