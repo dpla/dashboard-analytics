@@ -20,7 +20,7 @@ class MetadataCompleteness
   def get_data
     if @target.is_a?(Hub)
       get_hub_data
-    elsif @target.is_a(Contributor)
+    elsif @target.is_a?(Contributor)
       get_contributor_data
     end
   end
@@ -35,11 +35,28 @@ class MetadataCompleteness
       data = row if row["provider"] == hub_name
     end
 
+    return {} if data == nil
     return data.to_hash
   end
 
   def get_contributor_data
+    contributor_name = @target.name rescue nil
+    hub_name = @target.hub.name rescue nil
+    data = nil
 
+    begin
+      CSV.foreach(contributor_filepath, headers: true) do |row|
+        break if data != nil
+        if row["provider"] == hub_name and row["dataProvider"] == contributor_name
+          data = row
+        end
+      end
+    rescue => e
+      # TODO: Log error
+    end
+
+    return {} if data == nil
+    return data.to_hash
   end
 
   def hub_filepath
@@ -47,6 +64,6 @@ class MetadataCompleteness
   end
 
   def contributor_filepath
-
+    "/Users/audreyaltman/Desktop/contributor-scores-20180504.csv"
   end
 end

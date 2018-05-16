@@ -3,38 +3,44 @@
 <div class='metrics'>
   <h2>Metadata Completeness</h2>
 
-  <table>
-    <tr>
-      <td>Type</td>
-      <td><%= metadata_completeness.percentage("type") %></td>
-    </tr>
-    <tr>
-      <td>Subject</td>
-      <td><%= metadata_completeness.percentage("subject") %></td>
-    </tr>
-    <tr>
-      <td>Description</td>
-      <td><%= metadata_completeness.percentage("description") %></td>
-    </tr>
-    <tr>
-      <td>Thumbnail</td>
-      <td><%= metadata_completeness.percentage("preview") %></td>
-    </tr>
-    <tr>
-      <td>Date</td>
-      <td><%= metadata_completeness.percentage("date") %></td>
-    </tr>
-    <tr>
-      <td>Creator</td>
-      <td><%= metadata_completeness.percentage("creator") %></td>
-    </tr>
-    <tr>
-      <td>Location</td>
-      <td><%= metadata_completeness.percentage("location") %></td>
-    </tr>
-    <tr>
-      <td>Language</td>
-      <td><%= metadata_completeness.percentage("language") %></td>
-    </tr>
-  </table>
+  <% if metadata_completeness.data.present? %>
+
+    <table>
+      <tr>
+        <td>Type</td>
+        <td><%= metadata_completeness.percentage("type") %></td>
+      </tr>
+      <tr>
+        <td>Subject</td>
+        <td><%= metadata_completeness.percentage("subject") %></td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td><%= metadata_completeness.percentage("description") %></td>
+      </tr>
+      <tr>
+        <td>Thumbnail</td>
+        <td><%= metadata_completeness.percentage("preview") %></td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td><%= metadata_completeness.percentage("date") %></td>
+      </tr>
+      <tr>
+        <td>Creator</td>
+        <td><%= metadata_completeness.percentage("creator") %></td>
+      </tr>
+      <tr>
+        <td>Location</td>
+        <td><%= metadata_completeness.percentage("location") %></td>
+      </tr>
+      <tr>
+        <td>Language</td>
+        <td><%= metadata_completeness.percentage("language") %></td>
+      </tr>
+    </table>
+
+  <% else %>
+    <div class="no-data">Data not available</div>
+  <% end %>
 </div>
