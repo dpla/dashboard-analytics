@@ -4,17 +4,27 @@ class Events
   # @param event_type String
   #   acceptable values: "View Item", "View Exhibition Item",
   #                      "View Primary Source", "Click Through"
-  def initialize(target, event_type)
+  def initialize(target, id)
     @target = target
-    @event_type = event_type
+    @id = id
+  end
+
+  def id
+    @id
   end
 
   def target
     @target
   end
 
-  def event_type
-    @event_type
+  def event_name
+    dict = { 'view_item' => 'View Item',
+             'view_exhibit' => 'View Exhibition Item',
+             'view_pss' => 'View Primary Source',
+             'click_through' => 'Click Through',
+             'view_api' => 'View API Item' }
+
+    dict[id]
   end
 
   def hub_name
@@ -30,12 +40,15 @@ class Events
   end
 
   def total_results
+    frontend_response[:total_results]
   end
 
   def items_per_page
+    frontend_response[:items_per_page]
   end
 
   def start_index
+    frontend_response[:start_index]
   end
 
   private
@@ -46,6 +59,6 @@ class Events
 
   def frontend_response
     @frontend_response ||=
-      frontend_ga.events(event_type, hub_name, contributor_name)
+      frontend_ga.events(event_name, hub_name, contributor_name)
   end
 end

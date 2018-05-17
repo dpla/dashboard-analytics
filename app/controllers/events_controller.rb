@@ -18,7 +18,8 @@ class EventsController < ApplicationController
     end
 
     @target = params[:contributor_id] ? @contributor : @hub
-    @event_id = params[:id]
+    # @event_id = params[:id]
+    @events = Events.new(@target, params[:id])
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)

@@ -71,8 +71,8 @@ class Hub
     MetadataCompleteness.new(self)
   end
 
-  def events(event_type)
-    Events.new(self, event_type)
+  def events(event_id)
+    Events.new(self, event_id)
   end
 
   def total_frontend_events
