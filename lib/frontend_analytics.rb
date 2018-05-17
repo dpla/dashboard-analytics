@@ -136,7 +136,7 @@ class FrontendAnalytics < GaResponseBuilder
         items_per_page: res.items_per_page,
         start_index: res.query.start_index,
         total_results: res.total_results,
-        events: []
+        results: []
       }
 
       res.rows.each do |r|
@@ -145,7 +145,7 @@ class FrontendAnalytics < GaResponseBuilder
         title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
         count = r[columns.index("ga:totalEvents")]
 
-        data[:events].push({ contributor: contributor, id: id, title: title,
+        data[:results].push({ contributor: contributor, id: id, title: title,
                              count: count })
       end
 

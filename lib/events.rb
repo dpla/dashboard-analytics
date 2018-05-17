@@ -27,6 +27,10 @@ class Events
     dict[id]
   end
 
+  def response
+    id == 'view_api' ? api_response : frontend_response
+  end
+
   def hub_name
     target.is_a?(Hub) ? target.name : target.hub.name
   end
@@ -36,19 +40,19 @@ class Events
   end
 
   def results
-    frontend_response[:events]
+    response[:results]
   end
 
   def total_results
-    frontend_response[:total_results]
+    response[:total_results]
   end
 
   def items_per_page
-    frontend_response[:items_per_page]
+    response[:items_per_page]
   end
 
   def start_index
-    frontend_response[:start_index]
+    response[:start_index]
   end
 
   private
@@ -60,5 +64,9 @@ class Events
   def frontend_response
     @frontend_response ||=
       frontend_ga.events(event_name, hub_name, contributor_name)
+  end
+
+  def api_response
+
   end
 end
