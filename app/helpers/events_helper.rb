@@ -4,27 +4,27 @@ module EventsHelper
     case events.id
 
     when 'click_through'
-      table_name = "Items clicked through on website"
+      table_name = "Click throughs"
       action = "Click throughs"
       render_item_table(events, table_name, action)
 
     when 'view_item'
-      table_name = "Metadata records viewed on website"
+      table_name = "Metadata record views"
       action = "Views"
       render_item_table(events, table_name, action)
 
     when 'view_exhibit'
-      table_name = "Exhibition items viewed on website"
+      table_name = "Exhibit item views"
       action = "Views"
       render_item_table(events, table_name, action)
 
     when 'view_pss'
-      table_name = "Primary source set items viewed on website"
+      table_name = "Primary source views"
       action = "Views"
       render_item_table(events, table_name, action)
 
     when 'view_api'
-      table_name = "Items viewed in api"
+      table_name = "API item views"
       action = "Views"
       render_item_table(events, table_name, action)
       

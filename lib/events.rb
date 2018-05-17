@@ -55,6 +55,10 @@ class Events
     response[:start_index]
   end
 
+  def end_index
+    total_results < items_per_page ? total_results : items_per_page
+  end
+
   private
 
   def frontend_ga
