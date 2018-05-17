@@ -116,7 +116,7 @@ class FrontendAnalytics < GaResponseBuilder
   # @param contributor [String] Contributor name
   # @return [Hash] | nil
   #
-  def individual_event_counts(event, hub, contributor = nil)
+  def events(event, hub, contributor = nil)
     event_category = "#{event} : #{hub}"
 
     metrics = %w(ga:totalEvents)

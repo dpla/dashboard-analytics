@@ -1,20 +1,20 @@
 class Events
 
-  # @param Hub || Contributor
-  def initialize(target)
+  # @param target Hub || Contributor
+  # @param event_type String
+  #   acceptable values: "View Item", "View Exhibition Item",
+  #                      "View Primary Source", "Click Through"
+  def initialize(target, event_type)
     @target = target
+    @event_type = event_type
   end
 
   def target
     @target
   end
 
-  def start_date
-    target.start_date
-  end
-
-  def end_date
-    target.end_date
+  def event_type
+    @event_type
   end
 
   def hub_name
@@ -25,25 +25,27 @@ class Events
     target.is_a?(Contributor) ? target.name : nil
   end
 
-  def view_item
-    frontend_ga.individual_event_counts("View Item", hub_name, contributor_name)[:events]
+  def results
+    frontend_response[:events]
   end
 
-  def view_exhibit
-    frontend_ga.individual_event_counts("View Exhibition Item", hub_name, contributor_name)[:events]
+  def total_results
   end
 
-  def view_pss
-    frontend_ga.individual_event_counts("View Primary Source", hub_name, contributor_name)[:events]
+  def items_per_page
   end
 
-  def click_through
-    frontend_ga.individual_event_counts("Click Through", hub_name, contributor_name)[:events]
+  def start_index
   end
 
   private
 
   def frontend_ga
-    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
+    @frontend_ga ||= FrontendAnalytics.new(target.start_date, target.end_date)
+  end
+
+  def frontend_response
+    @frontend_response ||=
+      frontend_ga.events(event_type, hub_name, contributor_name)
   end
 end

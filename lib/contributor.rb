@@ -39,8 +39,8 @@ class Contributor
     MetadataCompleteness.new(self)
   end
 
-  def events
-    Events.new(self)
+  def events(event_type)
+    Events.new(self, event_type)
   end
 
   def total_frontend_events
