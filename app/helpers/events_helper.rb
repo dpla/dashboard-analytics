@@ -41,13 +41,13 @@ module EventsHelper
   def render_event_data(event_id, target)
     case event_id
     when 'click_through'
-      render_click_through_table(target.click_through_events, target)
+      render_click_through_table(target.events.click_through, target)
     when 'view_item'
-      render_view_item_table(target.view_item_events, target)
+      render_view_item_table(target.events.view_item, target)
     when 'view_exhibit'
-      render_view_exhibit_table(target.view_exhibit_events, target)
+      render_view_exhibit_table(target.events.view_exhibit, target)
     when 'view_pss'
-      render_view_pss_table(target.view_pss_events, target)
+      render_view_pss_table(target.events.view_pss, target)
     when 'view_api'
       render_view_api_table(target.view_api_item_events, target)
     else

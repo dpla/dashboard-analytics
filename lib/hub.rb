@@ -71,6 +71,10 @@ class Hub
     MetadataCompleteness.new(self)
   end
 
+  def events
+    Events.new(self)
+  end
+
   def total_frontend_events
     frontend_use_totals['ga:totalEvents'] || 0
   end
@@ -109,22 +113,6 @@ class Hub
 
   def total_api_events
     api_use_totals['ga:totalEvents'] || 0
-  end
-
-  def view_item_events
-    frontend_ga.individual_event_counts("View Item", name)[:events]
-  end
-
-  def view_exhibit_events
-    frontend_ga.individual_event_counts("View Exhibition Item", name)[:events]
-  end
-
-  def view_pss_events
-    frontend_ga.individual_event_counts("View Primary Source", name)[:events]
-  end
-
-  def click_through_events
-    frontend_ga.individual_event_counts("Click Through", name)[:events]
   end
 
   def view_api_item_events
