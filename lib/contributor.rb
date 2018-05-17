@@ -80,19 +80,19 @@ class Contributor
   end
 
   def view_item_events
-    frontend_ga.individual_event_counts("View Item", hub.name, name)
+    frontend_ga.individual_event_counts("View Item", hub.name, name)[:events]
   end
 
   def view_exhibit_events
-    frontend_ga.individual_event_counts("View Exhibition Item", hub.name, name)
+    frontend_ga.individual_event_counts("View Exhibition Item", hub.name, name)[:events]
   end
 
   def view_pss_events
-    frontend_ga.individual_event_counts("View Primary Source", hub.name, name)
+    frontend_ga.individual_event_counts("View Primary Source", hub.name, name)[:events]
   end
 
   def click_through_events
-    frontend_ga.individual_event_counts("Click Through", hub.name, name)
+    frontend_ga.individual_event_counts("Click Through", hub.name, name)[:events]
   end
 
   def view_api_item_events
