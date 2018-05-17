@@ -24,13 +24,13 @@
       <% if @event_id == "api_view" %>
 
         <% if api_data_for_date_range? %>
-          <%= render_event_data(@event_id, @target) %>
+          <%= render_event_data(@events) %>
         <% else %>
           Data is not available for this date range.
         <% end %>
         
       <% else %>
-        <%= render_event_data(@event_id, @target) %>
+        <%= render_event_data(@events) %>
       <% end %>
 
     </div>

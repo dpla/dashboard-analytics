@@ -4,6 +4,10 @@ require 'googleauth'
 ## Superclass
 class GaResponseBuilder
 
+  ##
+  # @param start_date [String] in format YYYT-MM-DD (iso8601)
+  # @param end_date [String] in format YYYT-MM-DD (iso8601)
+  #
   def initialize(start_date, end_date)
     @start_date = start_date
     @end_date = end_date

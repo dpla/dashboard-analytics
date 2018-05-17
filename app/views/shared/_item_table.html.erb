@@ -8,6 +8,11 @@
 
   <% if items && items.count > 0 %>
 
+  <div>
+    Showing <%= @events.start_index %>-<%= @events.end_index %> of 
+    <%= @events.total_results %> items.
+  </div> 
+
   <table>
     <tr>
       <th>Item</th>
