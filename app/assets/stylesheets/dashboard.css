@@ -274,6 +274,7 @@ table input[type="submit"] {
 
 .item-table table {
   margin-bottom: 30px;
+  margin-top: 20px;
   width: 100%;
 }
 

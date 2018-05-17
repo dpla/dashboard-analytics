@@ -116,7 +116,7 @@ class FrontendAnalytics < GaResponseBuilder
   # @param contributor [String] Contributor name
   # @return [Hash] | nil
   #
-  def individual_event_counts(event, hub, contributor = nil)
+  def events(event, hub, contributor = nil)
     event_category = "#{event} : #{hub}"
 
     metrics = %w(ga:totalEvents)
@@ -132,19 +132,24 @@ class FrontendAnalytics < GaResponseBuilder
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
       columns = res.column_headers.map { |c| c.name }
-      data = {}
+      data = {
+        items_per_page: res.items_per_page,
+        start_index: res.query.start_index,
+        total_results: res.total_results,
+        results: []
+      }
 
-      res.rows.map do |r|
+      res.rows.each do |r|
         contributor = r[columns.index("ga:eventAction")]
         id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
         title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
         count = r[columns.index("ga:totalEvents")]
 
-        { contributor: contributor,
-          id: id, 
-          title: title,
-          count: count }
+        data[:results].push({ contributor: contributor, id: id, title: title,
+                             count: count })
       end
+
+      return data
 
       # TODO: if there are no results, this returns nil.
       # Would be better to return an empty Hash.
