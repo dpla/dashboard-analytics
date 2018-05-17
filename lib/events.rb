@@ -61,12 +61,16 @@ class Events
     @frontend_ga ||= FrontendAnalytics.new(target.start_date, target.end_date)
   end
 
+  def api_ga
+    @api_ga ||= ApiAnalytics.new(target.start_date, target.end_date)
+  end
+
   def frontend_response
     @frontend_response ||=
       frontend_ga.events(event_name, hub_name, contributor_name)
   end
 
   def api_response
-
+    @api_response ||= api_ga.events(event_name, hub_name, contributor_name)
   end
 end
