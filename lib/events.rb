@@ -1,9 +1,7 @@
 class Events
 
   # @param target Hub || Contributor
-  # @param event_type String
-  #   acceptable values: "View Item", "View Exhibition Item",
-  #                      "View Primary Source", "Click Through"
+  # @param id String e.g. view_item, click_through, etc.
   def initialize(target, id)
     @target = target
     @id = id
