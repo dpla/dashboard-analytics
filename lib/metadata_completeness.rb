@@ -15,22 +15,14 @@ class MetadataCompleteness
     @data ||= get_data
   end
 
-  # @return Array[String]
-  def fields
-    ['type', 
-     'subject',
-     'description',
-     'preview',
-     'date',
-     'creator',
-     'location',
-     'language']
-  end
-
   # @param field String the metadata field e.g. "type"
   # @return String percentage representation of completeness for given field
   def percentage(field)
     number_to_percentage(data[field].to_f * 100, precision: 0)
+  end
+
+  def self.to_percentage(num)
+    number_to_percentage(num.to_f * 100, precision: 0)
   end
 
   def hub_name
@@ -94,22 +86,21 @@ class MetadataCompleteness
     return data.to_hash
   end
 
+  # @return Array[Hash]
   def get_all_contributors_data
-    data = nil
+    data = []
 
     begin
       CSV.foreach(contributor_filepath, headers: true) do |row|
-        break if data != nil
         if row["provider"] == hub_name
-          data = row
+          data.push(row.to_hash)
         end
       end
     rescue => e
       # TODO: Log error
     end
 
-    return {} if data == nil
-    return data.to_hash
+    return data
   end
 
   # @return String
