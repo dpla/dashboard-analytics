@@ -38,33 +38,10 @@ class Hub
   end
 
   ##
-  # Get all the contributors that belong to this hub instance
-  #
+  # Get names of all contributors that belonging to this hub
   # @return [Array<String>]
-  #
   def contributors
     @contributors ||= self.class.dpla_api.contributors(name).sort
-    @contributors
-  end
-
-  ##
-  # Get all contributors and their associated key metrics.
-  # @return [Hash]
-  # e.g. { "The Library" => { "Website" => { "Users" => 4 },
-  #                           "Api" => { "Users" => 6 } } }
-  def contributor_totals
-    data = {}
-
-    contributors.map do |c|
-      f_use = frontend_use_by_contributor[c] || {}
-      f_events = frontend_events_by_contributor[c] || {}
-      # TODO: only call API if date range applies
-      a_use = api_use_by_contributor[c] || {}
-      data[c] = { "Website" => f_use.merge(f_events),
-                  "Api" => a_use }
-    end
-
-    data
   end
 
   def overview
@@ -79,6 +56,10 @@ class Hub
     Events.new(self, event_id)
   end
 
+  def contributor_comparison
+    ContributorComparison.new(self)
+  end
+
   protected
 
   def self.dpla_api
@@ -89,22 +70,5 @@ class Hub
 
   def frontend_ga
     @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
-  end
-
-  def api_ga
-    @api_ga ||= ApiAnalytics.new(start_date, end_date)
-  end
-
-  def frontend_use_by_contributor
-    @frontend_use_by_contributor ||= frontend_ga.overall_use_by_contributor(name)
-  end
-
-  def frontend_events_by_contributor
-    @frontend_events_by_contributor ||= frontend_ga.events_by_contributor(name)
-  end
-
-  def api_use_by_contributor
-    @api_use_by_contributor ||= 
-      api_ga.overall_use_by_contributor(hub_name, contributor_name)
   end
 end

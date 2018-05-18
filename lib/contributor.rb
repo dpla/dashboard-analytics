@@ -46,4 +46,10 @@ class Contributor
   def events(event_type)
     Events.new(self, event_type)
   end
+
+  private
+
+  def frontend_ga
+    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
+  end
 end
