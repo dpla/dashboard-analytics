@@ -1,4 +1,5 @@
-FROM ruby:2.5
+FROM ruby:2.4.1
+
 
 ENV RAILS_ENV production
 ENV RAILS_SERVE_STATIC_FILES true
@@ -10,5 +11,6 @@ WORKDIR /opt/dashboard-analytics
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --deployment
 COPY . .
+#RUN bundle exec rake assets:precompile
 EXPOSE 3000
 CMD ["rails", "s"]
