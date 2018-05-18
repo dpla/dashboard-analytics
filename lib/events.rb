@@ -1,9 +1,7 @@
 class Events
 
   # @param target Hub || Contributor
-  # @param event_type String
-  #   acceptable values: "View Item", "View Exhibition Item",
-  #                      "View Primary Source", "Click Through"
+  # @param id String e.g. view_item, click_through, etc.
   def initialize(target, id)
     @target = target
     @id = id
@@ -62,11 +60,11 @@ class Events
   private
 
   def frontend_ga
-    @frontend_ga ||= FrontendAnalytics.new(target.start_date, target.end_date)
+    target.frontend_ga
   end
 
   def api_ga
-    @api_ga ||= ApiAnalytics.new(target.start_date, target.end_date)
+    target.api_ga
   end
 
   def frontend_response

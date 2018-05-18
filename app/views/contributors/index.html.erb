@@ -26,7 +26,7 @@
         <th>API Views</th>
         <th>API Users/Apps</th>
         <% end %>
-        <% @hub.contributor_totals.each do |contributor, totals| %>
+        <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
         <tr>
           <td>
             <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
