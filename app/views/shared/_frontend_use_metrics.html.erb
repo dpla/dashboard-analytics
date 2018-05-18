@@ -1,4 +1,4 @@
-<%# Local variables: target [Hub|Contributor] %>
+<%# Local variables: overview [Overview] %>
 <div class="metrics">
 
   <h2>Website use</h2>
@@ -6,31 +6,31 @@
   <table>
     <tr>
       <td>View item</td>
-      <td><%= target.total_view_events %></td>
+      <td><%= overview.total_view_events %></td>
     </tr>
     <tr class="subitem">
       <td>Metadata record</td>
-      <td><%= target.total_item_events %></td>
+      <td><%= overview.total_item_events %></td>
     </tr>
     <tr class="subitem">
       <td>Exhibition</td>
-      <td><%= target.total_exhibit_events %></td>
+      <td><%= overview.total_exhibit_events %></td>
     </tr>
     <tr class="subitem">
       <td>Primary source set</td>
-      <td><%= target.total_pss_events %></td>
+      <td><%= overview.total_pss_events %></td>
     </tr>
     <tr>
       <td>Click throughs</td>
-      <td><%= target.total_click_throughs %></td>
+      <td><%= overview.total_click_throughs %></td>
     </tr>
     <tr>
       <td>Users</td>
-      <td><%= target.frontend_users %></td>
+      <td><%= overview.frontend_users %></td>
     </tr>
     <tr>
       <td>Sessions</td>
-      <td><%= target.frontend_sessions %></td>
+      <td><%= overview.frontend_sessions %></td>
     </tr>
   </table>
 

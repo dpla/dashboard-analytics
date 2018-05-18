@@ -67,60 +67,16 @@ class Hub
     data
   end
 
+  def overview
+    Overview.new(self)
+  end
+
   def metadata_completeness
     MetadataCompleteness.new(self)
   end
 
   def events(event_id)
     Events.new(self, event_id)
-  end
-
-  def total_frontend_events
-    frontend_use_totals['ga:totalEvents'] || 0
-  end
-
-  def unique_frontend_events
-    frontend_use_totals['ga:uniqueEvents'] || 0
-  end
-
-  def frontend_sessions
-    frontend_use_totals['ga:sessions'] || 0
-  end
-
-  def frontend_users
-   frontend_use_totals['ga:users'] || 0
-  end
-
-  def total_view_events
-    total_item_events + total_exhibit_events + total_pss_events
-  end
-
-  def total_item_events
-    frontend_event_totals['View Item'].to_i rescue 0
-  end
-
-  def total_exhibit_events
-    frontend_event_totals['View Exhibition Item'].to_i rescue 0
-  end
-
-  def total_pss_events
-    frontend_event_totals['View Primary Source'].to_i rescue 0
-  end
-
-  def total_click_throughs
-    frontend_event_totals['Click Through'] || 0
-  end
-
-  def total_api_events
-    api_use_totals['ga:totalEvents'] || 0
-  end
-
-  def view_api_item_events
-    api_ga.individual_event_counts(name)
-  end
-
-  def api_users
-    api_use_totals['ga:users'] || 0
   end
 
   protected
@@ -139,14 +95,6 @@ class Hub
     @api_ga ||= ApiAnalytics.new(start_date, end_date)
   end
 
-  def frontend_use_totals
-    @frontend_use_totals ||= frontend_ga.overall_use_totals(name)
-  end
-
-  def frontend_event_totals
-    @frontend_event_totals ||= frontend_ga.event_totals(name)
-  end
-
   def frontend_use_by_contributor
     @frontend_use_by_contributor ||= frontend_ga.overall_use_by_contributor(name)
   end
@@ -155,11 +103,8 @@ class Hub
     @frontend_events_by_contributor ||= frontend_ga.events_by_contributor(name)
   end
 
-  def api_use_totals
-    @api_use_totals ||= api_ga.overall_use_totals(name)
-  end
-
   def api_use_by_contributor
-    @api_use_by_contributor ||= api_ga.overall_use_by_contributor(name)
+    @api_use_by_contributor ||= 
+      api_ga.overall_use_by_contributor(hub_name, contributor_name)
   end
 end
