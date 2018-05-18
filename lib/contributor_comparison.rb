@@ -32,11 +32,11 @@ class ContributorComparison
   private
 
   def frontend_ga
-    @frontend_ga ||= FrontendAnalytics.new(hub.start_date, hub.end_date)
+    hub.frontend_ga
   end
 
   def api_ga
-    @api_ga ||= ApiAnalytics.new(hub.start_date, hub.end_date)
+    hub.api_ga
   end
 
   def frontend_use_by_contributor

@@ -60,15 +60,17 @@ class Hub
     ContributorComparison.new(self)
   end
 
+  def frontend_ga
+    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
+  end
+
+  def api_ga
+    @api_ga ||= ApiAnalytics.new(start_date, end_date)
+  end
+
   protected
 
   def self.dpla_api
     @@dpla_api ||= DplaApiResponseBuilder.new()
-  end
-
-  private
-
-  def frontend_ga
-    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
   end
 end
