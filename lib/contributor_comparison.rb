@@ -22,6 +22,7 @@ class ContributorComparison
       f_events = frontend_events_by_contributor[c] || {}
       # TODO: only call API if date range applies
       a_use = api_use_by_contributor[c] || {}
+      mc = hub.metadata_completeness.fields
       data[c] = { "Website" => f_use.merge(f_events),
                   "Api" => a_use }
     end
