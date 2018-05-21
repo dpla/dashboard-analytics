@@ -1,6 +1,12 @@
 class MetadataCompleteness
   include ActionView::Helpers::NumberHelper
 
+  # Fields to be shown in the user interface.
+  def self.fields
+    [ 'type', 'subject', 'description', 'preview', 'date',  'creator',
+      'location', 'language' ]
+  end
+
   # @param Hub || Contributor
   def initialize(target)
     @target = target
@@ -12,17 +18,7 @@ class MetadataCompleteness
 
   # @return Hash
   def data
-    @data ||= get_data
-  end
-
-  # @param field String the metadata field e.g. "type"
-  # @return String percentage representation of completeness for given field
-  def percentage(field)
-    number_to_percentage(data[field].to_f * 100, precision: 0)
-  end
-
-  def self.to_percentage(num)
-    number_to_percentage(num.to_f * 100, precision: 0)
+    @data ||= get_data.select { |k, v| self.class.fields.include? k }
   end
 
   def hub_name

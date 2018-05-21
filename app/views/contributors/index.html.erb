@@ -23,16 +23,11 @@
         <th>Website Sessions</th>
         <th>Website Users</th>
         <% if api_data_for_date_range? %>
-        <th>API Views</th>
-        <th>API Users/Apps</th>
-        <th>Type</th>
-        <th>Subject</th>
-        <th>Description</th>
-        <th>Thumbnail</th>
-        <th>Date</th>
-        <th>Creator</th>
-        <th>Location</th>
-        <th>Langauge</th>
+          <th>API Views</th>
+          <th>API Users/Apps</th>
+        <% end %>
+        <% MetadataCompleteness.fields.each do |field| %>
+          <th><%= field.titleize %></th>
         <% end %>
         <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
         <tr>
@@ -48,14 +43,11 @@
           <% if api_data_for_date_range? %>
           <td><%= totals["Api"]["Views"] %></td>
           <td><%= totals["Api"]["Users"] %></td>
-          <td><%= totals["MetadataCompleteness"]["type"] %></td>
-          <td><%= totals["MetadataCompleteness"]["subject"] %></td>
-          <td><%= totals["MetadataCompleteness"]["description"] %></td>
-          <td><%= totals["MetadataCompleteness"]["preview"] %></td>
-          <td><%= totals["MetadataCompleteness"]["date"] %></td>
-          <td><%= totals["MetadataCompleteness"]["creator"] %></td>
-          <td><%= totals["MetadataCompleteness"]["location"] %></td>
-          <td><%= totals["MetadataCompleteness"]["language"] %></td>
+          <% MetadataCompleteness.fields.each do |field| %>
+            <td>
+              <%= render_percentage(totals["MetadataCompleteness"][field]) %>
+            </td>
+          <% end %>
           <% end %>
         </tr>
         <% end %>
