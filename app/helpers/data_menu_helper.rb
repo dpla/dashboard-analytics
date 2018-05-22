@@ -42,6 +42,16 @@ module DataMenuHelper
     link_to("API item views", path, html_opts(path))
   end
 
+  def render_website_terms_link
+    path = search_term_path('website')
+    link_to("Website", path, html_opts(path))
+  end
+
+  def render_api_terms_link
+    path = search_term_path('api')
+    link_to("API", path, html_opts(path))
+  end
+
   def html_opts(path)
     current_page?(path) ? { class: 'selected' } : {}
   end

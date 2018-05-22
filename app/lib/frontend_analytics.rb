@@ -159,6 +159,24 @@ class FrontendAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # @return [Array<Array<String>>]
+  #   Example: [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
+  def search_terms()
+    metrics = %w(ga:searchUniques)
+    dimensions = %w(ga:searchKeyword)
+    filters = nil
+    sort = %w(-ga:searchUniques) # Descending
+
+    begin
+      response(metrics, dimensions, filters, options={ sort: sort } ).rows
+    rescue => e
+      # TODO: Log error
+      Hash.new
+      return e
+    end
+  end
+
   protected
 
   def profile_id

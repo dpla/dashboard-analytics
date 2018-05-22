@@ -75,12 +75,15 @@ class GaResponseBuilder
     # TODO max results
     sort = options[:sort]
 
+    #semicolon = "and"
+    filters = filters.present? ? filters.join(';') : nil
+
     analytics.get_ga_data(profile_id,
                           start_date,
                           end_date,
                           metrics.join(','), #comma = "or"
                           dimensions: dimensions.join(','), #comma = "or"
-                          filters: filters.join(';'), #semicolon = "and"
+                          filters: filters,
                           sort: sort,
                           segment: segment) 
   end

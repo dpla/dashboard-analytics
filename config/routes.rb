@@ -18,5 +18,7 @@ Rails.application.routes.draw do
     resources :locations, only: [:index]
   end
 
+  resources :search_terms, only: [:show]
+
   root 'hubs#index'
 end
