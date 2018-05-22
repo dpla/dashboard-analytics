@@ -301,3 +301,14 @@ table input[type="submit"] {
   text-align: right;
   padding-right: 14px;
 }
+
+form.comparison fieldset {
+  display: inline-block;
+  float: left;
+  border: none;
+  margin-bottom: 20px;
+}
+
+form.comparison legend {
+  font-weight: bold;
+}
