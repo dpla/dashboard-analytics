@@ -15,31 +15,33 @@
 
   <div class="data-content">
     <div class="data-section">
+      <div class="item-table">
+        <h2><%= params[:id].titleize %></h2>
 
-      <h2><%= params[:id].titleize %></h2>
+        <% if @search_terms.data.present? %>
 
-      <% if @search_terms.data.present? %>
+          <div>
+            Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>
+            of <%= @search_terms.total_results %> search terms.
+          </div>
 
-        <div>
-          Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>
-          of <%= @search_terms.total_results %> search terms.
-        </div> 
-
-        <table class="item-table">
-          <tr>
-            <th>Search Term</th>
-            <th>Total Unique Searches</th>
-          </tr>
-          <% @search_terms.terms.each do |term| %>
+          <table>
             <tr>
-              <td><%= term[0] %></td>
-              <td><%= term[1] %></td>
+              <th>Search Term</th>
+              <th>Total Unique Searches</th>
             </tr>
-          <% end %>
-        </table>
-      <% else %>
-        Data not available.
-      <% end %>
+            <% @search_terms.terms.each do |term| %>
+              <tr>
+                <td><%= term[0] %></td>
+                <td><%= term[1] %></td>
+              </tr>
+            <% end %>
+          </table>
+
+        <% else %>
+          Data not available.
+        <% end %>
+      </div>
     </div>
   </div>
 </main>
