@@ -1,6 +1,24 @@
 <%= render partial: "shared/sub_navigation",
   locals: { hub: @hub } %>
 
+<script>
+  function toggle_column(element) {
+    els = document.getElementsByClassName(element.value);
+
+    if (element.checked == true) {
+      Array.prototype.forEach.call(els, function(el) {
+        el.style.display="block";
+        // el.style.visibility="visible";
+      });
+    } else {
+      Array.prototype.forEach.call(els, function(el) {
+        // el.style.visibility="collapse";
+        el.style.display="none";
+      });
+    }
+  }
+</script>
+
 <div class="heading">
 
   <h1><%= @hub.name %></h1>
@@ -15,10 +33,73 @@
 
     <h2>Contributors</h2>
 
-    <table>
+    <h3>Show/hide table columns</h3>
+    <form>
+      <fieldset>
+        <legend>Website use</legend>
+        <div>
+          <input type="checkbox" id="website-view-input" name="column" 
+                 value="website-view" checked="checked"
+                 onclick="toggle_column(this)">
+          <label for="website-view-input">Website Views</label>
+        </div>
+        <div>
+          <input type="checkbox" id="click-through-input" name="column"
+                 value="click-through" checked="checked">
+          <label for="click-through-input">Website Click Throughs</label>
+        </div>
+        <div>
+          <input type="checkbox" id="website-session-input" name="column" 
+                 value="website-session" checked="checked">
+          <label for="website-session-input">Website Sessions</label>
+        </div>
+        <div>
+          <input type="checkbox" id="website-user-input" name="column"
+                 value="website-user" checked="checked">
+          <label for="website-user-input">Website Users</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>API use</legend>
+        <div>
+          <input type="checkbox" id="website-session-input" name="column"
+                 value="website-session" checked="checked">
+          <label for="website-session-input">Website Sessions</label>
+        </div>
+        <div>
+          <input type="checkbox" id="api-user-input" name="column"
+                 value="api-user" checked="checked">
+          <label for="api-user-input">API Users/Apps</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Metadata Completeness</legend>
+        <% MetadataCompleteness.fields.each do |field| %>
+          <div>
+            <input type="checkbox" id="<%= field %>-input" name="column"
+                   value="<%= field %>" checked="checked">
+            <label for="<%= field %>-input"><%= field.titleize %></label>
+          </div>
+        <% end %>
+      </fieldset>
+    </form>
+
+    <table id='comparison'>
+      <colgroup>
+        <col id="contributor" />
+        <col class="website-view" />
+        <col id="click-through" />
+        <col id="website-session" />
+        <col id="website-user" />
+        <col id="api-view" />
+        <col id="api-user" />
+        <% MetadataCompleteness.fields.each do |field| %>
+          <col id="<%= field %>" />
+        <% end %>
+      </colgroup>
       <tr>
         <th>Contributor</th>
-        <th>Website Views</th>
+        <th class="website-view">Website Views</th>
         <th>Website Click Throughs</th>
         <th>Website Sessions</th>
         <th>Website Users</th>
@@ -36,7 +117,7 @@
               <%= contributor %>
             </a>
           </td>
-          <td><%= totals["Website"]["Views"] %></td>
+          <td class="website-view"><%= totals["Website"]["Views"] %></td>
           <td><%= totals["Website"]["Click Throughs"] %></td>
           <td><%= totals["Website"]["Sessions"] %></td>
           <td><%= totals["Website"]["Users"] %></td>

@@ -13,3 +13,4 @@
 //= require rails-ujs
 //= require turbolinks
 //= google-analytics
+//= table
