@@ -33,10 +33,10 @@
       // Create map
 
       var mapFilters = function(){
-        var filters = [`ga:eventCategory=@${hub}`, `ga:eventCategory!@Browse`];
+        var filters = ["ga:eventCategory=" + hub, "ga:eventCategory!@Browse"];
 
         if (contributor !== "") {
-          filters = filters.concat(`ga:eventAction==${contributor}`);
+          filters = filters.concat("ga:eventAction==" + contributor);
         }
 
         return filters.join(';');
