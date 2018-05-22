@@ -1,6 +1,12 @@
 class MetadataCompleteness
   include ActionView::Helpers::NumberHelper
 
+  # Fields to be shown in the user interface.
+  def self.fields
+    [ 'type', 'subject', 'description', 'preview', 'date',  'creator',
+      'location', 'language' ]
+  end
+
   # @param Hub || Contributor
   def initialize(target)
     @target = target
@@ -12,13 +18,19 @@ class MetadataCompleteness
 
   # @return Hash
   def data
-    @data ||= get_data
+    @data ||= get_data.select { |k, v| self.class.fields.include? k }
   end
 
-  # @param field String the metadata field e.g. "type"
-  # @return String percentage representation of completeness for given field
-  def percentage(field)
-    number_to_percentage(data[field].to_f * 100, precision: 0)
+  def hub_name
+    target.is_a?(Hub) ? target.name : target.hub.name
+  end
+
+  def contributor_name
+    target.is_a?(Contributor) ? target.name : nil
+  end
+
+  def all_contributors_data
+    @all_contributors_data ||= get_all_contributors_data
   end
 
   private
@@ -36,7 +48,6 @@ class MetadataCompleteness
 
   # @return Hash
   def get_hub_data
-    hub_name = target.name rescue nil
     data = nil
 
     begin
@@ -54,8 +65,6 @@ class MetadataCompleteness
 
   # @return Hash
   def get_contributor_data
-    contributor_name = target.name rescue nil
-    hub_name = @target.hub.name rescue nil
     data = nil
 
     begin
@@ -71,6 +80,23 @@ class MetadataCompleteness
 
     return {} if data == nil
     return data.to_hash
+  end
+
+  # @return Array[Hash]
+  def get_all_contributors_data
+    data = []
+
+    begin
+      CSV.foreach(contributor_filepath, headers: true) do |row|
+        if row["provider"] == hub_name
+          data.push(row.to_hash)
+        end
+      end
+    rescue => e
+      # TODO: Log error
+    end
+
+    return data
   end
 
   # @return String

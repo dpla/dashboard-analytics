@@ -7,6 +7,7 @@ class HubsController < ApplicationController
   include DataMenuHelper
   include DateHelper
   include EventsHelper
+  include MetadataCompletenessHelper
 
   def index
     @hubs = Hub.all
