@@ -31,12 +31,6 @@ class ContributorComparison
     data
   end
 
-  # def show_contributors_mc
-  #   hub.contributors.map do |c|
-  #     contributor_mc(c)
-  #   end
-  # end
-
   def contributor_mc(contributor)
     all_contributors_mc.find do |row|
       row['dataProvider'] == contributor
