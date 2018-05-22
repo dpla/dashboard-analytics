@@ -17,13 +17,33 @@ class SearchTerms
     @end_date.iso8601
   end
 
+  def data
+    @data ||= get_data
+  end
+
   def terms
-    @terms ||= get_terms
+    data[:results]
+  end
+
+  def total_results
+    data[:total_results]
+  end
+
+  def items_per_page
+    data[:items_per_page]
+  end
+
+  def start_index
+    data[:start_index]
+  end
+
+  def end_index
+    total_results < items_per_page ? total_results : items_per_page
   end
 
   private
 
-  def get_terms
+  def get_data
     if(id == "website")
       frontend_ga.search_terms
     elsif(id=="api")

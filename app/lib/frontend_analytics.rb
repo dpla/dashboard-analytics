@@ -161,15 +161,23 @@ class FrontendAnalytics < GaResponseBuilder
 
   ##
   # @return [Array<Array<String>>]
-  #   Example: [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
-  def search_terms()
+  #   Example results: [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
+  def search_terms
     metrics = %w(ga:searchUniques)
     dimensions = %w(ga:searchKeyword)
     filters = nil
     sort = %w(-ga:searchUniques) # Descending
 
     begin
-      response(metrics, dimensions, filters, options={ sort: sort } ).rows
+      res = response(metrics, dimensions, filters, options={ sort: sort } )
+
+      {
+        items_per_page: res.items_per_page,
+        start_index: res.query.start_index,
+        total_results: res.total_results,
+        results: res.rows
+      }
+
     rescue => e
       # TODO: Log error
       Hash.new

@@ -17,8 +17,15 @@
     <div class="data-section">
 
       <h2><%= params[:id].titleize %></h2>
-      <% if @search_terms.terms.present? %>
-        <table>
+
+      <% if @search_terms.data.present? %>
+
+        <div>
+          Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>
+          of <%= @search_terms.total_results %> search terms.
+        </div> 
+
+        <table class="item-table">
           <tr>
             <th>Search Term</th>
             <th>Total Unique Searches</th>
