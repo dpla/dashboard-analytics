@@ -37,6 +37,31 @@ class GaResponseBuilder
     end
   end
 
+  ##
+  # @return Hash
+  #   Example search_terms.results:
+  #     [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
+  def search_terms
+    metrics = %w(ga:searchUniques)
+    dimensions = %w(ga:searchKeyword)
+    filters = nil
+    sort = %w(-ga:searchUniques) # Descending
+
+    begin
+      res = response(metrics, dimensions, filters, options={ sort: sort } )
+
+      {
+        items_per_page: res.items_per_page,
+        start_index: res.query.start_index,
+        total_results: res.total_results,
+        results: res.rows
+      }
+    rescue => e
+      # TODO: Log error
+      Hash.new
+    end
+  end
+
   protected
 
   ##
@@ -75,12 +100,15 @@ class GaResponseBuilder
     # TODO max results
     sort = options[:sort]
 
+    #semicolon = "and"
+    filters = filters.present? ? filters.join(';') : nil
+
     analytics.get_ga_data(profile_id,
                           start_date,
                           end_date,
                           metrics.join(','), #comma = "or"
                           dimensions: dimensions.join(','), #comma = "or"
-                          filters: filters.join(';'), #semicolon = "and"
+                          filters: filters,
                           sort: sort,
                           segment: segment) 
   end

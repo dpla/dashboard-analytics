@@ -1,0 +1,47 @@
+<div class="heading">
+  <h1>Search terms</h1>
+  <%= render partial: "shared/date_menu" %>
+</div>
+
+<main>
+  <div class="clear"/>
+
+  <div class="data-menu">
+    <ul>
+      <li><%= render_website_terms_link %></li>
+      <li><%= render_api_terms_link %></li>
+    </ul>
+  </div>
+
+  <div class="data-content">
+    <div class="data-section">
+      <div class="item-table">
+        <h2><%= params[:id].titleize %></h2>
+
+        <% if @search_terms.terms.present? %>
+
+          <div>
+            Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>
+            of <%= @search_terms.total_results %> search terms.
+          </div>
+
+          <table>
+            <tr>
+              <th>Search Term</th>
+              <th>Total Unique Searches</th>
+            </tr>
+            <% @search_terms.terms.each do |term| %>
+              <tr>
+                <td><%= term[0] %></td>
+                <td><%= term[1] %></td>
+              </tr>
+            <% end %>
+          </table>
+
+        <% else %>
+          Data not available.
+        <% end %>
+      </div>
+    </div>
+  </div>
+</main>
