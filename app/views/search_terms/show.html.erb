@@ -18,7 +18,7 @@
       <div class="item-table">
         <h2><%= params[:id].titleize %></h2>
 
-        <% if @search_terms.data.present? %>
+        <% if @search_terms.terms.present? %>
 
           <div>
             Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>

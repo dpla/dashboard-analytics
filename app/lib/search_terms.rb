@@ -22,7 +22,7 @@ class SearchTerms
   end
 
   def terms
-    data[:results]
+    data[:results] || []
   end
 
   def total_results
@@ -47,7 +47,7 @@ class SearchTerms
     if(id == "website")
       frontend_ga.search_terms
     elsif(id=="api")
-      # TODO
+      api_ga.search_terms
     end
   end
 
