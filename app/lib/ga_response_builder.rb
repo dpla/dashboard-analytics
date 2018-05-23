@@ -38,8 +38,9 @@ class GaResponseBuilder
   end
 
   ##
-  # @return [Array<Array<String>>]
-  #   Example results: [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
+  # @return Hash
+  #   Example search_terms.results:
+  #     [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
   def search_terms
     metrics = %w(ga:searchUniques)
     dimensions = %w(ga:searchKeyword)
@@ -55,7 +56,6 @@ class GaResponseBuilder
         total_results: res.total_results,
         results: res.rows
       }
-
     rescue => e
       # TODO: Log error
       Hash.new

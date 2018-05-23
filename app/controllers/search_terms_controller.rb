@@ -1,4 +1,4 @@
-# Handles HTTP requests for events
+# Handles HTTP requests for search terms
 
 class SearchTermsController < ApplicationController
   # Controller concerns

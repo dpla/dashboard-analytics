@@ -17,32 +17,46 @@ class SearchTerms
     @end_date.iso8601
   end
 
+  ##
+  # @return Hash
   def data
     @data ||= get_data
   end
 
+  ##
+  # @return Array
   def terms
     data[:results] || []
   end
 
+  ##
+  # @return Integer
   def total_results
     data[:total_results]
   end
 
+  ##
+  # @return Integer
   def items_per_page
     data[:items_per_page]
   end
 
+  ##
+  # @return Integer
   def start_index
     data[:start_index]
   end
 
+  ##
+  # @return Integer
   def end_index
-    total_results < items_per_page ? total_results : items_per_page
+    total_results.to_i < items_per_page.to_i ? total_results : items_per_page
   end
 
   private
 
+  ##
+  # @return Hash
   def get_data
     if(id == "website")
       frontend_ga.search_terms
