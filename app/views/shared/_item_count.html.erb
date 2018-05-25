@@ -1,0 +1,16 @@
+<%# Local variables: metadata_completeness [MetadataCompleteness] %>
+
+<h2>Item Count</h2>
+
+<% if metadata_completeness.count.present? %>
+
+  <table>
+    <tr>
+      <td>Item count</td>
+      <td><%= metadata_completeness.count %></td>
+    </tr>
+  </table>
+
+<% else %>
+  <div class="no-data">Data not available</div>
+<% end %>

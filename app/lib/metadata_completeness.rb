@@ -4,7 +4,7 @@ class MetadataCompleteness
   # Fields to be shown in the user interface.
   def self.fields
     [ 'type', 'subject', 'description', 'preview', 'date',  'creator',
-      'location', 'language' ]
+      'location', 'language', 'standardizedRights' ]
   end
 
   # @param Hub || Contributor
@@ -18,7 +18,15 @@ class MetadataCompleteness
 
   # @return Hash
   def data
-    @data ||= get_data.select { |k, v| self.class.fields.include? k }
+    @data ||= get_data
+  end
+
+  def field_data
+    data.select { |k, v| self.class.fields.include? k }
+  end
+
+  def count
+    data['count']
   end
 
   def hub_name
@@ -101,11 +109,11 @@ class MetadataCompleteness
 
   # @return String
   def hub_filepath
-    Rails.root.join("public", "spreadsheets", "provider-scores-20180504.csv")
+    Rails.root.join("public", "spreadsheets", "provider-20180504.csv")
   end
 
   # @return String
   def contributor_filepath
-    Rails.root.join("public", "spreadsheets", "contributor-scores-20180504.csv")
+    Rails.root.join("public", "spreadsheets", "contributor-20180504.csv")
   end
 end

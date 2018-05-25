@@ -31,6 +31,7 @@ class ContributorComparison
     data
   end
 
+  # TODO check provider and dataProvider for match
   def contributor_mc(contributor)
     all_contributors_mc.find do |row|
       row['dataProvider'] == contributor

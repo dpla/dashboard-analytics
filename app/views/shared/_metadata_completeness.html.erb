@@ -1,20 +1,18 @@
 <%# Local variables: metadata_completeness [MetadataCompleteness] %>
 
-<div class='metrics'>
-  <h2>Metadata Completeness</h2>
+<h2>Metadata Completeness</h2>
 
-  <% if metadata_completeness.data.present? %>
+<% if metadata_completeness.field_data.present? %>
 
-    <table>
-      <% metadata_completeness.data.each do |key, value| %>
-          <tr>
-            <td><%= key.titleize %></td>
-            <td><%= render_percentage(value) %></td>
-          </tr>
-      <% end %>
-    </table>
+  <table>
+    <% metadata_completeness.field_data.each do |key, value| %>
+        <tr>
+          <td><%= key.titleize %></td>
+          <td><%= render_percentage(value) %></td>
+        </tr>
+    <% end %>
+  </table>
 
-  <% else %>
-    <div class="no-data">Data not available</div>
-  <% end %>
-</div>
+<% else %>
+  <div class="no-data">Data not available</div>
+<% end %>

@@ -1,24 +1,20 @@
 <%# Local variables: overview [Overview] %>
 
-<div class="metrics">
+<h2>API use</h2>
 
-  <h2>API use</h2>
+<% if api_data_for_date_range? %>
 
-  <% if api_data_for_date_range? %>
+  <table>
+    <tr>
+      <td>View item metadata</td>
+      <td><%= overview.total_api_events %></td>
+    </tr>
+    <tr>
+      <td>Registered users/apps</td>
+      <td><%= overview.api_users %></td>
+    </tr>
+  </table>
 
-    <table>
-      <tr>
-        <td>View item metadata</td>
-        <td><%= overview.total_api_events %></td>
-      </tr>
-      <tr>
-        <td>Registered users/apps</td>
-        <td><%= overview.api_users %></td>
-      </tr>
-    </table>
-
-  <% else %>
-      <div class="no-data">Data not available</div>
-  <% end %>
-
-</div>
+<% else %>
+    <div class="no-data">Data not available</div>
+<% end %>
