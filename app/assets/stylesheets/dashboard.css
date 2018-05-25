@@ -192,6 +192,7 @@ th, td {
 .metrics {
   display: inline-block;
   margin-bottom: 20px;
+  float: left;
 }
 
 .metrics:first-of-type, .metrics:nth-of-type(2) {
