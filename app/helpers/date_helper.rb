@@ -33,7 +33,7 @@ module DateHelper
 
     if (@start_date && @start_date >= api_min_date)
       true
-    else 
+    else
       false
     end
   end
