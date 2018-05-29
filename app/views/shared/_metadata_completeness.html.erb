@@ -8,7 +8,9 @@
     <% metadata_completeness.field_data.each do |key, value| %>
         <tr>
           <td><%= key.titleize %></td>
-          <td><%= render_percentage(value) %></td>
+          <td class="bar <%= percentage_class(value) %>">
+            <%= render_percentage(value) %>
+          </td>
         </tr>
     <% end %>
   </table>
