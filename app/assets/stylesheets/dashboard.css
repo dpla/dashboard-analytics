@@ -221,6 +221,13 @@ th, td {
   display: list-item;
 }
 
+.metrics td.bar {
+  min-width: 100px;
+  text-align: left;
+  border: 1px solid #e9dec8;
+  padding-left: 4px;
+}
+
 .metrics .no-data {
   display: table;
 }
@@ -302,6 +309,10 @@ table input[type="submit"] {
 .item-table td:last-child {
   text-align: right;
   padding-right: 14px;
+}
+
+table#comparison {
+  clear: both;
 }
 
 form.comparison fieldset {

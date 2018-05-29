@@ -111,7 +111,7 @@
       <% end %>
       <th class="item-count">Item Count</th>
       <% MetadataCompleteness.fields.each do |field| %>
-        <th class="<%= field %>"><%= field.titleize %></th>
+        <th class="<%= field %>"><%= field.titleize %> Completeness</th>
       <% end %>
 
       <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
@@ -146,8 +146,9 @@
           <%= totals["MetadataCompleteness"]['count'] %>
         </td>
         <% MetadataCompleteness.fields.each do |field| %>
-          <td class="<%= field %>">
-            <%= render_percentage(totals["MetadataCompleteness"][field]) %>
+          <% value = totals["MetadataCompleteness"][field] %>
+          <td class="<%= field %> <%= percentage_class(value) %>">
+            <%= render_percentage(value) %>
           </td>
         <% end %>
       </tr>

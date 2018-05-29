@@ -1,0 +1,405 @@
+/* https://codepen.io/mgiraldo/pen/BxgGMK */
+
+.value-0 {
+  background: linear-gradient(to right, #d7ebf4 0%, white 0%);
+}
+
+.value-1 {
+  background: linear-gradient(to right, #d7ebf4 1%, white 1%);
+}
+
+.value-2 {
+  background: linear-gradient(to right, #d7ebf4 2%, white 2%);
+}
+
+.value-3 {
+  background: linear-gradient(to right, #d7ebf4 3%, white 3%);
+}
+
+.value-4 {
+  background: linear-gradient(to right, #d7ebf4 4%, white 4%);
+}
+
+.value-5 {
+  background: linear-gradient(to right, #d7ebf4 5%, white 5%);
+}
+
+.value-6 {
+  background: linear-gradient(to right, #d7ebf4 6%, white 6%);
+}
+
+.value-7 {
+  background: linear-gradient(to right, #d7ebf4 7%, white 7%);
+}
+
+.value-8 {
+  background: linear-gradient(to right, #d7ebf4 8%, white 8%);
+}
+
+.value-9 {
+  background: linear-gradient(to right, #d7ebf4 9%, white 9%);
+}
+
+.value-10 {
+  background: linear-gradient(to right, #d7ebf4 10%, white 10%);
+}
+
+.value-11 {
+  background: linear-gradient(to right, #d7ebf4 11%, white 11%);
+}
+
+.value-12 {
+  background: linear-gradient(to right, #d7ebf4 12%, white 12%);
+}
+
+.value-13 {
+  background: linear-gradient(to right, #d7ebf4 13%, white 13%);
+}
+
+.value-14 {
+  background: linear-gradient(to right, #d7ebf4 14%, white 14%);
+}
+
+.value-15 {
+  background: linear-gradient(to right, #d7ebf4 15%, white 15%);
+}
+
+.value-16 {
+  background: linear-gradient(to right, #d7ebf4 16%, white 16%);
+}
+
+.value-17 {
+  background: linear-gradient(to right, #d7ebf4 17%, white 17%);
+}
+
+.value-18 {
+  background: linear-gradient(to right, #d7ebf4 18%, white 18%);
+}
+
+.value-19 {
+  background: linear-gradient(to right, #d7ebf4 19%, white 19%);
+}
+
+.value-20 {
+  background: linear-gradient(to right, #d7ebf4 20%, white 20%);
+}
+
+.value-21 {
+  background: linear-gradient(to right, #d7ebf4 21%, white 21%);
+}
+
+.value-22 {
+  background: linear-gradient(to right, #d7ebf4 22%, white 22%);
+}
+
+.value-23 {
+  background: linear-gradient(to right, #d7ebf4 23%, white 23%);
+}
+
+.value-24 {
+  background: linear-gradient(to right, #d7ebf4 24%, white 24%);
+}
+
+.value-25 {
+  background: linear-gradient(to right, #d7ebf4 25%, white 25%);
+}
+
+.value-26 {
+  background: linear-gradient(to right, #d7ebf4 26%, white 26%);
+}
+
+.value-27 {
+  background: linear-gradient(to right, #d7ebf4 27%, white 27%);
+}
+
+.value-28 {
+  background: linear-gradient(to right, #d7ebf4 28%, white 28%);
+}
+
+.value-29 {
+  background: linear-gradient(to right, #d7ebf4 29%, white 29%);
+}
+
+.value-30 {
+  background: linear-gradient(to right, #d7ebf4 30%, white 30%);
+}
+
+.value-31 {
+  background: linear-gradient(to right, #d7ebf4 31%, white 31%);
+}
+
+.value-32 {
+  background: linear-gradient(to right, #d7ebf4 32%, white 32%);
+}
+
+.value-33 {
+  background: linear-gradient(to right, #d7ebf4 33%, white 33%);
+}
+
+.value-34 {
+  background: linear-gradient(to right, #d7ebf4 34%, white 34%);
+}
+
+.value-35 {
+  background: linear-gradient(to right, #d7ebf4 35%, white 35%);
+}
+
+.value-36 {
+  background: linear-gradient(to right, #d7ebf4 36%, white 36%);
+}
+
+.value-37 {
+  background: linear-gradient(to right, #d7ebf4 37%, white 37%);
+}
+
+.value-38 {
+  background: linear-gradient(to right, #d7ebf4 38%, white 38%);
+}
+
+.value-39 {
+  background: linear-gradient(to right, #d7ebf4 39%, white 39%);
+}
+
+.value-40 {
+  background: linear-gradient(to right, #d7ebf4 40%, white 40%);
+}
+
+.value-41 {
+  background: linear-gradient(to right, #d7ebf4 41%, white 41%);
+}
+
+.value-42 {
+  background: linear-gradient(to right, #d7ebf4 42%, white 42%);
+}
+
+.value-43 {
+  background: linear-gradient(to right, #d7ebf4 43%, white 43%);
+}
+
+.value-44 {
+  background: linear-gradient(to right, #d7ebf4 44%, white 44%);
+}
+
+.value-45 {
+  background: linear-gradient(to right, #d7ebf4 45%, white 45%);
+}
+
+.value-46 {
+  background: linear-gradient(to right, #d7ebf4 46%, white 46%);
+}
+
+.value-47 {
+  background: linear-gradient(to right, #d7ebf4 47%, white 47%);
+}
+
+.value-48 {
+  background: linear-gradient(to right, #d7ebf4 48%, white 48%);
+}
+
+.value-49 {
+  background: linear-gradient(to right, #d7ebf4 49%, white 49%);
+}
+
+.value-50 {
+  background: linear-gradient(to right, #d7ebf4 50%, white 50%);
+}
+
+.value-51 {
+  background: linear-gradient(to right, #d7ebf4 51%, white 51%);
+}
+
+.value-52 {
+  background: linear-gradient(to right, #d7ebf4 52%, white 52%);
+}
+
+.value-53 {
+  background: linear-gradient(to right, #d7ebf4 53%, white 53%);
+}
+
+.value-54 {
+  background: linear-gradient(to right, #d7ebf4 54%, white 54%);
+}
+
+.value-55 {
+  background: linear-gradient(to right, #d7ebf4 55%, white 55%);
+}
+
+.value-56 {
+  background: linear-gradient(to right, #d7ebf4 56%, white 56%);
+}
+
+.value-57 {
+  background: linear-gradient(to right, #d7ebf4 57%, white 57%);
+}
+
+.value-58 {
+  background: linear-gradient(to right, #d7ebf4 58%, white 58%);
+}
+
+.value-59 {
+  background: linear-gradient(to right, #d7ebf4 59%, white 59%);
+}
+
+.value-60 {
+  background: linear-gradient(to right, #d7ebf4 60%, white 60%);
+}
+
+.value-61 {
+  background: linear-gradient(to right, #d7ebf4 61%, white 61%);
+}
+
+.value-62 {
+  background: linear-gradient(to right, #d7ebf4 62%, white 62%);
+}
+
+.value-63 {
+  background: linear-gradient(to right, #d7ebf4 63%, white 63%);
+}
+
+.value-64 {
+  background: linear-gradient(to right, #d7ebf4 64%, white 64%);
+}
+
+.value-65 {
+  background: linear-gradient(to right, #d7ebf4 65%, white 65%);
+}
+
+.value-66 {
+  background: linear-gradient(to right, #d7ebf4 66%, white 66%);
+}
+
+.value-67 {
+  background: linear-gradient(to right, #d7ebf4 67%, white 67%);
+}
+
+.value-68 {
+  background: linear-gradient(to right, #d7ebf4 68%, white 68%);
+}
+
+.value-69 {
+  background: linear-gradient(to right, #d7ebf4 69%, white 69%);
+}
+
+.value-70 {
+  background: linear-gradient(to right, #d7ebf4 70%, white 70%);
+}
+
+.value-71 {
+  background: linear-gradient(to right, #d7ebf4 71%, white 71%);
+}
+
+.value-72 {
+  background: linear-gradient(to right, #d7ebf4 72%, white 72%);
+}
+
+.value-73 {
+  background: linear-gradient(to right, #d7ebf4 73%, white 73%);
+}
+
+.value-74 {
+  background: linear-gradient(to right, #d7ebf4 74%, white 74%);
+}
+
+.value-75 {
+  background: linear-gradient(to right, #d7ebf4 75%, white 75%);
+}
+
+.value-76 {
+  background: linear-gradient(to right, #d7ebf4 76%, white 76%);
+}
+
+.value-77 {
+  background: linear-gradient(to right, #d7ebf4 77%, white 77%);
+}
+
+.value-78 {
+  background: linear-gradient(to right, #d7ebf4 78%, white 78%);
+}
+
+.value-79 {
+  background: linear-gradient(to right, #d7ebf4 79%, white 79%);
+}
+
+.value-80 {
+  background: linear-gradient(to right, #d7ebf4 80%, white 80%);
+}
+
+.value-81 {
+  background: linear-gradient(to right, #d7ebf4 81%, white 81%);
+}
+
+.value-82 {
+  background: linear-gradient(to right, #d7ebf4 82%, white 82%);
+}
+
+.value-83 {
+  background: linear-gradient(to right, #d7ebf4 83%, white 83%);
+}
+
+.value-84 {
+  background: linear-gradient(to right, #d7ebf4 84%, white 84%);
+}
+
+.value-85 {
+  background: linear-gradient(to right, #d7ebf4 85%, white 85%);
+}
+
+.value-86 {
+  background: linear-gradient(to right, #d7ebf4 86%, white 86%);
+}
+
+.value-87 {
+  background: linear-gradient(to right, #d7ebf4 87%, white 87%);
+}
+
+.value-88 {
+  background: linear-gradient(to right, #d7ebf4 88%, white 88%);
+}
+
+.value-89 {
+  background: linear-gradient(to right, #d7ebf4 89%, white 89%);
+}
+
+.value-90 {
+  background: linear-gradient(to right, #d7ebf4 90%, white 90%);
+}
+
+.value-91 {
+  background: linear-gradient(to right, #d7ebf4 91%, white 91%);
+}
+
+.value-92 {
+  background: linear-gradient(to right, #d7ebf4 92%, white 92%);
+}
+
+.value-93 {
+  background: linear-gradient(to right, #d7ebf4 93%, white 93%);
+}
+
+.value-94 {
+  background: linear-gradient(to right, #d7ebf4 94%, white 94%);
+}
+
+.value-95 {
+  background: linear-gradient(to right, #d7ebf4 95%, white 95%);
+}
+
+.value-96 {
+  background: linear-gradient(to right, #d7ebf4 96%, white 96%);
+}
+
+.value-97 {
+  background: linear-gradient(to right, #d7ebf4 97%, white 97%);
+}
+
+.value-98 {
+  background: linear-gradient(to right, #d7ebf4 98%, white 98%);
+}
+
+.value-99 {
+  background: linear-gradient(to right, #d7ebf4 99%, white 99%);
+}
+
+.value-100 {
+  background: linear-gradient(to right, #d7ebf4 100%, white 100%);
+}
