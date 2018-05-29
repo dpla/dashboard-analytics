@@ -1,16 +1,19 @@
 <%# Local variables: hub [Hub] %>
 
 <% if current_user.hub == "All" %>
-<div class="submenu">
-  <nav>
-    <ul>
-      <li><%= link_to hub.name, hub_path(hub.name, date_opts) %></li>
-      <% if hub.contributors.count > 1 %>
+  <div class="submenu">
+    <nav>
+      <ul>
         <li>
-          <%= link_to "Contributors", hub_contributors_path(hub.name, date_opts) %>
+          <%= link_to hub.name, hub_path(hub.name, date_opts) %>
         </li>
-      <% end %>
-    </ul>
-  </nav>
-</div>
+        <% if hub.contributors.count > 1 %>
+          <li>
+            <%= link_to "Contributors",
+                hub_contributors_path(hub.name, date_opts) %>
+          </li>
+        <% end %>
+      </ul>
+    </nav>
+  </div>
 <% end %>

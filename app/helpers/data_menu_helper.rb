@@ -66,6 +66,12 @@ module DataMenuHelper
     link_to("API", path, html_opts(path))
   end
 
+  ##
+  # Set HTML class to selected if the given path matches the current request
+  # path. Parameters (e.g. start_date and end_date) are ignored.
+  #
+  # @param String
+  #
   def html_opts(path)
     path.split("?").first == request.path ? { class: 'selected' } : {}
   end
