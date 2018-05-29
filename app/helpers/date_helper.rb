@@ -27,21 +27,13 @@ module DateHelper
     dates
   end
 
-  def selected_start_date
-    @start_date.strftime("%Y-%m")
-  end
-
-  def selected_end_date
-    @end_date.strftime("%Y-%m")
-  end
-
   def api_data_for_date_range?
     api_min_date = Date.new(Settings.api_min_date.year, 
                             Settings.api_min_date.month)
 
     if (@start_date && @start_date >= api_min_date)
       true
-    else 
+    else
       false
     end
   end

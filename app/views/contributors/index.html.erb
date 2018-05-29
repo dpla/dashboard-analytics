@@ -117,9 +117,10 @@
       <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
       <tr>
         <td>
-          <a href="/hubs/<%= @hub.name %>/contributors/<%= contributor %>">
-            <%= contributor %>
-          </a>
+          <%= link_to contributor, controller: :contributors, action: :show,
+                                   hub_id: @hub.name, id: contributor,
+                                   start_date: current_start_date,
+                                   end_date: current_end_date %>
         </td>
         <td class="website-view">
           <%= totals["Website"]["Views"] %>

@@ -1,10 +1,10 @@
 <div class="date-select">
   <%= form_tag(request.path, method: :get) do %>
     <%= label_tag(:start_date, 'Start:') %>
-    <%= select_tag(:start_date, options_for_select(date_form_options, selected_start_date)) %>
+    <%= select_tag(:start_date, options_for_select(date_form_options, current_start_date)) %>
 
     <%= label_tag(:end_date, 'End:') %>
-    <%= select_tag(:end_date, options_for_select(date_form_options, selected_end_date)) %>
+    <%= select_tag(:end_date, options_for_select(date_form_options, current_end_date)) %>
 
     <%= submit_tag 'Refresh' %>
   <% end %>

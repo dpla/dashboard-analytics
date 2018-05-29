@@ -10,6 +10,7 @@ class HubsController < ApplicationController
   include MetadataCompletenessHelper
 
   def index
+    assign_start_and_end_dates
     @hubs = Hub.all
     redirect_to hub_path(current_user.hub) unless current_user.hub == "All"
   end
