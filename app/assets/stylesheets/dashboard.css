@@ -232,11 +232,12 @@ th, td {
 }
 
 .date-select label {
-  margin-right: 10px;
+  margin-right: 6px;
 }
 
 .date-select select {
   background-color: white;
+  margin-right: 10px;
 }
 
 .users label {

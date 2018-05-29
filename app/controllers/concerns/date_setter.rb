@@ -18,62 +18,46 @@ module DateSetter
   end
 
   ##
-  # This assigns values to @start_date and @end_date using params[:date].
-  # params[:date] is expected to be in format "YYYY-MM" or "YYYY-Q#"
+  # This assigns values to @start_date and @end_date using params[:start_date]
+  # and params[:end_date], both of which are expected to be in the format
+  # "YYYY-MM"
   # The default start date is the beginning of the current month.
   # The default end date is today.
   # DateSetter has access to controller params and instance variables.
   #
   def assign_start_and_end_dates
-    year = parse_year
-    month = parse_month
-    quarter = parse_quarter
+    start_year = parse_year(params[:start_date])
+    start_month = parse_month(params[:start_date])
+    @start_date = start_of_month(start_year, start_month)
+    @end_date = default_end_date
 
-    if quarter
-      @start_date = start_of_quarter(year, quarter)
-      @end_date = end_of_quarter(@start_date)
+    if params[:end_date].present?
+      end_year = parse_year(params[:end_date])
+      end_month = parse_month(params[:end_date])
+      @end_date = end_of_month(end_year, end_month)
     else
-      @start_date = start_of_month(year, month)
-      @end_date = end_of_month(@start_date)
+      @end_date = end_of_start_month(@start_date)
     end
+
+    @end_date = default_end_date if @end_date < @start_date
   end
 
   ##
-  # Parse year from date param.
+  # Parse year from date.
   # Date param expected to be in format "YYYY-MM" or "YYYY-Q#"
   # @return Int | nil
   #
-  def parse_year
-    params[:date].split("-").first.to_i rescue nil
+  def parse_year(date)
+    date.split("-").first.to_i rescue nil
   end
 
   ##
-  # Parse month from date param.
+  # Parse month from date.
   # Date param expected to be in format "YYYY-MM" or "YYYY-Q#"
   # @return Int | nil
   #
-  def parse_month
-    params[:date].split("-").last.to_i rescue nil
-  end
-
-  ##
-  # Parse quarter from date param.
-  # Date param expected to be in format "YYYY-MM" or "YYYY-Q#"
-  # @return Int | nil
-  #
-  def parse_quarter
-    quarter = params[:date].split("-").last rescue ""
-    return unless quarter.start_with?("Q")
-    quarter.sub("Q", "").to_i rescue nil
-  end
-
-  ##
-  # Given a quarter, return the first month of the quarter.
-  # @param Int
-  # @return Int
-  #
-  def quarter_start_month(q)
-    (q*3)-2
+  def parse_month(date)
+    date.split("-").last.to_i rescue nil
   end
 
   ##
@@ -96,24 +80,14 @@ module DateSetter
     end
   end
 
-  ##
-  # Get the first day of a given quarter and year.
-  # If quarter and day are missing or invalid, return default start date.
-  #
-  # @param year Int | nil
-  # @param quarter Int | nil
-  # @return Date
-  #
-  def start_of_quarter(year, quarter)
+  def end_of_month(year, month)
     begin
       # will raise exception if params are missing or invalid
-      month = quarter_start_month(quarter)
-      start_date = Date.new(year, month)
-      raise ArgumentError if start_date < min_date
-      raise ArgumentError if start_date > max_date
-      start_date
+      end_date = Date.new(year, month).end_of_month
+      raise ArgumentError if end_date > max_date
+      end_date
     rescue
-      default_start_date
+      default_end_date
     end
   end
 
@@ -124,27 +98,9 @@ module DateSetter
   #
   # @param Date
   # @return Date
-  def end_of_month(start_date)
+  def end_of_start_month(start_date)
     begin
       end_date = start_date.end_of_month
-      raise ArgumentError if end_date > max_date
-      end_date
-    rescue
-      default_end_date
-    end
-  end
-
-  ##
-  # Given the first day of a quarter, get the last day of that same quarter.
-  # If the end of the given quarter is after the current date,
-  # return default end date.
-  #
-  # @param Date
-  # @return Date
-  #
-  def end_of_quarter(start_date)
-    begin
-      end_date = start_date.end_of_quarter
       raise ArgumentError if end_date > max_date
       end_date
     rescue
