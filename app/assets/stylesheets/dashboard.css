@@ -313,6 +313,7 @@ table input[type="submit"] {
 
 table#comparison {
   clear: both;
+  font-size: 0.9em;
 }
 
 form.comparison fieldset {
@@ -320,6 +321,7 @@ form.comparison fieldset {
   float: left;
   border: none;
   margin-bottom: 20px;
+  font-size: 0.9em;
 }
 
 form.comparison legend {

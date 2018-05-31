@@ -24,6 +24,7 @@ gem 'google-api-client', '~> 0.11'
 gem 'googleauth', '~> 0.6'
 gem 'httparty', '~> 0.16.2'
 gem 'devise', '~> 4.4.3'
+gem 'jquery-rails', '~> 4.3.1'
 # Set versions of following gems to fix security vulnerabilities
 gem 'rails-html-sanitizer', '>= 1.0.4'
 
