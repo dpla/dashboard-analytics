@@ -14,4 +14,5 @@
 //= require jquery
 //= require turbolinks
 //= google-analytics
+//= jquery-tablesorter
 //= tablesort
