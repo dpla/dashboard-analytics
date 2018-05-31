@@ -3,7 +3,11 @@
   document.addEventListener("turbolinks:load", function(){
     console.log("turbolinks load");
     $(document).ready(function() {
-      $("#comparison").tablesorter();
+      $("#comparison").tablesorter({
+        cssHeader: 'header',
+        cssAsc: 'headerSortUp',
+        cssDesc: 'headerSortDown'
+      });
     });
   });
 })();

@@ -1,0 +1,22 @@
+th.header { 
+    background-image: url(/assets/bg.gif); 
+    cursor: pointer; 
+    background-repeat: no-repeat; 
+    background-position: center left; 
+    padding-left: 20px; 
+    margin-left: -1px;
+} 
+
+th.header:hover {
+  background-color: #f9f6f0;
+}
+
+th.headerSortUp { 
+    background-image: url(/assets/asc.gif); 
+    background-color: #e9dec8; 
+} 
+
+th.headerSortDown { 
+    background-image: url(/assets/desc.gif); 
+    background-color: #e9dec8;
+} 

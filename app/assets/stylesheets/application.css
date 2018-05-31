@@ -13,5 +13,6 @@
  *= require reset.css
  *= require dashboard.css
  *= require percentage_cells.css
+ *= require tablesort.css
  *= require_self
  */
