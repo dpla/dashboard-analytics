@@ -327,3 +327,8 @@ form.comparison fieldset {
 form.comparison legend {
   font-weight: bold;
 }
+
+.description {
+  font-weight: bold;
+  margin: 10px 0;
+}

@@ -16,7 +16,13 @@
   <div class="data-content">
     <div class="data-section">
       <div class="item-table">
-        <h2><%= params[:id].titleize %></h2>
+        <% scope = params[:id] == "website" ? "Website" : "API" %>
+
+        <h2><%= scope %></h2>
+
+        <div class="description">
+          Top search terms across the DPLA <%= scope %> for all hubs and contributors.
+        </div>
 
         <% if @search_terms.terms.present? %>
 
