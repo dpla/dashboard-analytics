@@ -2,6 +2,8 @@
   // This is the turbolinks equivalent to a page load.
   document.addEventListener("turbolinks:load", function(){
 
+    console.log("mapmap");
+
     // Load google analytics api
 
     (function(w,d,s,g,js,fjs){

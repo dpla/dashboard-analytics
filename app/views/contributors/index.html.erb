@@ -1,3 +1,11 @@
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'http://tablesorter.com/__jquery.tablesorter.min.js',
+      'data-turbolinks-track': 'reload', defer: 'defer' %>
+
+  <%= javascript_include_tag 'tablesort', 
+      'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
+
 <%= render partial: "shared/sub_navigation",
   locals: { hub: @hub } %>
 
@@ -98,61 +106,66 @@
     </fieldset>
   </form>
 
-  <table id='comparison'>
-    <tr>
-      <th>Contributor</th>
-      <th class="website-view">Website Views</th>
-      <th class="click-through">Website Click Throughs</th>
-      <th class="website-session">Website Sessions</th>
-      <th class="website-user">Website Users</th>
-      <% if api_data_for_date_range? %>
-        <th class="api-view">API Views</th>
-        <th class="api-user">API Users/Apps</th>
-      <% end %>
-      <th class="item-count">Item Count</th>
-      <% MetadataCompleteness.fields.each do |field| %>
-        <th class="<%= field %>"><%= field.titleize %> Completeness</th>
-      <% end %>
-
-      <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
+  <table id='comparison' class='tablesorter'>
+    <thead>
       <tr>
-        <td>
-          <%= link_to contributor, controller: :contributors, action: :show,
-                                   hub_id: @hub.name, id: contributor,
-                                   start_date: current_start_date,
-                                   end_date: current_end_date %>
-        </td>
-        <td class="website-view">
-          <%= totals["Website"]["Views"] %>
-        </td>
-        <td class="click-through">
-          <%= totals["Website"]["Click Throughs"] %>
-        </td>
-        <td class="website-session">
-          <%= totals["Website"]["Sessions"] %>
-        </td>
-        <td class="website-user">
-          <%= totals["Website"]["Users"] %>
-        </td>
+        <th>Contributor</th>
+        <th class="website-view">Website Views</th>
+        <th class="click-through">Website Click Throughs</th>
+        <th class="website-session">Website Sessions</th>
+        <th class="website-user">Website Users</th>
         <% if api_data_for_date_range? %>
-          <td class="api-view">
-            <%= totals["Api"]["Views"] %>
-          </td>
-          <td class="api-user">
-            <%= totals["Api"]["Users"] %>
-          </td>
+          <th class="api-view">API Views</th>
+          <th class="api-user">API Users/Apps</th>
         <% end %>
-        <td class="item-count">
-          <%= totals["MetadataCompleteness"]['count'] %>
-        </td>
+        <th class="item-count">Item Count</th>
         <% MetadataCompleteness.fields.each do |field| %>
-          <% value = totals["MetadataCompleteness"][field] %>
-          <td class="<%= field %> <%= percentage_class(value) %>">
-            <%= render_percentage(value) %>
-          </td>
+          <th class="<%= field %>"><%= field.titleize %> Completeness</th>
         <% end %>
       </tr>
+    </thead>
+
+    <tbody>
+      <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
+        <tr>
+          <td>
+            <%= link_to contributor, controller: :contributors, action: :show,
+                                     hub_id: @hub.name, id: contributor,
+                                     start_date: current_start_date,
+                                     end_date: current_end_date %>
+          </td>
+          <td class="website-view">
+            <%= totals["Website"]["Views"] %>
+          </td>
+          <td class="click-through">
+            <%= totals["Website"]["Click Throughs"] %>
+          </td>
+          <td class="website-session">
+            <%= totals["Website"]["Sessions"] %>
+          </td>
+          <td class="website-user">
+            <%= totals["Website"]["Users"] %>
+          </td>
+          <% if api_data_for_date_range? %>
+            <td class="api-view">
+              <%= totals["Api"]["Views"] %>
+            </td>
+            <td class="api-user">
+              <%= totals["Api"]["Users"] %>
+            </td>
+          <% end %>
+          <td class="item-count">
+            <%= totals["MetadataCompleteness"]['count'] %>
+          </td>
+          <% MetadataCompleteness.fields.each do |field| %>
+            <% value = totals["MetadataCompleteness"][field] %>
+            <td class="<%= field %> <%= percentage_class(value) %>">
+              <%= render_percentage(value) %>
+            </td>
+          <% end %>
+        </tr>
       <% end %>
+    </tbody>
   </table>
 
 </main>
