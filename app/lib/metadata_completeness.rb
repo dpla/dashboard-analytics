@@ -95,7 +95,7 @@ class MetadataCompleteness
     data = []
 
     begin
-      CSV.foreach(contributor_filepath, headers: true) do |row|
+      sThree.contributor_data.each do |row|
         if row["provider"] == hub_name
           data.push(row.to_hash)
         end
