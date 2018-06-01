@@ -59,7 +59,7 @@ class MetadataCompleteness
     data = nil
 
     begin
-      CSV.foreach(hub_filepath, headers: true) do |row|
+      sThree.provider_data.each do |row|
         break if data != nil
         data = row if row["provider"] == hub_name
       end
@@ -76,7 +76,7 @@ class MetadataCompleteness
     data = nil
 
     begin
-      CSV.foreach(contributor_filepath, headers: true) do |row|
+      sThree.contributor_data.each do |row|
         break if data != nil
         if row["provider"] == hub_name and row["dataProvider"] == contributor_name
           data = row
@@ -95,7 +95,7 @@ class MetadataCompleteness
     data = []
 
     begin
-      CSV.foreach(contributor_filepath, headers: true) do |row|
+      sThree.contributor_data.each do |row|
         if row["provider"] == hub_name
           data.push(row.to_hash)
         end
@@ -105,6 +105,10 @@ class MetadataCompleteness
     end
 
     return data
+  end
+
+  def sThree
+    SThreeResponseBuilder.new(target.end_date)
   end
 
   # @return String
