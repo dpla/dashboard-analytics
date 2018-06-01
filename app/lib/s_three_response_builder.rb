@@ -1,4 +1,4 @@
-class SThreeResponseBuider
+class SThreeResponseBuilder
 
   ##
   # @param start_date [String] in format YYYT-MM-DD (iso8601)
@@ -9,11 +9,12 @@ class SThreeResponseBuider
   end
 
   def month
+    # @end_date.split("-")[1]
     "04"
   end
 
   def year
-    @end_date.year.to_s
+    @end_date.split("-").first
   end
 
   def provider_data
@@ -28,15 +29,15 @@ class SThreeResponseBuider
 
   # @param String file name
   # @return String representation of the contents of the CSV file
-  def get_data_string(name)
+  def get_csv(name)
     client = Aws::S3::Client.new(region: 'us-east-1')
     bucket = "dashboard-analytics"
-    # key = "#{year}/#{month}/#{name}"
-    key = "2018/04/providers.csv"
+    key = "#{year}/#{month}/#{name}"
+    # key = "2018/04/provider.csv"
     # response is instance of Seahorse::Client::Response
     response = client.get_object({ bucket: bucket, key: key })
     # response.body.read is instance of String
-    # CSV.new(response.body.read, headers: true)
-    response.body.read
+    CSV.new(response.body.read, headers: true)
+    # response.body.read
   end
 end

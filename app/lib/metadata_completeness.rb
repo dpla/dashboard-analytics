@@ -41,7 +41,7 @@ class MetadataCompleteness
     @all_contributors_data ||= get_all_contributors_data
   end
 
-  private
+  # private
 
   ##
   # Gets completeness data for the target.
@@ -59,7 +59,7 @@ class MetadataCompleteness
     data = nil
 
     begin
-      CSV.new(sThree.provider_data, headers: true) do |row|
+      sThree.provider_data.each do |row|
         break if data != nil
         data = row if row["provider"] == hub_name
       end
@@ -108,7 +108,7 @@ class MetadataCompleteness
   end
 
   def sThree
-    sThreeResponseBuilder.new(end_date)
+    SThreeResponseBuilder.new(target.end_date)
   end
 
   # @return String
