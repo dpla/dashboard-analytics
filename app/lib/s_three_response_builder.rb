@@ -47,7 +47,7 @@ class SThreeResponseBuilder
   end
 
   def min_date
-    Date.new(Settings.min_date.year, Settings.min_date.month)
+    Date.new(Settings.mc_min_date.year.to_i, Settings.mc_min_date.month.to_i)
   end
 
   ##
@@ -58,10 +58,13 @@ class SThreeResponseBuilder
     response = nil
 
     while response == nil
+      break if date < min_date
+
       # File path in format YYYY/MM/filename.csv
       key = "#{date.year}/#{date.strftime("%m")}/#{name}"
 
       begin
+        puts "try #{key}"
         response = get_csv(key)
       rescue Aws::S3::Errors::NoSuchKey => e
         # no action, loop continues
@@ -70,7 +73,6 @@ class SThreeResponseBuilder
       end
 
       date = date.last_month
-      break if date <= min_date
     end
 
     return response

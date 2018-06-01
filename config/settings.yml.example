@@ -26,3 +26,8 @@ min_date:
 api_min_date:
   month: 05
   year: 2018
+
+# Minimum date for which metadata completeness data is available
+mc_min_date:
+  month: 04
+  year: 2018
