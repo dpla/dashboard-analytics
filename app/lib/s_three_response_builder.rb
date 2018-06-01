@@ -43,14 +43,21 @@ class SThreeResponseBuilder
   ##
   # @return String
   def bucket
-    "dashboard-analytics"
+    Settings.s3.bucket
   end
 
+  ##
+  # Minimum data that data is expected to be available.
+  # @return Date
   def min_date
     Date.new(Settings.mc_min_date.year.to_i, Settings.mc_min_date.month.to_i)
   end
 
   ##
+  # Get data from the month specified in end_date.
+  # If no data is available for that month, get the previous month.
+  # Continue trying until data is available or min date is surpassed.
+  #
   # @param String file name
   # @return CSV | nil
   def most_recent(name)
@@ -79,6 +86,8 @@ class SThreeResponseBuilder
   end
 
   ##
+  # Get a CSV file from S3.
+  #
   # @param String filepath
   # @return CSV
   # @throws Aws::S3::Errors::NoSuchKey if file does not exist

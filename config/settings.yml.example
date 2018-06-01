@@ -17,6 +17,9 @@ dpla:
   # include trailing backslash
   base_uri: https://dp.la/
 
+s3:
+  bucket: CHANGEME
+
 # Minimum date for which any dashboard data is available
 min_date:
   month: 01
