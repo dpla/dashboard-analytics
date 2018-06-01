@@ -11,8 +11,7 @@ class SThreeResponseBuilder
   ##
   # @return String
   def month
-    # @end_date.split("-")[1]
-    "04"
+    @end_date.split("-")[1]
   end
 
   ##
@@ -22,18 +21,18 @@ class SThreeResponseBuilder
   end
 
   ##
-  # @return CSV
+  # @return CSV | nil
   def provider_data
-    get_csv("provider.csv")
+    most_recent("provider.csv")
   end
 
   ##
-  # @return CSV
+  # @return CSV | nil
   def contributor_data
-    get_csv("contributor.csv")
+    most_recent("contributor.csv")
   end
 
-  # private
+  private
 
   ##
   # @return Aws::S3::Client
@@ -47,11 +46,41 @@ class SThreeResponseBuilder
     "dashboard-analytics"
   end
 
+  def min_date
+    Date.new(Settings.min_date.year, Settings.min_date.month)
+  end
+
+  ##
   # @param String file name
+  # @return CSV | nil
+  def most_recent(name)
+    date = Date.new(year.to_i, month.to_i)
+    response = nil
+
+    while response == nil
+      # File path in format YYYY/MM/filename.csv
+      key = "#{date.year}/#{date.strftime("%m")}/#{name}"
+
+      begin
+        response = get_csv(key)
+      rescue Aws::S3::Errors::NoSuchKey => e
+        # no action, loop continues
+      rescue Exception => e
+        # TODO: log/handle error
+      end
+
+      date = date.last_month
+      break if date <= min_date
+    end
+
+    return response
+  end
+
+  ##
+  # @param String filepath
   # @return CSV
-  def get_csv(name)
-    key = "#{year}/#{month}/#{name}"
-    # key = "2018/04/provider.csv"
+  # @throws Aws::S3::Errors::NoSuchKey if file does not exist
+  def get_csv(key)
     # response is instance of Seahorse::Client::Response
     response = client.get_object({ bucket: bucket, key: key })
     # response.body.read is instance of String
