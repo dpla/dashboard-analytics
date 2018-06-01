@@ -41,7 +41,7 @@ class MetadataCompleteness
     @all_contributors_data ||= get_all_contributors_data
   end
 
-  # private
+  private
 
   ##
   # Gets completeness data for the target.
