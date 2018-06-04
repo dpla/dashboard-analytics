@@ -49,7 +49,7 @@ class Hub
   end
 
   def metadata_completeness
-    @mc ||= MetadataCompleteness.new(self)
+    MetadataCompleteness.new(self)
   end
 
   def events(event_id)
