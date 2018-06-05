@@ -16,6 +16,11 @@ class ContributorsController < ApplicationController
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_contributors_path(current_user.hub)
     end
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data @hub.contributor_comparison.to_csv }
+    end
   end
 
   def show
