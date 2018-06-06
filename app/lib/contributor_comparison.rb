@@ -69,9 +69,7 @@ class ContributorComparison
                 api["Views"],
                 api["Users"] ]
 
-        MetadataCompleteness.fields.each do |field|
-          data.push(metadata_completeness.field_data[field])
-        end
+        MetadataCompleteness.fields.each { |field| data.push(mc[field]) }
 
         csv << data
       end
