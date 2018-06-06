@@ -3,7 +3,7 @@ class MetadataCompleteness
 
   # Fields to be shown in the user interface.
   def self.fields
-    [ 'type', 'subject', 'description', 'preview', 'date',  'creator',
+    [ 'type', 'subject', 'description', 'preview', 'date', 'creator',
       'location', 'language', 'standardizedRights' ]
   end
 
@@ -21,6 +21,7 @@ class MetadataCompleteness
     @data ||= get_data
   end
 
+  # @return Hash
   def field_data
     data.select { |k, v| self.class.fields.include? k }
   end

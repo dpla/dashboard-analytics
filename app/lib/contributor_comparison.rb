@@ -37,6 +37,45 @@ class ContributorComparison
     end
   end
 
+  ##
+  # Generate a CSV file with the data from totals.
+  def to_csv
+    attributes = [ "Contributor",
+                   "Website Sessions",
+                   "Website Users",
+                   "Website Views",
+                   "Website Click Throughs",
+                   "API Views",
+                   "API Users" ]
+
+    MetadataCompleteness.fields.each do |field|
+      attributes.push(field.titleize + " Completeness")
+    end
+
+    CSV.generate({ headers: true }) do |csv|
+      csv << attributes
+
+      totals.each do |contributor|
+
+        website = contributor[1]["Website"]
+        api = contributor[1]["Api"]
+        mc = contributor[1]["MetadataCompleteness"]
+
+        data =[ contributor[0],
+                website["Sessions"],
+                website["Users"],
+                website["Views"],
+                website["Click Throughs"],
+                api["Views"],
+                api["Users"] ]
+
+        MetadataCompleteness.fields.each { |field| data.push(mc[field]) }
+
+        csv << data
+      end
+    end
+  end
+
   private
 
   def frontend_ga

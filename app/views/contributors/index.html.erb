@@ -106,6 +106,15 @@
     </fieldset>
   </form>
 
+  <div class='download'>
+    <%= link_to 'Download CSV', controller: :contributors,
+                                action: :index,
+                                hub_id: @hub.name,
+                                start_date: current_start_date,
+                                end_date: current_end_date,
+                                format: :csv %>
+  </div>
+
   <table id='comparison'>
     <thead>
       <tr>
