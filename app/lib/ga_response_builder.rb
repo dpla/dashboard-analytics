@@ -41,25 +41,39 @@ class GaResponseBuilder
   # @return Hash
   #   Example search_terms.results:
   #     [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
-  def search_terms
+  def search_terms(start_index = nil)
     metrics = %w(ga:searchUniques)
     dimensions = %w(ga:searchKeyword)
     filters = nil
     sort = %w(-ga:searchUniques) # Descending
 
-    begin
-      res = response(metrics, dimensions, filters, options={ sort: sort } )
+    options={ sort: sort, start_index: start_index }
 
-      {
-        items_per_page: res.items_per_page,
+    begin
+      res = response(metrics, dimensions, filters, options=options )
+
+      { items_per_page: res.items_per_page,
         start_index: res.query.start_index,
         total_results: res.total_results,
-        results: res.rows
-      }
+        next_link: res.next_link,
+        results: res.rows }
     rescue => e
-      # TODO: Log error
+      Rails.logger.error(e)
       Hash.new
     end
+  end
+
+  def all_search_terms
+    results = [search_terms]
+    more = search_terms[:next_link].present?
+
+    while more == true
+      next_start_index = results.last[:start_index] + results.last[:items_per_page]
+      results.push search_terms(next_start_index)
+      more = results.last[:next_link].present?
+    end
+    
+    results.flat_map { |response| response[:results] }
   end
 
   protected
@@ -99,6 +113,7 @@ class GaResponseBuilder
   def response(metrics, dimensions, filters, options={})
     # TODO max results
     sort = options[:sort]
+    start_index = options[:start_index]
 
     #semicolon = "and"
     filters = filters.present? ? filters.join(';') : nil
@@ -110,6 +125,7 @@ class GaResponseBuilder
                           dimensions: dimensions.join(','), #comma = "or"
                           filters: filters,
                           sort: sort,
+                          start_index: start_index,
                           segment: segment) 
   end
 

@@ -26,9 +26,18 @@
 
         <% if @search_terms.terms.present? %>
 
-          <div>
+          <div class="result-info">
             Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>
             of <%= @search_terms.total_results %> search terms.
+          </div>
+
+          <div class="download">
+            <%= link_to "Download all #{@search_terms.total_results} terms",
+                        controller: :search_terms,
+                        action: :show,
+                        start_date: current_start_date,
+                        end_date: current_end_date,
+                        format: :csv %>
           </div>
 
           <table>
