@@ -332,3 +332,8 @@ form.comparison legend {
   font-weight: bold;
   margin: 10px 0;
 }
+
+.download {
+  display: inline-block;
+  float: right;
+}

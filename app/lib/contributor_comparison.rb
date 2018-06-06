@@ -37,6 +37,8 @@ class ContributorComparison
     end
   end
 
+  ##
+  # Generate a CSV file with the data from totals.
   def to_csv
     attributes = [ "Contributor",
                    "Website Sessions",
