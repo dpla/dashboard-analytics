@@ -20,7 +20,7 @@ class SearchTerms
   ##
   # @return Hash
   def data
-    @data ||= get_data
+    @data ||= ga.search_terms
   end
 
   ##
@@ -47,6 +47,24 @@ class SearchTerms
     data[:start_index]
   end
 
+  def all_search_terms
+    @all_search_terms ||= ga.all_search_terms
+  end
+
+  ##
+  # Generate CSV of all search terms.
+  def to_csv
+    attributes = [ "Search term", "Count" ]
+
+    CSV.generate({ headers: true }) do |csv|
+      csv << attributes
+
+      all_search_terms.each do |term|
+        csv << term
+      end
+    end
+  end
+
   ##
   # @return Integer
   def end_index
@@ -55,13 +73,11 @@ class SearchTerms
 
   private
 
-  ##
-  # @return Hash
-  def get_data
+  def ga
     if(id == "website")
-      frontend_ga.search_terms
+      frontend_ga
     elsif(id=="api")
-      api_ga.search_terms
+      api_ga
     end
   end
 

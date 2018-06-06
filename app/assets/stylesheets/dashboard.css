@@ -337,3 +337,9 @@ form.comparison legend {
   display: inline-block;
   float: right;
 }
+
+.result-info {
+  display: inline-block;
+  float: left;
+  margin-bottom: 10px;
+}
