@@ -96,7 +96,7 @@ class ApiAnalytics < GaResponseBuilder
   ##
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
-  # @param options [Hash] Contributor name
+  # @param options [Hash]
   # @return [Hash] | nil
   #
   def events(event, hub, options={})
@@ -148,6 +148,9 @@ class ApiAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # Get all events. Paginate as necessary.
+  # @return [Array]
   def all_events(event, hub, options={})
     results = []
     first_response = events(event, hub, options)

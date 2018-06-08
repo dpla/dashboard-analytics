@@ -164,6 +164,9 @@ class FrontendAnalytics < GaResponseBuilder
     end
   end
 
+  ##
+  # Get all events. Paginate as necessary.
+  # @return [Array]
   def all_events(event, hub, options={})
     results = []
     first_response = events(event, hub, options)

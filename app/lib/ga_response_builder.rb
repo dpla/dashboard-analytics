@@ -63,6 +63,9 @@ class GaResponseBuilder
     end
   end
 
+  ##
+  # Get all search terms. Paginate as necessary.
+  # @return [Array]
   def all_search_terms
     results = [search_terms]
     more = search_terms[:next_link].present?
