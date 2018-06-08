@@ -29,6 +29,10 @@ class Events
     id == 'view_api' ? api_response : frontend_response
   end
 
+  def all_events
+    id == 'view_api' ? all_api_events : all_frontend_events
+  end
+
   def hub_name
     target.is_a?(Hub) ? target.name : target.hub.name
   end
@@ -57,7 +61,21 @@ class Events
     total_results < items_per_page ? total_results : items_per_page
   end
 
-  private
+  ##
+  # Generate CSV of all events
+  def to_csv
+    attributes = ["Item", "Item ID", "Contributor", event_name]
+
+    CSV.generate({ headers: true }) do |csv|
+      csv << attributes
+
+      all_events.each do |event|
+        csv << [event[:title], event[:id], event[:contributor], event[:count]]
+      end
+    end
+  end
+
+  # private
 
   def frontend_ga
     target.frontend_ga
@@ -69,10 +87,24 @@ class Events
 
   def frontend_response
     @frontend_response ||=
-      frontend_ga.events(event_name, hub_name, contributor_name)
+      frontend_ga.events(event_name, hub_name,
+                         options={ contributor: contributor_name })
   end
 
   def api_response
-    @api_response ||= api_ga.events(event_name, hub_name, contributor_name)
+    @api_response ||= api_ga.events(event_name, hub_name,
+                                    options={ contributor: contributor_name })
+  end
+
+  def all_frontend_events
+    @all_frontend_events ||=
+      frontend_ga.all_events(event_name, hub_name,
+                             options={ contributor: contributor_name })
+  end
+
+  def all_api_events
+    @all_frontend_events ||=
+      api_ga.all_events(event_name, hub_name,
+                        options={ contributor: contributor_name })
   end
 end

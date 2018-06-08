@@ -12,8 +12,8 @@ class Hub
   # Initialize a single hub
   # 
   # @param name [String]
-  # @param start_date [String]
-  # @param end_date [String]
+  # @param start_date [Date]
+  # @param end_date [Date]
   #
   def initialize(name, start_date, end_date)
     @name = name

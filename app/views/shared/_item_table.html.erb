@@ -8,10 +8,19 @@
 
   <% if items && items.count > 0 %>
 
-  <div>
+  <div class="result-info">
     Showing <%= @events.start_index %>-<%= @events.end_index %> of 
     <%= @events.total_results %> items.
-  </div> 
+  </div>
+
+  <div class="download">
+    <%= link_to "Download all #{action.downcase}",
+                controller: :events,
+                action: :show,
+                start_date: current_start_date,
+                end_date: current_end_date,
+                format: :csv %>
+  </div>
 
   <table>
     <tr>

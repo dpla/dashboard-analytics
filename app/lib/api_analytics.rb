@@ -96,10 +96,13 @@ class ApiAnalytics < GaResponseBuilder
   ##
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
+  # @param options [Hash]
   # @return [Hash] | nil
   #
-  def events(event, hub, contributor = nil)
+  def events(event, hub, options={})
+    contributor = options[:contributor]
+    start_index = options[:start_index]
+
     event_category = "#{event} : #{hub}"
 
     metrics = %w(ga:totalEvents)
@@ -107,10 +110,12 @@ class ApiAnalytics < GaResponseBuilder
     filters = %W(ga:eventCategory==#{event_category})
     sort = %w(-ga:totalEvents) # Descending
 
+    opts = { sort: sort, start_index: start_index }
+
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      res = response(metrics, dimensions, filters, options={ sort: sort } )
+      res = response(metrics, dimensions, filters, options=opts )
 
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
@@ -119,6 +124,7 @@ class ApiAnalytics < GaResponseBuilder
         items_per_page: res.items_per_page,
         start_index: res.query.start_index,
         total_results: res.total_results,
+        next_link: res.next_link,
         results: []
       }
 
@@ -140,6 +146,26 @@ class ApiAnalytics < GaResponseBuilder
       # TODO: Handle error
       Hash.new
     end
+  end
+
+  ##
+  # Get all events. Paginate as necessary.
+  # @return [Array]
+  def all_events(event, hub, options={})
+    results = []
+    first_response = events(event, hub, options)
+    results.push first_response
+    more = first_response[:next_link].present?
+
+    while more == true
+      options[:start_index] = 
+        results.last[:start_index] + results.last[:items_per_page]
+
+      results.push events(event, hub, options)
+      more = results.last[:next_link].present?
+    end
+
+    results.flat_map{ |response| response[:results] }
   end
 
   protected
