@@ -14,7 +14,7 @@
   </div>
 
   <div class="download">
-    <%= link_to "Download all #{action.downcase}",
+    <%= link_to "Download all #{@events.total_results} #{action.downcase}",
                 controller: :events,
                 action: :show,
                 start_date: current_start_date,
