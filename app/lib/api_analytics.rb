@@ -99,7 +99,9 @@ class ApiAnalytics < GaResponseBuilder
   # @param contributor [String] Contributor name
   # @return [Hash] | nil
   #
-  def events(event, hub, contributor = nil)
+  def events(event, hub, options={})
+    contributor = options[:contributor]
+
     event_category = "#{event} : #{hub}"
 
     metrics = %w(ga:totalEvents)

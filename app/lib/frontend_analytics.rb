@@ -98,7 +98,6 @@ class FrontendAnalytics < GaResponseBuilder
         count = r[2].to_i rescue 0
 
         data[contributor] ||= { "Views" => 0 }
-        # data[contributor][event] = count
         data[contributor]["Click Throughs"] = count if event == "Click Through"
         data[contributor]["Views"] += count if event.start_with?("View")
       end
@@ -116,7 +115,10 @@ class FrontendAnalytics < GaResponseBuilder
   # @param contributor [String] Contributor name
   # @return [Hash] | nil
   #
-  def events(event, hub, contributor = nil)
+  def events(event, hub, options = {})
+    contributor = options[:contributor]
+    start_index = options[:start_index]
+
     event_category = "#{event} : #{hub}"
 
     metrics = %w(ga:totalEvents)
@@ -124,10 +126,12 @@ class FrontendAnalytics < GaResponseBuilder
     filters = %W(ga:eventCategory==#{event_category})
     sort = %w(-ga:totalEvents) # Descending
 
+    opts = { sort: sort, start_index: start_index }
+
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      res = response(metrics, dimensions, filters, options={ sort: sort } )
+      res = response(metrics, dimensions, filters, options=opts )
 
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
@@ -136,6 +140,7 @@ class FrontendAnalytics < GaResponseBuilder
         items_per_page: res.items_per_page,
         start_index: res.query.start_index,
         total_results: res.total_results,
+        next_link: res.next_link,
         results: []
       }
 
@@ -146,7 +151,7 @@ class FrontendAnalytics < GaResponseBuilder
         count = r[columns.index("ga:totalEvents")]
 
         data[:results].push({ contributor: contributor, id: id, title: title,
-                             count: count })
+                              count: count })
       end
 
       return data
@@ -157,6 +162,23 @@ class FrontendAnalytics < GaResponseBuilder
       # TODO: Handle error
       Hash.new
     end
+  end
+
+  def all_events(event, hub, options={})
+    results = []
+    first_response = events(event, hub, options)
+    results.push first_response
+    more = first_response[:next_link].present?
+
+    while more == true
+      options[:start_index] = 
+        results.last[:start_index] + results.last[:items_per_page]
+
+      results.push events(event, hub, options)
+      more = results.last[:next_link].present?
+    end
+
+    results.flat_map{ |response| response[:results] }
   end
 
   protected
