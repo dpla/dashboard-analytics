@@ -112,7 +112,7 @@ class FrontendAnalytics < GaResponseBuilder
   ##
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
+  # @param options [Hash]
   # @return [Hash] | nil
   #
   def events(event, hub, options = {})

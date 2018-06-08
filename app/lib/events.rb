@@ -103,6 +103,8 @@ class Events
   end
 
   def all_api_events
-
+    @all_frontend_events ||=
+      api_ga.all_events(event_name, hub_name,
+                        options={ contributor: contributor_name })
   end
 end
