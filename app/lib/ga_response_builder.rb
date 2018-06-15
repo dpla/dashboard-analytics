@@ -92,6 +92,8 @@ class GaResponseBuilder
   def segment
   end
 
+  ##
+  # @return Google::Auth::ServiceAccountCredentials
   def self.authorizer
     @@authorizer ||= Google::Auth::ServiceAccountCredentials.make_creds(
       json_key_io: File.open(Settings.google_analytics.service_account_json_key),
