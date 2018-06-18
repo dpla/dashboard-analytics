@@ -27,4 +27,10 @@ describe GaAuthorizer do
     expect(credentials).to receive(:fetch_access_token!)
     GaAuthorizer.token
   end
+
+  after do
+    if GaAuthorizer.class_variable_defined? :@@authorizer
+      GaAuthorizer.remove_class_variable :@@authorizer
+    end
+  end
 end
