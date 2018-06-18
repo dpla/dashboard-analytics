@@ -1,4 +1,9 @@
-class ApiAnalytics < GaResponseBuilder
+class ApiAnalytics
+
+  def initialize(start_date, end_date)
+    @start_date = start_date
+    @end_date = end_date
+  end
 
   ##
   # @param hub [String] Hub name
@@ -6,14 +11,18 @@ class ApiAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def overall_use_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents ga:users)
-    dimensions = %w()
     filters = %W(ga:eventCategory=@#{hub})
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      response(metrics, dimensions, filters).totals_for_all_results
+      GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.segment = segment
+        builder.metrics = %w(ga:totalEvents ga:users)
+        builder.filters = filters
+      end.totals_for_all_results
     rescue
       # TODO: Log error
       Hash.new
@@ -25,12 +34,16 @@ class ApiAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def overall_use_by_contributor(hub)
-    metrics = %w(ga:totalEvents ga:users)
-    dimensions = %w(ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub})
-
     begin
-      res = response(metrics, dimensions, filters)
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.segment = segment
+        builder.metrics = %w(ga:totalEvents ga:users)
+        builder.dimensions = %w(ga:eventAction)
+        builder.filters = %W(ga:eventCategory=@#{hub})
+      end
 
       # Create Hash of data
       # e.g. { "The Library" => { "Views" => 4, "Users" => 2 } }
@@ -52,48 +65,6 @@ class ApiAnalytics < GaResponseBuilder
   end
 
   ##
-  # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash] | nil
-  #
-  def individual_event_counts(hub, contributor = nil)
-    event_category = "View API Item : #{hub}"
-
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventLabel ga:eventAction)
-    filters = %W(ga:eventCategory==#{event_category})
-    sort = %w(-ga:totalEvents) # Descending
-
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    begin
-      res = response(metrics, dimensions, filters, options={ sort: sort } )
-
-      # Create a Hash of data
-      # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
-      columns = res.column_headers.map { |c| c.name }
-
-      res.rows.map do |r|
-        contributor = r[columns.index("ga:eventAction")]
-        id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
-        title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-        count = r[columns.index("ga:totalEvents")]
-
-        { contributor: contributor,
-          id: id, 
-          title: title,
-          count: count }
-      end
-
-      # TODO: if there are no results, this returns nil.
-      # Would be better to return an empty Hash.
-    rescue
-      # TODO: Handle error
-      Hash.new
-    end
-  end
-
-  ##
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
   # @param options [Hash]
@@ -102,20 +73,22 @@ class ApiAnalytics < GaResponseBuilder
   def events(event, hub, options={})
     contributor = options[:contributor]
     start_index = options[:start_index]
-
     event_category = "#{event} : #{hub}"
-
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventLabel ga:eventAction)
     filters = %W(ga:eventCategory==#{event_category})
-    sort = %w(-ga:totalEvents) # Descending
-
-    opts = { sort: sort, start_index: start_index }
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      res = response(metrics, dimensions, filters, options=opts )
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.segment = segment
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventLabel ga:eventAction)
+        builder.filters = filters
+        builder.sort = %w(-ga:totalEvents) # Descending
+        builder.start_index = start_index
+      end
 
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
@@ -135,14 +108,15 @@ class ApiAnalytics < GaResponseBuilder
         count = r[columns.index("ga:totalEvents")]
 
         data[:results].push({ contributor: contributor, id: id, title: title,
-                             count: count })
+                              count: count })
       end
 
       return data
 
       # TODO: if there are no results, this returns nil.
       # Would be better to return an empty Hash.
-    rescue
+    rescue => e
+      Rails.logger.error(e)
       # TODO: Handle error
       Hash.new
     end

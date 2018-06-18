@@ -24,7 +24,7 @@
       <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
 
       <%= render partial: "shared/map",
-                 locals: { ga_token: @hub.ga_token,          
+                 locals: { ga_token: GaAuthorizer.token,          
                            hub: @hub.name,
                            contributor: contributor } %>
 

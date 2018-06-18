@@ -1,19 +1,27 @@
 class FrontendAnalytics < GaResponseBuilder
 
+  def initialize(start_date, end_date)
+    @start_date = start_date
+    @end_date = end_date
+  end
+
   ##
   # @param hub [String] Hub name
   # @param contributor [String] Contributor name
   # @return [Hash]
   #
   def overall_use_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
-    dimensions = %w()
     filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      response(metrics, dimensions, filters).totals_for_all_results
+      GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
+        builder.filters = filters
+      end.totals_for_all_results
     rescue
       # TODO: Log error
       Hash.new
@@ -26,14 +34,20 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def event_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventCategory)
     filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      response(metrics, dimensions, filters).rows.collect{ |row| 
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventCategory)
+        builder.filters = filters
+      end
+
+      res.rows.collect{ |row| 
         # Create human-readable key-value pairs
         # Example: change "Click Through : ArtStor" to "Click Through"
         [row[0].split(' : ')[0], row[1]]
@@ -49,12 +63,16 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def overall_use_by_contributor(hub)
-    metrics = %w(ga:sessions ga:users)
-    dimensions = %w(ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
     begin
-      res = response(metrics, dimensions, filters)
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:sessions ga:users)
+        builder.dimensions = %w(ga:eventAction)
+        builder.filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
+      end
 
       # Create Hash of data
       # e.g. "The Library" => { "Sessions" => 4, "Users" => 2 }
@@ -81,12 +99,16 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def events_by_contributor(hub)
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventCategory ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
     begin
-      res = response(metrics, dimensions, filters)
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventCategory ga:eventAction)
+        builder.filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
+      end
 
       # Create Hash of data
       # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
@@ -118,20 +140,21 @@ class FrontendAnalytics < GaResponseBuilder
   def events(event, hub, options = {})
     contributor = options[:contributor]
     start_index = options[:start_index]
-
     event_category = "#{event} : #{hub}"
-
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventLabel ga:eventAction)
     filters = %W(ga:eventCategory==#{event_category})
-    sort = %w(-ga:totalEvents) # Descending
-
-    opts = { sort: sort, start_index: start_index }
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      res = response(metrics, dimensions, filters, options=opts )
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventLabel ga:eventAction)
+        builder.filters = filters
+        builder.sort = %w(-ga:totalEvents) # Descending
+        builder.start_index = start_index
+      end
 
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
