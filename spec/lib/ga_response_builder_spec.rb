@@ -1,4 +1,6 @@
 require 'rails_helper'
+require 'google/apis/analytics_v3'
+require 'googleauth'
 
 describe GaResponseBuilder do
 
@@ -26,9 +28,7 @@ describe GaResponseBuilder do
     allow(analyticsService).to receive(:get_ga_data)
     expect(analyticsService).to receive(:authorization=).with(token)
 
-    GaResponseBuilder.build do |builder|
-      builder.profile_id="foo"
-    end
+    GaResponseBuilder.build { |builder| builder.profile_id="foo" }
   end
 
   it 'builds response with given data' do
@@ -56,5 +56,13 @@ describe GaResponseBuilder do
       builder.start_index = start_index
       builder.segment = segment
     end
+  end
+
+  it 'retries if server error' do
+    allow(analyticsService).to receive(:authorization=)
+    allow(analyticsService).to receive(:get_ga_data).and_raise(Exception)
+    # allow(analyticsService).to receive(:get_ga_data).and_raise(Google::Apis::ServerError)
+    expect(analyticsService).to receive(:get_ga_data).exactly(3).times
+    GaResponseBuilder.build { |builder| builder.profile_id="foo" }
   end
 end

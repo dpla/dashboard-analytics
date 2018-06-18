@@ -92,6 +92,7 @@ class GaResponseBuilder
   # 
   # TODO: Retry failed request if appropriate
   def response
+    tries ||= 3
     @analytics.get_ga_data(@profile_id,
                            @start_date,
                            @end_date,
@@ -100,7 +101,10 @@ class GaResponseBuilder
                            filters: @filters,
                            sort: @sort,
                            start_index: @start_index,
-                           segment: @segment) 
+                           segment: @segment)
+
+  rescue Exception => e
+    retry unless(tries -= 1).zero?
   end
 
   ##
