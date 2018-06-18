@@ -67,53 +67,6 @@ class ApiAnalytics
   end
 
   ##
-  # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash] | nil
-  #
-  # def individual_event_counts(hub, contributor = nil)
-  #   event_category = "View API Item : #{hub}"
-
-  #   filters = %W(ga:eventCategory==#{event_category})
-  #   filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-  #   begin
-  #     res = GaResponseBuilder.build do |builder|
-  #       builder.profile_id = profile_id
-  #       builder.start_date = @start_date
-  #       builder.end_date = @end_date
-  #       builder.segment = segment
-  #       builder.metrics = %w(ga:totalEvents)
-  #       builder.dimensions = %w(ga:eventLabel ga:eventAction)
-  #       builder.filters = filters
-  #       builder.sort = %w(-ga:totalEvents) # Descending
-  #     end
-
-  #     # Create a Hash of data
-  #     # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
-  #     columns = res.column_headers.map { |c| c.name }
-
-  #     res.rows.map do |r|
-  #       contributor = r[columns.index("ga:eventAction")]
-  #       id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
-  #       title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-  #       count = r[columns.index("ga:totalEvents")]
-
-  #       { contributor: contributor,
-  #         id: id, 
-  #         title: title,
-  #         count: count }
-  #     end
-
-  #     # TODO: if there are no results, this returns nil.
-  #     # Would be better to return an empty Hash.
-  #   rescue
-  #     # TODO: Handle error
-  #     Hash.new
-  #   end
-  # end
-
-  ##
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
   # @param options [Hash]

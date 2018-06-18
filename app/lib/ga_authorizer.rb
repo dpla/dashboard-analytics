@@ -4,16 +4,16 @@ class GaAuthorizer
 
   ##
   # @return [String]
+  # By default, the access token will expire after 1 hour.
   def self.token
     begin
-      # By default, the access token will expire after 1 hour.
-
       if(self.authorizer.access_token.nil? or self.authorizer.expired?)
         self.authorizer.fetch_access_token!
       end
       self.authorizer.access_token
     rescue
       # TODO: Log error
+      # TODO: Retry if failure?
       String.new
     end
   end
