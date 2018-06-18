@@ -11,10 +11,7 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def overall_use_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
-    dimensions = %w()
     filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
@@ -22,7 +19,7 @@ class FrontendAnalytics < GaResponseBuilder
         builder.profile_id = profile_id
         builder.start_date = @start_date
         builder.end_date = @end_date
-        builder.metrics = metrics
+        builder.metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
         builder.filters = filters
       end.totals_for_all_results
     rescue
@@ -37,10 +34,7 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def event_totals(hub, contributor = nil)
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventCategory)
     filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
@@ -48,8 +42,8 @@ class FrontendAnalytics < GaResponseBuilder
         builder.profile_id = profile_id
         builder.start_date = @start_date
         builder.end_date = @end_date
-        builder.metrics = metrics
-        builder.dimensions = dimensions
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventCategory)
         builder.filters = filters
       end
 
@@ -146,14 +140,8 @@ class FrontendAnalytics < GaResponseBuilder
   def events(event, hub, options = {})
     contributor = options[:contributor]
     start_index = options[:start_index]
-
     event_category = "#{event} : #{hub}"
-
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventLabel ga:eventAction)
     filters = %W(ga:eventCategory==#{event_category})
-    sort = %w(-ga:totalEvents) # Descending
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
@@ -161,10 +149,10 @@ class FrontendAnalytics < GaResponseBuilder
         builder.profile_id = profile_id
         builder.start_date = @start_date
         builder.end_date = @end_date
-        builder.metrics = metrics
-        builder.dimensions = dimensions
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventLabel ga:eventAction)
         builder.filters = filters
-        builder.sort = sort
+        builder.sort = %w(-ga:totalEvents) # Descending
         builder.start_index = start_index
       end
 
