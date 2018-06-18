@@ -20,7 +20,7 @@ class SearchTerms
   ##
   # @return Hash
   def data
-    @data ||= ga.search_terms
+    @data ||= search_terms
   end
 
   ##
@@ -79,6 +79,64 @@ class SearchTerms
     elsif(id=="api")
       api_ga
     end
+  end
+
+  def profile_id
+    if(id == "website")
+      Settings.google_analytics.frontend_profile_id
+    elsif(id=="api")
+      Settings.google_analytics.api_profile_id
+    end
+  end
+
+  def segment
+    if(id=="api")
+      Settings.google_analytics.api_segment
+    end
+  end
+
+  ##
+  # @return Hash
+  #   Example search_terms.results:
+  #     [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
+  def search_terms(start_index = nil)
+    begin
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = start_date
+        builder.end_date = end_date
+        builder.segment = segment
+        builder.metrics = %w(ga:searchUniques)
+        builder.dimensions = %w(ga:searchKeyword)
+        builder.sort = %w(-ga:searchUniques) # Descending
+        builder.start_index = start_index
+      end
+
+      { items_per_page: res.items_per_page,
+        start_index: res.query.start_index,
+        total_results: res.total_results,
+        next_link: res.next_link,
+        results: res.rows }
+    rescue => e
+      Rails.logger.error(e)
+      Hash.new
+    end
+  end
+
+  ##
+  # Get all search terms. Paginate as necessary.
+  # @return [Array]
+  def all_search_terms
+    results = [search_terms]
+    more = search_terms[:next_link].present?
+
+    while more == true
+      next_start_index = results.last[:start_index] + results.last[:items_per_page]
+      results.push search_terms(next_start_index)
+      more = results.last[:next_link].present?
+    end
+    
+    results.flat_map { |response| response[:results] }
   end
 
   def frontend_ga
