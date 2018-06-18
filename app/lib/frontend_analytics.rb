@@ -44,7 +44,16 @@ class FrontendAnalytics < GaResponseBuilder
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      response(metrics, dimensions, filters).rows.collect{ |row| 
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = metrics
+        builder.dimensions = dimensions
+        builder.filters = filters
+      end
+
+      res.rows.collect{ |row| 
         # Create human-readable key-value pairs
         # Example: change "Click Through : ArtStor" to "Click Through"
         [row[0].split(' : ')[0], row[1]]
@@ -137,12 +146,19 @@ class FrontendAnalytics < GaResponseBuilder
     filters = %W(ga:eventCategory==#{event_category})
     sort = %w(-ga:totalEvents) # Descending
 
-    opts = { sort: sort, start_index: start_index }
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      res = response(metrics, dimensions, filters, options=opts )
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = metrics
+        builder.dimensions = dimensions
+        builder.filters = filters
+        builder.sort = sort
+        builder.start_index = start_index
+      end
 
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
