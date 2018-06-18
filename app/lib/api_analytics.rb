@@ -1,4 +1,9 @@
-class ApiAnalytics < GaResponseBuilder
+class ApiAnalytics
+
+  def initialize(start_date, end_date)
+    @start_date = start_date
+    @end_date = end_date
+  end
 
   ##
   # @param hub [String] Hub name
@@ -7,13 +12,19 @@ class ApiAnalytics < GaResponseBuilder
   #
   def overall_use_totals(hub, contributor = nil)
     metrics = %w(ga:totalEvents ga:users)
-    dimensions = %w()
     filters = %W(ga:eventCategory=@#{hub})
 
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      response(metrics, dimensions, filters).totals_for_all_results
+      GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.segment = segment
+        builder.metrics = metrics
+        builder.filters = filters
+      end.totals_for_all_results
     rescue
       # TODO: Log error
       Hash.new

@@ -1,5 +1,10 @@
 class FrontendAnalytics < GaResponseBuilder
 
+  def initialize(start_date, end_date)
+    @start_date = start_date
+    @end_date = end_date
+  end
+
   ##
   # @param hub [String] Hub name
   # @param contributor [String] Contributor name
@@ -13,7 +18,13 @@ class FrontendAnalytics < GaResponseBuilder
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      response(metrics, dimensions, filters).totals_for_all_results
+      GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = metrics
+        builder.filters = filters
+      end.totals_for_all_results
     rescue
       # TODO: Log error
       Hash.new

@@ -24,9 +24,9 @@ class GaResponseBuilder
     @profile_id = nil
     @start_date = nil
     @end_date = nil
-    @metrics = nil
-    @dimensions = nil
-    @filters = nil
+    @metrics = []
+    @dimensions = []
+    @filters = []
     @start_index = nil
     @sort = nil
     @segment = nil
@@ -194,7 +194,12 @@ class GaResponseBuilder
   #                         segment: segment) 
   # end
 
+  ##
   # @return [Google::Apis::AnalyticsV3::GaData]
+  #
+  # @raise [Google::Apis::ServerError] An error occurred on the server and the request can be retried
+  # @raise [Google::Apis::ClientError] The request is invalid and should not be retried without modification
+  # @raise [Google::Apis::AuthorizationError] Authorization is required
   def response
     @analytics.get_ga_data(@profile_id,
                            @start_date,
