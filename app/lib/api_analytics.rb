@@ -121,12 +121,20 @@ class ApiAnalytics
     filters = %W(ga:eventCategory==#{event_category})
     sort = %w(-ga:totalEvents) # Descending
 
-    opts = { sort: sort, start_index: start_index }
-
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
     begin
-      res = response(metrics, dimensions, filters, options=opts )
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.segment = segment
+        builder.metrics = metrics
+        builder.dimensions = dimensions
+        builder.filters = filters
+        builder.sort = sort
+        builder.start_index = start_index
+      end
 
       # Create a Hash of data
       # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
@@ -146,14 +154,15 @@ class ApiAnalytics
         count = r[columns.index("ga:totalEvents")]
 
         data[:results].push({ contributor: contributor, id: id, title: title,
-                             count: count })
+                              count: count })
       end
 
       return data
 
       # TODO: if there are no results, this returns nil.
       # Would be better to return an empty Hash.
-    rescue
+    rescue => e
+      Rails.logger.error(e)
       # TODO: Handle error
       Hash.new
     end
