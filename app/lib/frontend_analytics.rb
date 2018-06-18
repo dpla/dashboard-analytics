@@ -69,12 +69,16 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def overall_use_by_contributor(hub)
-    metrics = %w(ga:sessions ga:users)
-    dimensions = %w(ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
     begin
-      res = response(metrics, dimensions, filters)
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:sessions ga:users)
+        builder.dimensions = %w(ga:eventAction)
+        builder.filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
+      end
 
       # Create Hash of data
       # e.g. "The Library" => { "Sessions" => 4, "Users" => 2 }
@@ -101,12 +105,16 @@ class FrontendAnalytics < GaResponseBuilder
   # @return [Hash]
   #
   def events_by_contributor(hub)
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventCategory ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
 
     begin
-      res = response(metrics, dimensions, filters)
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.metrics = %w(ga:totalEvents)
+        builder.dimensions = %w(ga:eventCategory ga:eventAction)
+        builder.filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
+      end
 
       # Create Hash of data
       # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }

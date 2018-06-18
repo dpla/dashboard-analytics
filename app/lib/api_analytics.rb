@@ -36,12 +36,16 @@ class ApiAnalytics
   # @return [Hash]
   #
   def overall_use_by_contributor(hub)
-    metrics = %w(ga:totalEvents ga:users)
-    dimensions = %w(ga:eventAction)
-    filters = %W(ga:eventCategory=@#{hub})
-
     begin
-      res = response(metrics, dimensions, filters)
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.segment = segment
+        builder.metrics = %w(ga:totalEvents ga:users)
+        builder.dimensions = %w(ga:eventAction)
+        builder.filters = %W(ga:eventCategory=@#{hub})
+      end
 
       # Create Hash of data
       # e.g. { "The Library" => { "Views" => 4, "Users" => 2 } }
@@ -67,42 +71,47 @@ class ApiAnalytics
   # @param contributor [String] Contributor name
   # @return [Hash] | nil
   #
-  def individual_event_counts(hub, contributor = nil)
-    event_category = "View API Item : #{hub}"
+  # def individual_event_counts(hub, contributor = nil)
+  #   event_category = "View API Item : #{hub}"
 
-    metrics = %w(ga:totalEvents)
-    dimensions = %w(ga:eventLabel ga:eventAction)
-    filters = %W(ga:eventCategory==#{event_category})
-    sort = %w(-ga:totalEvents) # Descending
+  #   filters = %W(ga:eventCategory==#{event_category})
+  #   filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
+  #   begin
+  #     res = GaResponseBuilder.build do |builder|
+  #       builder.profile_id = profile_id
+  #       builder.start_date = @start_date
+  #       builder.end_date = @end_date
+  #       builder.segment = segment
+  #       builder.metrics = %w(ga:totalEvents)
+  #       builder.dimensions = %w(ga:eventLabel ga:eventAction)
+  #       builder.filters = filters
+  #       builder.sort = %w(-ga:totalEvents) # Descending
+  #     end
 
-    begin
-      res = response(metrics, dimensions, filters, options={ sort: sort } )
+  #     # Create a Hash of data
+  #     # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
+  #     columns = res.column_headers.map { |c| c.name }
 
-      # Create a Hash of data
-      # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
-      columns = res.column_headers.map { |c| c.name }
+  #     res.rows.map do |r|
+  #       contributor = r[columns.index("ga:eventAction")]
+  #       id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
+  #       title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
+  #       count = r[columns.index("ga:totalEvents")]
 
-      res.rows.map do |r|
-        contributor = r[columns.index("ga:eventAction")]
-        id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
-        title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-        count = r[columns.index("ga:totalEvents")]
+  #       { contributor: contributor,
+  #         id: id, 
+  #         title: title,
+  #         count: count }
+  #     end
 
-        { contributor: contributor,
-          id: id, 
-          title: title,
-          count: count }
-      end
-
-      # TODO: if there are no results, this returns nil.
-      # Would be better to return an empty Hash.
-    rescue
-      # TODO: Handle error
-      Hash.new
-    end
-  end
+  #     # TODO: if there are no results, this returns nil.
+  #     # Would be better to return an empty Hash.
+  #   rescue
+  #     # TODO: Handle error
+  #     Hash.new
+  #   end
+  # end
 
   ##
   # @param event [String] event name, e.g. "Click Through" 
