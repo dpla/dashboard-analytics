@@ -3,7 +3,8 @@ require 'google/apis/analytics_v3'
 class GaResponseBuilder
 
   ##
-  # @return [Google::Apis::AnalyticsV3::GaData]
+  # @return [Google::Apis::AnalyticsV3::GaData] if @all_results == false (default)
+  # @return [Array<Google::Apis::AnalyticsV3::GaData>] if @all_results == true
   #
   # @example
   #   GaResponseBuilder.build do |builder|
@@ -17,7 +18,7 @@ class GaResponseBuilder
     builder = new
     yield(builder)
     builder.authorize
-    builder.response
+    builder.get_response
   end
 
   def initialize
@@ -28,9 +29,10 @@ class GaResponseBuilder
     @metrics = []
     @dimensions = []
     @filters = []
-    @start_index = nil
+    @start_index = 1
     @sort = nil
     @segment = nil
+    @all_results = false
   end
 
   # @param [String]
@@ -82,6 +84,24 @@ class GaResponseBuilder
     @segment = segment
   end
 
+  # @param [Boolean]
+  # If true, will return multiple response objects containing all results.
+  def all_results=(all_results)
+    @all_results = all_results
+  end
+
+  ##
+  # Authorize the AnalyticsService.
+  # If the AnalyticsService is not authorized, any request for data will return
+  # an error.
+  def authorize
+    @analytics.authorization = GaAuthorizer.token
+  end
+
+  def get_response
+    @all_results ? multi_page_response : response
+  end
+
   ##
   # @return [Google::Apis::AnalyticsV3::GaData]
   #
@@ -116,10 +136,18 @@ class GaResponseBuilder
   end
 
   ##
-  # Authorize the AnalyticsService.
-  # If the AnalyticsService is not authorized, any request for data will return
-  # an error.
-  def authorize
-    @analytics.authorization = GaAuthorizer.token
+  # @return [Array<Google::Apis::AnalyticsV3::GaData>]
+  def multi_page_response
+    results = [response]
+    more = results.last.next_link.present?
+
+    while more == true
+      @start_index = (results.last.query.start_index.to_i + results.last.items_per_page.to_i)
+      Rails.logger.debug("START INDEX::::::: #{@start_index}")
+      results.push response
+      more = results.last.next_link.present?
+    end
+
+    results
   end
 end

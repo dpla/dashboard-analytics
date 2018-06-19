@@ -109,7 +109,6 @@ class SearchTerms
         builder.metrics = %w(ga:searchUniques)
         builder.dimensions = %w(ga:searchKeyword)
         builder.sort = %w(-ga:searchUniques) # Descending
-        builder.start_index = start_index
       end
 
       { items_per_page: res.items_per_page,
@@ -124,19 +123,27 @@ class SearchTerms
   end
 
   ##
-  # Get all search terms. Paginate as necessary.
+  # Get all search terms.
   # @return [Array]
   def all_search_terms
-    results = [search_terms]
-    more = search_terms[:next_link].present?
 
-    while more == true
-      next_start_index = results.last[:start_index] + results.last[:items_per_page]
-      results.push search_terms(next_start_index)
-      more = results.last[:next_link].present?
+    begin
+      res = GaResponseBuilder.build do |builder|
+        builder.profile_id = profile_id
+        builder.start_date = start_date
+        builder.end_date = end_date
+        builder.segment = segment
+        builder.metrics = %w(ga:searchUniques)
+        builder.dimensions = %w(ga:searchKeyword)
+        builder.sort = %w(-ga:searchUniques) # Descending
+        builder.all_results = true
+      end
+
+      res.flat_map { |response| response.rows }
+    rescue => e
+      Rails.logger.error(e)
+      Hash.new
     end
-    
-    results.flat_map { |response| response[:results] }
   end
 
   def frontend_ga
