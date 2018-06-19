@@ -1,5 +1,4 @@
 require 'google/apis/analytics_v3'
-require 'googleauth'
 
 class GaResponseBuilder
 
@@ -86,12 +85,18 @@ class GaResponseBuilder
   ##
   # @return [Google::Apis::AnalyticsV3::GaData]
   #
-  # @raise [Google::Apis::ServerError] An error occurred on the server and the request can be retried
-  # @raise [Google::Apis::ClientError] The request is invalid and should not be retried without modification
-  # @raise [Google::Apis::AuthorizationError] Authorization is required
-  # 
-  # TODO: Retry failed request if appropriate
+  # @raise [Google::Apis::ServerError]
+  # An error occurred on the server and the request can be retried.
+  #
+  # @raise [Google::Apis::ClientError]
+  # The request is invalid and should not be retried without modification.
+  #
+  # @raise [Google::Apis::AuthorizationError]
+  # Authorization is required.
+  #
   def response
+    tries ||= 0
+
     @analytics.get_ga_data(@profile_id,
                            @start_date,
                            @end_date,
@@ -100,7 +105,14 @@ class GaResponseBuilder
                            filters: @filters,
                            sort: @sort,
                            start_index: @start_index,
-                           segment: @segment) 
+                           segment: @segment)
+
+  rescue Google::Apis::AuthorizationError
+    # Reauthorize in case token has expired or been invalidated.
+    authorize and retry unless(tries += 1) == 2
+  rescue Google::Apis::ServerError
+    # Use exponential backoff to delay next request attempt.
+    sleep(2**tries + rand) and retry unless(tries += 1) == 3
   end
 
   ##

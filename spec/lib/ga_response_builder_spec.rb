@@ -19,21 +19,18 @@ describe GaResponseBuilder do
   before do
     allow(Google::Apis::AnalyticsV3::AnalyticsService).to receive(:new)
       .and_return(analyticsService)
+    allow(analyticsService).to receive(:authorization=)
+    allow(analyticsService).to receive(:get_ga_data)
     allow(GaAuthorizer).to receive(:token).and_return(token)
   end
 
   it 'authorizes analytics service' do
-    allow(analyticsService).to receive(:get_ga_data)
     expect(analyticsService).to receive(:authorization=).with(token)
 
-    GaResponseBuilder.build do |builder|
-      builder.profile_id="foo"
-    end
+    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
   end
 
   it 'builds response with given data' do
-    allow(analyticsService).to receive(:authorization=)
-
     expect(analyticsService).to receive(:get_ga_data).with(
       profile_id,
       start_date,
@@ -56,5 +53,23 @@ describe GaResponseBuilder do
       builder.start_index = start_index
       builder.segment = segment
     end
+  end
+
+  it 'retries twice if server error' do
+    allow(analyticsService).to receive(:get_ga_data).and_raise(Google::Apis::ServerError, "oops")
+    expect(analyticsService).to receive(:get_ga_data).exactly(3).times
+    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
+  end
+
+  it 'retries once if authorization error' do
+    allow(analyticsService).to receive(:get_ga_data).and_raise(Google::Apis::AuthorizationError, "oops")
+    expect(analyticsService).to receive(:get_ga_data).exactly(2).times
+    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
+  end
+
+  it 'reauthorizes if authorization error' do
+    allow(analyticsService).to receive(:get_ga_data).and_raise(Google::Apis::AuthorizationError, "oops")
+    expect(analyticsService).to receive(:authorization=).exactly(2).times
+    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
   end
 end
