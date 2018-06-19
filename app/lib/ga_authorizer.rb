@@ -17,6 +17,7 @@ class GaAuthorizer
     if(self.authorizer.access_token.nil? or self.authorizer.expired?)
       self.authorizer.fetch_access_token!
     end
+    
     self.authorizer.access_token
 
   rescue StandardError => e
