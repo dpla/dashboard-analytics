@@ -28,6 +28,11 @@ describe GaAuthorizer do
     GaAuthorizer.token
   end
 
+  it 'returns empty string if token cannot be fetched' do
+    allow(GaAuthorizer).to receive(:authorizer).and_raise(StandardError)
+    expect(GaAuthorizer.token).to be_nil
+  end
+
   after do
     if GaAuthorizer.class_variable_defined? :@@authorizer
       GaAuthorizer.remove_class_variable :@@authorizer
