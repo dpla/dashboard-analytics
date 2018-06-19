@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'google/apis/errors.rb'
 
 describe GaResponseBuilder do
 

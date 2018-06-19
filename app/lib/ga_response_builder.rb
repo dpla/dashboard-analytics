@@ -1,5 +1,4 @@
 require 'google/apis/analytics_v3'
-require 'googleauth'
 
 class GaResponseBuilder
 
