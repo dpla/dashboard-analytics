@@ -87,24 +87,20 @@ class Events
 
   def frontend_response
     @frontend_response ||=
-      frontend_ga.events(event_name, hub_name,
-                         options={ contributor: contributor_name })
+      frontend_ga.events(event_name, hub_name, contributor_name)
   end
 
   def api_response
-    @api_response ||= api_ga.events(event_name, hub_name,
-                                    options={ contributor: contributor_name })
+    @api_response ||= api_ga.events(event_name, hub_name, contributor_name)
   end
 
   def all_frontend_events
     @all_frontend_events ||=
-      frontend_ga.all_events(event_name, hub_name,
-                             options={ contributor: contributor_name })
+      frontend_ga.all_events(event_name, hub_name, contributor_name)
   end
 
   def all_api_events
     @all_frontend_events ||=
-      api_ga.all_events(event_name, hub_name,
-                        options={ contributor: contributor_name })
+      api_ga.all_events(event_name, hub_name, contributor_name)
   end
 end

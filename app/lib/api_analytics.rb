@@ -67,11 +67,11 @@ class ApiAnalytics
   ##
   # @param event [String] event name, e.g. "Click Through" 
   # @param hub [String] Hub name
-  # @param options [Hash]
+  # @param contributor [String]
   # @return [Hash] | nil
   #
-  def events(event, hub, options={})
-    res = events_builder(event, hub, options).response
+  def events(event, hub, contributor=nil)
+    res = events_builder(event, hub, contributor).response
     parse_event_data(res)
 
     # TODO: if there are no results, this returns nil.
@@ -85,8 +85,8 @@ class ApiAnalytics
   ##
   # Get all events.
   # @return [Array<Hash>]
-  def all_events(event, hub, options={})
-    res = events_builder(event, hub, options).multi_page_response
+  def all_events(event, hub, contributor=nil)
+    res = events_builder(event, hub, contributor).multi_page_response
     res.flat_map{ |response| parse_event_data(response)[:results] }
   rescue => e
     Rails.logger.error(e)
@@ -96,8 +96,7 @@ class ApiAnalytics
 
   ##
   # @return GaResponseBuilder
-  def events_builder(event, hub, options={})
-    contributor = options[:contributor]
+  def events_builder(event, hub, contributor)
     event_category = "#{event} : #{hub}"
     filters = %W(ga:eventCategory==#{event_category})
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
