@@ -16,23 +16,23 @@
   <div class="data-content">
     <div class="data-section">
       <div class="item-table">
-        <% scope = params[:id] == "website" ? "Website" : "API" %>
 
-        <h2><%= scope %></h2>
+        <h2><%= scope_label %></h2>
 
         <div class="description-text">
-          Top search terms across the DPLA <%= scope %> for all hubs and contributors.
+          Top search terms across the DPLA <%= scope_label %> for all hubs and contributors.
         </div>
 
-        <% if @search_terms.terms.present? %>
+        <% if @search_terms.response.present? %>
 
           <div class="result-info">
-            Showing <%= @search_terms.start_index %>-<%= @search_terms.end_index %>
-            of <%= @search_terms.total_results %> search terms.
+            Showing <%= @search_terms.response.query.start_index %>-
+            <%= end_index(@search_terms.response) %>
+            of <%= @search_terms.response.total_results %> search terms.
           </div>
 
           <div class="download">
-            <%= link_to "Download all #{@search_terms.total_results} terms",
+            <%= link_to "Download all #{@search_terms.response.total_results} terms",
                         controller: :search_terms,
                         action: :show,
                         start_date: current_start_date,
@@ -45,10 +45,10 @@
               <th>Search Term</th>
               <th>Total Unique Searches</th>
             </tr>
-            <% @search_terms.terms.each do |term| %>
+            <% @search_terms.response.rows.each do |row| %>
               <tr>
-                <td><%= term[0] %></td>
-                <td><%= term[1] %></td>
+                <td><%= row[0] %></td>
+                <td><%= row[1] %></td>
               </tr>
             <% end %>
           </table>

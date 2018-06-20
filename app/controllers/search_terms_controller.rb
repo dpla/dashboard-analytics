@@ -6,6 +6,7 @@ class SearchTermsController < ApplicationController
   # View helpers
   include DataMenuHelper
   include DateHelper
+  include SearchTermsHelper
 
   def show
     assign_start_and_end_dates
