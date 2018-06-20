@@ -72,74 +72,78 @@ class ApiAnalytics
   #
   def events(event, hub, options={})
     contributor = options[:contributor]
-    start_index = options[:start_index]
     event_category = "#{event} : #{hub}"
     filters = %W(ga:eventCategory==#{event_category})
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
-    begin
-      res = GaResponseBuilder.build do |builder|
-        builder.profile_id = profile_id
-        builder.start_date = @start_date
-        builder.end_date = @end_date
-        builder.segment = segment
-        builder.metrics = %w(ga:totalEvents)
-        builder.dimensions = %w(ga:eventLabel ga:eventAction)
-        builder.filters = filters
-        builder.sort = %w(-ga:totalEvents) # Descending
-        builder.start_index = start_index
-      end
-
-      # Create a Hash of data
-      # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
-      columns = res.column_headers.map { |c| c.name }
-      data = {
-        items_per_page: res.items_per_page,
-        start_index: res.query.start_index,
-        total_results: res.total_results,
-        next_link: res.next_link,
-        results: []
-      }
-
-      res.rows.each do |r|
-        contributor = r[columns.index("ga:eventAction")]
-        id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
-        title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-        count = r[columns.index("ga:totalEvents")]
-
-        data[:results].push({ contributor: contributor, id: id, title: title,
-                              count: count })
-      end
-
-      return data
-
-      # TODO: if there are no results, this returns nil.
-      # Would be better to return an empty Hash.
-    rescue => e
-      Rails.logger.error(e)
-      # TODO: Handle error
-      Hash.new
+    res = GaResponseBuilder.build do |builder|
+      builder.profile_id = profile_id
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+      builder.segment = segment
+      builder.metrics = %w(ga:totalEvents)
+      builder.dimensions = %w(ga:eventLabel ga:eventAction)
+      builder.filters = filters
+      builder.sort = %w(-ga:totalEvents) # Descending
     end
+
+    parse_event_data(res)
+
+    # TODO: if there are no results, this returns nil.
+    # Would be better to return an empty Hash.
+  rescue => e
+    Rails.logger.error(e)
+    # TODO: Handle error
+    Hash.new
   end
 
   ##
   # Get all events. Paginate as necessary.
   # @return [Array]
   def all_events(event, hub, options={})
-    results = []
-    first_response = events(event, hub, options)
-    results.push first_response
-    more = first_response[:next_link].present?
+    contributor = options[:contributor]
+    event_category = "#{event} : #{hub}"
+    filters = %W(ga:eventCategory==#{event_category})
+    filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
-    while more == true
-      options[:start_index] = 
-        results.last[:start_index] + results.last[:items_per_page]
-
-      results.push events(event, hub, options)
-      more = results.last[:next_link].present?
+    results = GaResponseBuilder.build do |builder|
+      builder.profile_id = profile_id
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+      builder.segment = segment
+      builder.metrics = %w(ga:totalEvents)
+      builder.dimensions = %w(ga:eventLabel ga:eventAction)
+      builder.filters = filters
+      builder.sort = %w(-ga:totalEvents) # Descending
+      builder.all_results = true
     end
 
-    results.flat_map{ |response| response[:results] }
+    results.flat_map{ |response| parse_event_data(response)[:results] }
+  end
+
+  def parse_event_data(res)
+    # Create a Hash of data
+    # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
+    columns = res.column_headers.map { |c| c.name }
+    data = {
+      items_per_page: res.items_per_page,
+      start_index: res.query.start_index,
+      total_results: res.total_results,
+      next_link: res.next_link,
+      results: []
+    }
+
+    res.rows.each do |r|
+      contributor = r[columns.index("ga:eventAction")]
+      id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
+      title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
+      count = r[columns.index("ga:totalEvents")]
+
+      data[:results].push({ contributor: contributor, id: id, title: title,
+                            count: count })
+    end
+
+    return data
   end
 
   protected
