@@ -3,6 +3,8 @@ require 'google/apis/analytics_v3'
 class GaResponseBuilder
 
   ##
+  # Get an authorized GaResponseBuider
+  #
   # @return [GaResponseBuilder]
   #
   # @example
@@ -130,7 +132,11 @@ class GaResponseBuilder
     more = results.last.next_link.present?
 
     while more == true
-      @start_index = (results.last.query.start_index.to_i + results.last.items_per_page.to_i)
+      next_uri = URI(results.last.next_link)
+      next_start_index = Rack::Utils.parse_query(next_uri.query)["start-index"]
+      # sanity check to protect against infinite loop
+      break unless (next_start_index && next_start_index != @start_index)
+      @start_index = next_start_index
       results.push response
       more = results.last.next_link.present?
     end

@@ -77,4 +77,20 @@ describe GaResponseBuilder do
     GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
       .response
   end
+
+  it 'handles multi-page response' do
+    builder = GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
+
+    page_1 = double
+    allow(page_1).to receive(:next_link)
+      .and_return "https://googleapis.com?start-index=1001"
+
+    page_2 = double
+    allow(page_2).to receive(:next_link).and_return(nil)
+
+    allow(builder).to receive(:response).and_return(page_1, page_2)
+    
+    response = builder.multi_page_response
+    expect(response).to eq [page_1, page_2]
+  end
 end
