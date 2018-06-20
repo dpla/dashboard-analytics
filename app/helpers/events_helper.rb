@@ -1,7 +1,15 @@
 module EventsHelper
 
+  ##
+  # @param [Google::Apis::AnalyticsV3::GaData]
+  # @return Integer
+  def end_index(response)
+    response.total_results.to_i < response.items_per_page.to_i ? 
+      response.total_results : response.items_per_page
+  end
+
   def render_event_data(events)
-    case events.id
+    case params[:id]
 
     when 'click_through'
       table_name = "Click throughs"
