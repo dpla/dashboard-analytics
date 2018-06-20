@@ -3,7 +3,9 @@ require 'google/apis/analytics_v3'
 class GaResponseBuilder
 
   ##
-  # @return [Google::Apis::AnalyticsV3::GaData]
+  # Get an authorized GaResponseBuider
+  #
+  # @return [GaResponseBuilder]
   #
   # @example
   #   GaResponseBuilder.build do |builder|
@@ -17,7 +19,7 @@ class GaResponseBuilder
     builder = new
     yield(builder)
     builder.authorize
-    builder.response
+    builder
   end
 
   def initialize
@@ -28,7 +30,7 @@ class GaResponseBuilder
     @metrics = []
     @dimensions = []
     @filters = []
-    @start_index = nil
+    @start_index = 1
     @sort = nil
     @segment = nil
   end
@@ -83,6 +85,14 @@ class GaResponseBuilder
   end
 
   ##
+  # Authorize the AnalyticsService.
+  # If the AnalyticsService is not authorized, any request for data will return
+  # an error.
+  def authorize
+    @analytics.authorization = GaAuthorizer.token
+  end
+
+  ##
   # @return [Google::Apis::AnalyticsV3::GaData]
   #
   # @raise [Google::Apis::ServerError]
@@ -116,10 +126,21 @@ class GaResponseBuilder
   end
 
   ##
-  # Authorize the AnalyticsService.
-  # If the AnalyticsService is not authorized, any request for data will return
-  # an error.
-  def authorize
-    @analytics.authorization = GaAuthorizer.token
+  # @return [Array<Google::Apis::AnalyticsV3::GaData>]
+  def multi_page_response
+    results = [response]
+    more = results.last.next_link.present?
+
+    while more == true
+      next_uri = URI(results.last.next_link)
+      next_start_index = Rack::Utils.parse_query(next_uri.query)["start-index"]
+      # sanity check to protect against infinite loop
+      break unless (next_start_index && next_start_index != @start_index)
+      @start_index = next_start_index
+      results.push response
+      more = results.last.next_link.present?
+    end
+
+    results
   end
 end

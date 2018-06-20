@@ -100,43 +100,41 @@ class SearchTerms
   #   Example search_terms.results:
   #     [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
   def search_terms(start_index = nil)
-    begin
-      res = GaResponseBuilder.build do |builder|
-        builder.profile_id = profile_id
-        builder.start_date = start_date
-        builder.end_date = end_date
-        builder.segment = segment
-        builder.metrics = %w(ga:searchUniques)
-        builder.dimensions = %w(ga:searchKeyword)
-        builder.sort = %w(-ga:searchUniques) # Descending
-        builder.start_index = start_index
-      end
+    res = search_terms_builder.response
 
-      { items_per_page: res.items_per_page,
-        start_index: res.query.start_index,
-        total_results: res.total_results,
-        next_link: res.next_link,
-        results: res.rows }
-    rescue => e
-      Rails.logger.error(e)
-      Hash.new
-    end
+    { items_per_page: res.items_per_page,
+      start_index: res.query.start_index,
+      total_results: res.total_results,
+      next_link: res.next_link,
+      results: res.rows }
+  rescue => e
+    Rails.logger.error(e)
+    Hash.new
   end
 
   ##
-  # Get all search terms. Paginate as necessary.
-  # @return [Array]
+  # Get all search terms.
+  # @return [Array<Hash>]
   def all_search_terms
-    results = [search_terms]
-    more = search_terms[:next_link].present?
+    res = search_terms_builder.multi_page_response
+    res.flat_map { |response| response.rows }
+  rescue => e
+    Rails.logger.error(e)
+    Array.new
+  end
 
-    while more == true
-      next_start_index = results.last[:start_index] + results.last[:items_per_page]
-      results.push search_terms(next_start_index)
-      more = results.last[:next_link].present?
+  ##
+  # @return GaResponseBuilder
+  def search_terms_builder
+    GaResponseBuilder.build do |builder|
+      builder.profile_id = profile_id
+      builder.start_date = start_date
+      builder.end_date = end_date
+      builder.segment = segment
+      builder.metrics = %w(ga:searchUniques)
+      builder.dimensions = %w(ga:searchKeyword)
+      builder.sort = %w(-ga:searchUniques) # Descending
     end
-    
-    results.flat_map { |response| response[:results] }
   end
 
   def frontend_ga
