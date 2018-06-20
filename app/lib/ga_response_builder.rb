@@ -3,8 +3,7 @@ require 'google/apis/analytics_v3'
 class GaResponseBuilder
 
   ##
-  # @return [Google::Apis::AnalyticsV3::GaData] if @all_results == false (default)
-  # @return [Array<Google::Apis::AnalyticsV3::GaData>] if @all_results == true
+  # @return [GaResponseBuilder]
   #
   # @example
   #   GaResponseBuilder.build do |builder|
@@ -18,7 +17,7 @@ class GaResponseBuilder
     builder = new
     yield(builder)
     builder.authorize
-    builder.get_response
+    builder
   end
 
   def initialize
@@ -32,7 +31,6 @@ class GaResponseBuilder
     @start_index = 1
     @sort = nil
     @segment = nil
-    @all_results = false
   end
 
   # @param [String]
@@ -84,22 +82,12 @@ class GaResponseBuilder
     @segment = segment
   end
 
-  # @param [Boolean]
-  # If true, will return multiple response objects containing all results.
-  def all_results=(all_results)
-    @all_results = all_results
-  end
-
   ##
   # Authorize the AnalyticsService.
   # If the AnalyticsService is not authorized, any request for data will return
   # an error.
   def authorize
     @analytics.authorization = GaAuthorizer.token
-  end
-
-  def get_response
-    @all_results ? multi_page_response : response
   end
 
   ##
@@ -143,7 +131,6 @@ class GaResponseBuilder
 
     while more == true
       @start_index = (results.last.query.start_index.to_i + results.last.items_per_page.to_i)
-      Rails.logger.debug("START INDEX::::::: #{@start_index}")
       results.push response
       more = results.last.next_link.present?
     end

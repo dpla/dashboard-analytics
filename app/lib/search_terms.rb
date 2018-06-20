@@ -109,7 +109,7 @@ class SearchTerms
         builder.metrics = %w(ga:searchUniques)
         builder.dimensions = %w(ga:searchKeyword)
         builder.sort = %w(-ga:searchUniques) # Descending
-      end
+      end.response
 
       { items_per_page: res.items_per_page,
         start_index: res.query.start_index,
@@ -136,8 +136,7 @@ class SearchTerms
         builder.metrics = %w(ga:searchUniques)
         builder.dimensions = %w(ga:searchKeyword)
         builder.sort = %w(-ga:searchUniques) # Descending
-        builder.all_results = true
-      end
+      end.multi_page_response
 
       res.flat_map { |response| response.rows }
     rescue => e

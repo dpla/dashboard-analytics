@@ -21,7 +21,7 @@ class FrontendAnalytics < GaResponseBuilder
         builder.end_date = @end_date
         builder.metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
         builder.filters = filters
-      end.totals_for_all_results
+      end.response.totals_for_all_results
     rescue
       # TODO: Log error
       Hash.new
@@ -45,7 +45,7 @@ class FrontendAnalytics < GaResponseBuilder
         builder.metrics = %w(ga:totalEvents)
         builder.dimensions = %w(ga:eventCategory)
         builder.filters = filters
-      end
+      end.response
 
       res.rows.collect{ |row| 
         # Create human-readable key-value pairs
@@ -72,7 +72,7 @@ class FrontendAnalytics < GaResponseBuilder
         builder.metrics = %w(ga:sessions ga:users)
         builder.dimensions = %w(ga:eventAction)
         builder.filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-      end
+      end.response
 
       # Create Hash of data
       # e.g. "The Library" => { "Sessions" => 4, "Users" => 2 }
@@ -108,7 +108,7 @@ class FrontendAnalytics < GaResponseBuilder
         builder.metrics = %w(ga:totalEvents)
         builder.dimensions = %w(ga:eventCategory ga:eventAction)
         builder.filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-      end
+      end.response
 
       # Create Hash of data
       # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
@@ -151,7 +151,7 @@ class FrontendAnalytics < GaResponseBuilder
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
-    end
+    end.response
 
     parsed_event_data(res)
 
@@ -179,8 +179,7 @@ class FrontendAnalytics < GaResponseBuilder
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
-      builder.all_results = true
-    end
+    end.multi_page_response
 
     res.flat_map{ |response| parsed_event_data(response)[:results] }
   rescue

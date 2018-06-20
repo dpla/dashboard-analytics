@@ -22,7 +22,7 @@ class ApiAnalytics
         builder.segment = segment
         builder.metrics = %w(ga:totalEvents ga:users)
         builder.filters = filters
-      end.totals_for_all_results
+      end.response.totals_for_all_results
     rescue
       # TODO: Log error
       Hash.new
@@ -43,7 +43,7 @@ class ApiAnalytics
         builder.metrics = %w(ga:totalEvents ga:users)
         builder.dimensions = %w(ga:eventAction)
         builder.filters = %W(ga:eventCategory=@#{hub})
-      end
+      end.response
 
       # Create Hash of data
       # e.g. { "The Library" => { "Views" => 4, "Users" => 2 } }
@@ -85,7 +85,7 @@ class ApiAnalytics
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
-    end
+    end.response
 
     parse_event_data(res)
 
@@ -115,8 +115,7 @@ class ApiAnalytics
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
-      builder.all_results = true
-    end
+    end.multi_page_response
 
     results.flat_map{ |response| parse_event_data(response)[:results] }
   end
