@@ -9,12 +9,13 @@
   <% if items && items.count > 0 %>
 
   <div class="result-info">
-    Showing <%= @events.start_index %>-<%= @events.end_index %> of 
-    <%= @events.total_results %> items.
+    Showing <%= @events.response.query.start_index %>-
+    <%= end_index(@events.response) %> of 
+    <%= @events.response.total_results %> items.
   </div>
 
   <div class="download">
-    <%= link_to "Download all #{@events.total_results} #{action.downcase}",
+    <%= link_to "Download all #{@events.response.total_results} #{action.downcase}",
                 controller: :events,
                 action: :show,
                 start_date: current_start_date,

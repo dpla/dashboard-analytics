@@ -11,23 +11,12 @@ class SearchTerms
     @end_date = end_date
   end
 
-  def profile_id
-    if(@scope == "website")
-      Settings.google_analytics.frontend_profile_id
-    elsif(@scope =="api")
-      Settings.google_analytics.api_profile_id
-    end
-  end
-
-  def segment
-    Settings.google_analytics.api_segment if @scope =="api"
-  end
-
   ##
   # Lazy load single-page response.
   # Return nil if response fails.
   #
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
+  #
   def response
     @response ||= search_terms_builder.response
   rescue => e
@@ -40,6 +29,7 @@ class SearchTerms
   # Return empty array if response fails.
   #
   # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
+  #
   def multi_page_response
     @multi_page_response ||= search_terms_builder.multi_page_response
   rescue => e
@@ -64,6 +54,18 @@ class SearchTerms
   end
 
   private
+
+  def profile_id
+    if(@scope == "website")
+      Settings.google_analytics.frontend_profile_id
+    elsif(@scope =="api")
+      Settings.google_analytics.api_profile_id
+    end
+  end
+
+  def segment
+    Settings.google_analytics.api_segment if @scope =="api"
+  end
 
   ##
   # @return GaResponseBuilder
