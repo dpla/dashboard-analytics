@@ -1,54 +1,50 @@
 class SearchTerms
-  def initialize(id, start_date, end_date)
-    @id = id
+
+  ##
+  # @param scope [String] "api" or "website"
+  # @param start_date [Date]
+  # @param end_date [Date]
+  #
+  def initialize(scope, start_date, end_date)
+    @scope = scope
     @start_date = start_date
     @end_date = end_date
   end
 
-  def id
-    @id
+  def profile_id
+    if(@scope == "website")
+      Settings.google_analytics.frontend_profile_id
+    elsif(@scope =="api")
+      Settings.google_analytics.api_profile_id
+    end
   end
 
-  def start_date
-    @start_date.iso8601
-  end
-
-  def end_date
-    @end_date.iso8601
-  end
-
-  ##
-  # @return Hash
-  def data
-    @data ||= search_terms
+  def segment
+    Settings.google_analytics.api_segment if @scope =="api"
   end
 
   ##
-  # @return Array
-  def terms
-    data[:results] || []
+  # Lazy load single-page response.
+  # Return nil if response fails.
+  #
+  # @return [Google::Apis::AnalyticsV3::GaData] | nil
+  def response
+    @response ||= search_terms_builder.response
+  rescue => e
+    Rails.logger.error(e)
+    nil
   end
 
   ##
-  # @return Integer
-  def total_results
-    data[:total_results]
-  end
-
-  ##
-  # @return Integer
-  def items_per_page
-    data[:items_per_page]
-  end
-
-  ##
-  # @return Integer
-  def start_index
-    data[:start_index]
-  end
-
-  def all_search_terms
-    @all_search_terms ||= ga.all_search_terms
+  # Lazy load multi-page response.
+  # Return empty array if response fails.
+  #
+  # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
+  def multi_page_response
+    @multi_page_response ||= search_terms_builder.multi_page_response
+  rescue => e
+    Rails.logger.error(e)
+    Array.new
   end
 
   ##
@@ -59,89 +55,27 @@ class SearchTerms
     CSV.generate({ headers: true }) do |csv|
       csv << attributes
 
-      all_search_terms.each do |term|
-        csv << term
+      multi_page_response.each do |response|
+        response.rows.each do |row|
+          csv << row
+        end
       end
     end
   end
 
-  ##
-  # @return Integer
-  def end_index
-    total_results.to_i < items_per_page.to_i ? total_results : items_per_page
-  end
-
   private
-
-  def ga
-    if(id == "website")
-      frontend_ga
-    elsif(id=="api")
-      api_ga
-    end
-  end
-
-  def profile_id
-    if(id == "website")
-      Settings.google_analytics.frontend_profile_id
-    elsif(id=="api")
-      Settings.google_analytics.api_profile_id
-    end
-  end
-
-  def segment
-    if(id=="api")
-      Settings.google_analytics.api_segment
-    end
-  end
-
-  ##
-  # @return Hash
-  #   Example search_terms.results:
-  #     [["genealogy", "140"], ["\"family bible\"", "65"] ... ]
-  def search_terms(start_index = nil)
-    res = search_terms_builder.response
-
-    { items_per_page: res.items_per_page,
-      start_index: res.query.start_index,
-      total_results: res.total_results,
-      next_link: res.next_link,
-      results: res.rows }
-  rescue => e
-    Rails.logger.error(e)
-    Hash.new
-  end
-
-  ##
-  # Get all search terms.
-  # @return [Array<Hash>]
-  def all_search_terms
-    res = search_terms_builder.multi_page_response
-    res.flat_map { |response| response.rows }
-  rescue => e
-    Rails.logger.error(e)
-    Array.new
-  end
 
   ##
   # @return GaResponseBuilder
   def search_terms_builder
     GaResponseBuilder.build do |builder|
       builder.profile_id = profile_id
-      builder.start_date = start_date
-      builder.end_date = end_date
+      builder.start_date = @start_date.iso8601
+      builder.end_date = @end_date.iso8601
       builder.segment = segment
       builder.metrics = %w(ga:searchUniques)
       builder.dimensions = %w(ga:searchKeyword)
       builder.sort = %w(-ga:searchUniques) # Descending
     end
-  end
-
-  def frontend_ga
-    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
-  end
-
-  def api_ga
-    @api_ga ||= ApiAnalytics.new(start_date, end_date)
   end
 end
