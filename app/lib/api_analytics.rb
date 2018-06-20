@@ -71,22 +71,7 @@ class ApiAnalytics
   # @return [Hash] | nil
   #
   def events(event, hub, options={})
-    contributor = options[:contributor]
-    event_category = "#{event} : #{hub}"
-    filters = %W(ga:eventCategory==#{event_category})
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    res = GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-      builder.segment = segment
-      builder.metrics = %w(ga:totalEvents)
-      builder.dimensions = %w(ga:eventLabel ga:eventAction)
-      builder.filters = filters
-      builder.sort = %w(-ga:totalEvents) # Descending
-    end.response
-
+    res = events_builder(event, hub, options).response
     parse_event_data(res)
 
     # TODO: if there are no results, this returns nil.
@@ -98,15 +83,26 @@ class ApiAnalytics
   end
 
   ##
-  # Get all events. Paginate as necessary.
-  # @return [Array]
+  # Get all events.
+  # @return [Array<Hash>]
   def all_events(event, hub, options={})
+    res = events_builder(event, hub, options).multi_page_response
+    res.flat_map{ |response| parse_event_data(response)[:results] }
+  rescue => e
+    Rails.logger.error(e)
+    # TODO: Handle error
+    Array.new
+  end
+
+  ##
+  # @return GaResponseBuilder
+  def events_builder(event, hub, options={})
     contributor = options[:contributor]
     event_category = "#{event} : #{hub}"
     filters = %W(ga:eventCategory==#{event_category})
     filters.concat %W(ga:eventAction==#{contributor}) if contributor
 
-    results = GaResponseBuilder.build do |builder|
+    GaResponseBuilder.build do |builder|
       builder.profile_id = profile_id
       builder.start_date = @start_date
       builder.end_date = @end_date
@@ -115,9 +111,7 @@ class ApiAnalytics
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
-    end.multi_page_response
-
-    results.flat_map{ |response| parse_event_data(response)[:results] }
+    end
   end
 
   def parse_event_data(res)
