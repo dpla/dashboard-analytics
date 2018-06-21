@@ -7,30 +7,6 @@ class ApiAnalytics
 
   ##
   # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash]
-  #
-  def overall_use_totals(hub, contributor = nil)
-    filters = %W(ga:eventCategory=@#{hub})
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    begin
-      GaResponseBuilder.build do |builder|
-        builder.profile_id = profile_id
-        builder.start_date = @start_date
-        builder.end_date = @end_date
-        builder.segment = segment
-        builder.metrics = %w(ga:totalEvents ga:users)
-        builder.filters = filters
-      end.response.totals_for_all_results
-    rescue
-      # TODO: Log error
-      Hash.new
-    end
-  end
-
-  ##
-  # @param hub [String] Hub name
   # @return [Hash]
   #
   def overall_use_by_contributor(hub)
@@ -62,24 +38,6 @@ class ApiAnalytics
       # TODO: Log error
       Hash.new
     end
-  end
-
-  ##
-  # @param event [String] event name, e.g. "Click Through" 
-  # @param hub [String] Hub name
-  # @param contributor [String]
-  # @return [Hash] | nil
-  #
-  def events(event, hub, contributor=nil)
-    res = events_builder(event, hub, contributor).response
-    parse_event_data(res)
-
-    # TODO: if there are no results, this returns nil.
-    # Would be better to return an empty Hash.
-  rescue => e
-    Rails.logger.error(e)
-    # TODO: Handle error
-    Hash.new
   end
 
   protected

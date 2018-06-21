@@ -1,34 +1,34 @@
-<%# Local variables: overview [Overview] %>
+<%# Local variables: overview [OverviewWebite], events [OverviewEvents] %>
 
 <h2>Website use</h2>
 
 <table>
   <tr>
     <td>View item</td>
-    <td><%= overview.total_view_events %></td>
+    <td><%= events.view_events %></td>
   </tr>
   <tr class="subitem">
     <td>Metadata record</td>
-    <td><%= overview.total_item_events %></td>
+    <td><%= events.item_events %></td>
   </tr>
   <tr class="subitem">
     <td>Exhibition</td>
-    <td><%= overview.total_exhibit_events %></td>
+    <td><%= events.exhibit_events %></td>
   </tr>
   <tr class="subitem">
     <td>Primary source set</td>
-    <td><%= overview.total_pss_events %></td>
+    <td><%= events.pss_events %></td>
   </tr>
   <tr>
     <td>Click throughs</td>
-    <td><%= overview.total_click_throughs %></td>
+    <td><%= events.click_throughs %></td>
   </tr>
   <tr>
     <td>Users</td>
-    <td><%= overview.frontend_users %></td>
+    <td><%= overview.users %></td>
   </tr>
   <tr>
     <td>Sessions</td>
-    <td><%= overview.frontend_sessions %></td>
+    <td><%= overview.sessions %></td>
   </tr>
 </table>
