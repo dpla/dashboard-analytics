@@ -39,7 +39,7 @@ class Events
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    events_builder.response
+    @response ||= events_builder.response
   rescue => e
     Rails.logger.error(e)
     nil
@@ -52,7 +52,7 @@ class Events
   # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
   #
   def multi_page_response
-    events_builder.multi_page_response
+    @multi_page_reponse ||= events_builder.multi_page_response
   rescue => e
     Rails.logger.error(e)
     Array.new
@@ -111,6 +111,8 @@ class Events
 
   ##
   # @return GaResponseBuilder
+  # @throws exception if HTTP request fails
+  #
   def events_builder
     event_category = "#{event_name} : #{hub_name}"
     filters = %W(ga:eventCategory==#{event_category})

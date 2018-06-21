@@ -69,6 +69,8 @@ class SearchTerms
 
   ##
   # @return GaResponseBuilder
+  # @throws exception if HTTP request fails
+  #
   def search_terms_builder
     GaResponseBuilder.build do |builder|
       builder.profile_id = profile_id

@@ -35,8 +35,16 @@ class Contributor
     @frontend_ga.token
   end
 
-  def overview
-    Overview.new(self)
+  def overview_website
+    OverviewWebsite.new(self)
+  end
+
+  def overview_api
+    OverviewApi.new(self)
+  end
+
+  def overview_events
+    OverviewEvents.new(self)
   end
 
   def metadata_completeness

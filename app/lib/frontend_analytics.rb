@@ -7,59 +7,6 @@ class FrontendAnalytics < GaResponseBuilder
 
   ##
   # @param hub [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash]
-  #
-  def overall_use_totals(hub, contributor = nil)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    begin
-      GaResponseBuilder.build do |builder|
-        builder.profile_id = profile_id
-        builder.start_date = @start_date
-        builder.end_date = @end_date
-        builder.metrics = %w(ga:totalEvents ga:uniqueEvents ga:sessions ga:users)
-        builder.filters = filters
-      end.response.totals_for_all_results
-    rescue
-      # TODO: Log error
-      Hash.new
-    end
-  end
-
-  ##
-  # @param [String] Hub name
-  # @param contributor [String] Contributor name
-  # @return [Hash]
-  #
-  def event_totals(hub, contributor = nil)
-    filters = %W(ga:eventCategory=@#{hub} ga:eventCategory!@Browse)
-    filters.concat %W(ga:eventAction==#{contributor}) if contributor
-
-    begin
-      res = GaResponseBuilder.build do |builder|
-        builder.profile_id = profile_id
-        builder.start_date = @start_date
-        builder.end_date = @end_date
-        builder.metrics = %w(ga:totalEvents)
-        builder.dimensions = %w(ga:eventCategory)
-        builder.filters = filters
-      end.response
-
-      res.rows.collect{ |row| 
-        # Create human-readable key-value pairs
-        # Example: change "Click Through : ArtStor" to "Click Through"
-        [row[0].split(' : ')[0], row[1]]
-      }.to_h
-    rescue
-      # TODO: Log error message
-      Hash.new
-    end
-  end
-
-  ##
-  # @param hub [String] Hub name
   # @return [Hash]
   #
   def overall_use_by_contributor(hub)
