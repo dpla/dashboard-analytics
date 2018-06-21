@@ -92,17 +92,17 @@ class ContributorComparison
 
   def frontend_use_by_contributor
     @frontend_use_by_contributor ||=
-      frontend_ga.overall_use_by_contributor(hub.name)
+      WebsiteOverviewByContributor.new(hub).parse_data
   end
 
   def frontend_events_by_contributor
     @frontend_events_by_contributor ||=
-      frontend_ga.events_by_contributor(hub.name)
+      WebsiteEventsByContributor.new(hub).parse_data
   end
 
   def api_use_by_contributor
     @api_use_by_contributor ||= 
-      api_ga.overall_use_by_contributor(hub.name)
+      ApiOverviewByContributor.new(hub).parse_data
   end
 
   def all_contributors_mc
