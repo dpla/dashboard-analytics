@@ -44,10 +44,6 @@ class Hub
     OverviewApi.new(self)
   end
 
-  def overview_events
-    OverviewEvents.new(self)
-  end
-
   def metadata_completeness
     @mc ||= MetadataCompleteness.new(self)
   end

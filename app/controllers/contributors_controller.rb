@@ -37,6 +37,13 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
+    @website_event_totals = WebsiteEventTotals.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
     end

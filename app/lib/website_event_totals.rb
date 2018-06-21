@@ -1,24 +1,43 @@
-##
-# Event totals for website.
-#
-class OverviewEvents
+class WebsiteEventTotals
 
-  def initialize(target)
-    @target = target
-    @start_date = target.start_date #already in iso8601
-    @end_date = target.end_date #already in iso8601
+  ##
+  # @return [WebsiteEventTotals]
+  #
+  # @example
+  #   WebsiteEventTotals.build do |builder|
+  #     builder.hub = "California Digital Library"
+  #     builder.contributor = "Agua Caliente Cultural Museum"
+  #     builder.start_date = Date.yesterday
+  #     builder.end_date = Date.today
+  #   end
+  #
+  def self.build
+    builder = new
+    yield(builder)
+    builder
   end
 
-  def target
-    @target
+  def initialize
+    @hub = nil
+    @contributor = nil
+    @start_date = nil
+    @end_date = nil
   end
 
-  def hub_name
-    target.is_a?(Hub) ? target.name : target.hub.name
+  def hub=(hub)
+    @hub = hub
   end
 
-  def contributor_name
-    target.is_a?(Contributor) ? target.name : nil
+  def contributor=(contributor)
+    @contributor = contributor
+  end
+
+  def start_date=(start_date)
+    @start_date = start_date
+  end
+
+  def end_date=(end_date)
+    @end_date = end_date
   end
 
   def view_events
@@ -61,13 +80,13 @@ class OverviewEvents
   # @throws exception if HTTP request fails
   #
   def event_overview_builder
-    filters = %W(ga:eventCategory=@#{hub_name} ga:eventCategory!@Browse)
-    filters.concat %W(ga:eventAction==#{contributor_name}) if contributor_name
+    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
+    filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
 
     GaResponseBuilder.build do |builder|
       builder.profile_id = profile_id
-      builder.start_date = @start_date
-      builder.end_date = @end_date
+      builder.start_date = @start_date.iso8601
+      builder.end_date = @end_date.iso8601
       builder.metrics = %w(ga:totalEvents)
       builder.dimensions = %w(ga:eventCategory)
       builder.filters = filters
