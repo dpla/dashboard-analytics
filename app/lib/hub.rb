@@ -40,10 +40,6 @@ class Hub
     @contributors ||= self.class.dpla_api.contributors(name).sort
   end
 
-  def overview_website
-    OverviewWebsite.new(self)
-  end
-
   def overview_api
     OverviewApi.new(self)
   end

@@ -31,10 +31,6 @@ class Contributor
     @end_date.iso8601
   end
 
-  def overview_website
-    OverviewWebsite.new(self)
-  end
-
   def overview_api
     OverviewApi.new(self)
   end
