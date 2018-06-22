@@ -1,17 +1,37 @@
 class WebsiteEventsByContributor
 
-  def initialize(hub)
+  ##
+  # @return [WebsiteEventsByContributor]
+  #
+  # @example
+  #   WebsiteEventsByContributor.build do |builder|
+  #     builder.hub = "California Digital Library"
+  #     builder.start_date = Date.yesterday
+  #     builder.end_date = Date.today
+  #   end
+  #
+  def self.build
+    builder = new
+    yield(builder)
+    builder
+  end
+
+  def initialize
+    @hub = nil
+    @start_date = nil
+    @end_date = nil
+  end
+
+  def hub=(hub)
     @hub = hub
-    @start_date = hub.start_date #already in iso8601
-    @end_date = hub.end_date #already in iso8601
   end
 
-  def target
-    @target
+  def start_date=(start_date)
+    @start_date = start_date
   end
 
-  def hub_name
-    @hub.name
+  def end_date=(end_date)
+    @end_date = end_date
   end
 
   def parse_data
@@ -55,11 +75,11 @@ class WebsiteEventsByContributor
   def events_by_contributor_builder
     GaResponseBuilder.build do |builder|
       builder.profile_id = profile_id
-      builder.start_date = @start_date
-      builder.end_date = @end_date
+      builder.start_date = @start_date.iso8601
+      builder.end_date = @end_date.iso8601
       builder.metrics = %w(ga:totalEvents)
       builder.dimensions = %w(ga:eventCategory ga:eventAction)
-      builder.filters = %W(ga:eventCategory=@#{hub_name} ga:eventCategory!@Browse)
+      builder.filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
     end
   end
 

@@ -1,12 +1,42 @@
 class ContributorComparison
 
-  # @param hub Hub
-  def initialize(hub)
-    @hub= hub
+  def self.build
+    builder = new
+    yield(builder)
+    builder
   end
 
-  def hub
-    @hub
+  def initialize
+    @contributors = nil
+    @website_overview = nil
+    @website_events = nil
+    @api_overview = nil
+    @metadata_completeness = nil
+  end
+
+  # @param [Array<String>]
+  def contributors=(contributors)
+    @contributors = contributors
+  end
+
+  # @param WebsiteOverviewByContributor
+  def website_overview=(website_overview)
+    @website_overview = website_overview
+  end
+
+  # @param WebsiteEventsByContributor
+  def website_events=(website_events)
+    @website_events = website_events
+  end
+
+  # @param ApiOverviewByContributor
+  def api_overview=(api_overview)
+    @api_overview = api_overview
+  end
+
+  # @param MetadataCompleteness
+  def metadata_completeness=(metadata_completeness)
+    @metadata_completeness = metadata_completeness
   end
 
   ##
@@ -17,7 +47,7 @@ class ContributorComparison
   def totals
     data = {}
 
-    hub.contributors.map do |c|
+    @contributors.map do |c|
       f_use = frontend_use_by_contributor[c] || {}
       f_events = frontend_events_by_contributor[c] || {}
       # TODO: only call API if date range applies
@@ -78,34 +108,19 @@ class ContributorComparison
 
   private
 
-  def frontend_ga
-    hub.frontend_ga
-  end
-
-  def api_ga
-    hub.api_ga
-  end
-
-  def metadata_completeness
-    @mc ||= MetadataCompleteness.new(hub)
-  end
-
   def frontend_use_by_contributor
-    @frontend_use_by_contributor ||=
-      WebsiteOverviewByContributor.new(hub).parse_data
+    @website_overview.parse_data
   end
 
   def frontend_events_by_contributor
-    @frontend_events_by_contributor ||=
-      WebsiteEventsByContributor.new(hub).parse_data
+    @website_events.parse_data
   end
 
   def api_use_by_contributor
-    @api_use_by_contributor ||= 
-      ApiOverviewByContributor.new(hub).parse_data
+    @api_overview.parse_data
   end
 
   def all_contributors_mc
-    @all_contributors_mc ||= metadata_completeness.all_contributors_data
+    @all_contributors_mc ||= @metadata_completeness.all_contributors_data
   end
 end

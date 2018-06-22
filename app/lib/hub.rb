@@ -44,10 +44,6 @@ class Hub
     @mc ||= MetadataCompleteness.new(self)
   end
 
-  def contributor_comparison
-    ContributorComparison.new(self)
-  end
-
   protected
 
   def self.dpla_api
