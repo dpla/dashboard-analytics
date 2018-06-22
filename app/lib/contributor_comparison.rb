@@ -1,12 +1,32 @@
 class ContributorComparison
 
+  def self.build
+    builder = new
+    yield(builder)
+    builder
+  end
+
   # @param hub Hub
-  def initialize(hub)
-    @hub= hub
+  def initialize
+    @hub = nil
+    @website_overview = nil
+    @website_events = nil
   end
 
   def hub
     @hub
+  end
+
+  def hub=(hub)
+    @hub = hub
+  end
+
+  def website_overview=(website_overview)
+    @website_overview = website_overview
+  end
+
+  def website_events=(website_events)
+    @website_events = website_events
   end
 
   ##
@@ -78,26 +98,16 @@ class ContributorComparison
 
   private
 
-  def frontend_ga
-    hub.frontend_ga
-  end
-
-  def api_ga
-    hub.api_ga
-  end
-
   def metadata_completeness
     @mc ||= MetadataCompleteness.new(hub)
   end
 
   def frontend_use_by_contributor
-    @frontend_use_by_contributor ||=
-      WebsiteOverviewByContributor.new(hub).parse_data
+    @website_overview.parse_data
   end
 
   def frontend_events_by_contributor
-    @frontend_events_by_contributor ||=
-      WebsiteEventsByContributor.new(hub).parse_data
+    @website_events.parse_data
   end
 
   def api_use_by_contributor

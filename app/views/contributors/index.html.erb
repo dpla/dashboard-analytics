@@ -135,7 +135,7 @@
     </thead>
 
     <tbody>
-      <% @hub.contributor_comparison.totals.each do |contributor, totals| %>
+      <% @contributor_comparison.totals.each do |contributor, totals| %>
         <tr>
           <td>
             <%= link_to contributor, controller: :contributors, action: :show,
