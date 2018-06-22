@@ -6,19 +6,16 @@ class ContributorComparison
     builder
   end
 
-  # @param hub Hub
   def initialize
-    @hub = nil
+    @contributors = nil
     @website_overview = nil
     @website_events = nil
+    @api_overview = nil
+    @metadata_completeness = nil
   end
 
-  def hub
-    @hub
-  end
-
-  def hub=(hub)
-    @hub = hub
+  def contributors=(contributors)
+    @contributors = contributors
   end
 
   def website_overview=(website_overview)
@@ -29,6 +26,14 @@ class ContributorComparison
     @website_events = website_events
   end
 
+  def api_overview=(api_overview)
+    @api_overview = api_overview
+  end
+
+  def metadata_completeness=(metadata_completeness)
+    @metadata_completeness = metadata_completeness
+  end
+
   ##
   # Get all contributors and their associated key metrics.
   # @return [Hash]
@@ -37,7 +42,7 @@ class ContributorComparison
   def totals
     data = {}
 
-    hub.contributors.map do |c|
+    @contributors.map do |c|
       f_use = frontend_use_by_contributor[c] || {}
       f_events = frontend_events_by_contributor[c] || {}
       # TODO: only call API if date range applies
@@ -98,10 +103,6 @@ class ContributorComparison
 
   private
 
-  def metadata_completeness
-    @mc ||= MetadataCompleteness.new(hub)
-  end
-
   def frontend_use_by_contributor
     @website_overview.parse_data
   end
@@ -111,11 +112,10 @@ class ContributorComparison
   end
 
   def api_use_by_contributor
-    @api_use_by_contributor ||= 
-      ApiOverviewByContributor.new(hub).parse_data
+    @api_overview.parse_data
   end
 
   def all_contributors_mc
-    @all_contributors_mc ||= metadata_completeness.all_contributors_data
+    @all_contributors_mc ||= @metadata_completeness.all_contributors_data
   end
 end
