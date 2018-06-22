@@ -14,22 +14,27 @@ class ContributorComparison
     @metadata_completeness = nil
   end
 
+  # @param [Array<String>]
   def contributors=(contributors)
     @contributors = contributors
   end
 
+  # @param WebsiteOverviewByContributor
   def website_overview=(website_overview)
     @website_overview = website_overview
   end
 
+  # @param WebsiteEventsByContributor
   def website_events=(website_events)
     @website_events = website_events
   end
 
+  # @param ApiOverviewByContributor
   def api_overview=(api_overview)
     @api_overview = api_overview
   end
 
+  # @param MetadataCompleteness
   def metadata_completeness=(metadata_completeness)
     @metadata_completeness = metadata_completeness
   end
