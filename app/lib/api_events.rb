@@ -1,35 +1,43 @@
-class Events
+class ApiEvents
 
   ##
-  # @param target [Hub|Contributor]
-  # @param event_label [String] e.g. view_item, click_through, etc.
-  def initialize(target, event_label)
-    @target = target
-    @event_label = event_label
-    @start_date = target.start_date #already in iso8601
-    @end_date = target.end_date #already in iso8601
+  # @return [ApiEvents]
+  #
+  # @example
+  #   ApiEvents.build do |builder|
+  #     builder.hub = "California Digital Library"
+  #     builder.contributor = "Agua Caliente Cultural Museum"
+  #     builder.start_date = Date.yesterday
+  #     builder.end_date = Date.today
+  #   end
+  #
+  def self.build
+    builder = new
+    yield(builder)
+    builder
   end
 
-  def target
-    @target
+  def initialize
+    @hub = nil
+    @contributor = nil
+    @start_date = nil
+    @end_date = nil
   end
 
-  def hub_name
-    target.is_a?(Hub) ? target.name : target.hub.name
+  def hub=(hub)
+    @hub = hub
   end
 
-  def contributor_name
-    target.is_a?(Contributor) ? target.name : nil
+  def contributor=(contributor)
+    @contributor = contributor
   end
 
-  def event_name
-    dict = { 'view_item' => 'View Item',
-             'view_exhibit' => 'View Exhibition Item',
-             'view_pss' => 'View Primary Source',
-             'click_through' => 'Click Through',
-             'view_api' => 'View API Item' }
+  def start_date=(start_date)
+    @start_date = start_date
+  end
 
-    dict[@event_label]
+  def end_date=(end_date)
+    @end_date = end_date
   end
 
   ##
@@ -67,7 +75,7 @@ class Events
   ##
   # Generate CSV of all events
   def to_csv
-    attributes = ["Item", "Item ID", "Contributor", event_name]
+    attributes = ["Item", "Item ID", "Contributor", "View API Item"]
 
     CSV.generate({ headers: true }) do |csv|
       csv << attributes
@@ -114,14 +122,15 @@ class Events
   # @throws exception if HTTP request fails
   #
   def events_builder
-    event_category = "#{event_name} : #{hub_name}"
+    event_category = "View API Item : #{@hub}"
     filters = %W(ga:eventCategory==#{event_category})
-    filters.concat %W(ga:eventAction==#{contributor_name}) if contributor_name
+    filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
 
     GaResponseBuilder.build do |builder|
       builder.profile_id = profile_id
-      builder.start_date = @start_date
-      builder.end_date = @end_date
+      builder.start_date = @start_date.iso8601
+      builder.end_date = @end_date.iso8601
+      builder.segment = segment
       builder.metrics = %w(ga:totalEvents)
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
@@ -130,11 +139,7 @@ class Events
   end
 
   def profile_id
-    if(@event_label == "view_api")
-      Settings.google_analytics.api_profile_id
-    else
-      Settings.google_analytics.frontend_profile_id
-    end
+    Settings.google_analytics.api_profile_id
   end
 
   def segment

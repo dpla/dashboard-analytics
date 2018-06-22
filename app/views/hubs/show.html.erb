@@ -24,15 +24,15 @@
       <div class="metrics">
 
         <%= render partial: "shared/frontend_use_metrics",
-                   locals: { overview: @hub.overview_website,
-                             events: @hub.overview_events } %>
+                   locals: { overview: @website_overview,
+                             events: @website_event_totals } %>
 
       </div>
 
       <div class="metrics">
 
         <%= render partial: "shared/api_use_metrics",
-                   locals: { overview: @hub.overview_api } %>
+                   locals: { overview: @api_overview } %>
 
         <br/>
 

@@ -18,7 +18,7 @@ class EventsController < ApplicationController
     end
 
     @target = params[:contributor_id] ? @contributor : @hub
-    @events = Events.new(@target, params[:id])
+    @events = get_events(params[:id])
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
@@ -28,5 +28,31 @@ class EventsController < ApplicationController
       format.html
       format.csv { send_data @events.to_csv }
     end
+  end
+
+  def get_events(label)
+    if label == "view_api"
+      ApiEvents.build do |builder|
+        builder.hub = params[:hub_id]
+        builder.contributor = params[:contributor_id] #may be nil
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+      end
+    else
+      WebsiteEvents.build do |builder|
+        builder.hub = params[:hub_id]
+        builder.contributor = params[:contributor_id] #may be nil
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.event_name = website_event_names[label]
+      end
+    end
+  end
+
+  def website_event_names
+    { "view_item" => "View Item",
+      "view_exhibit" => "View Exhibition Item",
+      "view_pss" => "View Primary Source",
+      "click_through" => "Click Through" }
   end
 end

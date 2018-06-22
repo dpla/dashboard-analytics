@@ -45,7 +45,7 @@ module EventsHelper
     render partial: 'shared/item_table',
            locals: { items: events.results,
                      table_name: table_name,
-                     contributor: events.target.is_a?(Contributor),
+                     contributor: @contributor.present?,
                      action: action }
   end
 end

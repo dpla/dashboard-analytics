@@ -33,10 +33,6 @@ class Hub
     @end_date.iso8601
   end
 
-  def ga_token
-    frontend_ga.token
-  end
-
   ##
   # Get names of all contributors that belonging to this hub
   # @return [Array<String>]
@@ -44,36 +40,12 @@ class Hub
     @contributors ||= self.class.dpla_api.contributors(name).sort
   end
 
-  def overview_website
-    OverviewWebsite.new(self)
-  end
-
-  def overview_api
-    OverviewApi.new(self)
-  end
-
-  def overview_events
-    OverviewEvents.new(self)
-  end
-
   def metadata_completeness
     @mc ||= MetadataCompleteness.new(self)
   end
 
-  def events(event_id)
-    Events.new(self, event_id)
-  end
-
   def contributor_comparison
     ContributorComparison.new(self)
-  end
-
-  def frontend_ga
-    @frontend_ga ||= FrontendAnalytics.new(start_date, end_date)
-  end
-
-  def api_ga
-    @api_ga ||= ApiAnalytics.new(start_date, end_date)
   end
 
   protected
