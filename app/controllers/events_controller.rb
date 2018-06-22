@@ -6,7 +6,6 @@ class EventsController < ApplicationController
   # View helpers
   include DataMenuHelper
   include DateHelper
-  include EventsHelper
 
   def show
     assign_start_and_end_dates

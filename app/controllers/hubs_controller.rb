@@ -6,7 +6,6 @@ class HubsController < ApplicationController
   # View helpers
   include DataMenuHelper
   include DateHelper
-  include EventsHelper
   include MetadataCompletenessHelper
 
   def index
