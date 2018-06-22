@@ -10,7 +10,7 @@ class GaResponsePresenter
   end
 
   def multi_page_response
-    @ga_response.multi_page_response
+    @ga_response.multi_page_response ? @ga_response.multi_page_response : []
   end
 
   def total_results

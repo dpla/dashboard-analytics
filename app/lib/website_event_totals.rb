@@ -94,7 +94,7 @@ class WebsiteEventTotals
   end
 
   def parse_response
-    if response.present?
+    if response.present? && response.rows.present?
       response.rows.collect{ |row| 
         # Create human-readable key-value pairs
         # Example: change "Click Through : ArtStor" to "Click Through"
