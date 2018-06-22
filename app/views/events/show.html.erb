@@ -21,10 +21,10 @@
 
     <div class="data-section">
 
-      <% if @event_id == "api_view" %>
+      <% if params[:id] == "view_api" %>
 
         <% if api_data_for_date_range? %>
-          <%= render_event_data(@events) %>
+          <%= render partial: 'shared/events_table' %>
         <% else %>
           Data is not available for this date range.
         <% end %>

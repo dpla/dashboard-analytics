@@ -22,6 +22,7 @@ class ApiEvents
     @contributor = nil
     @start_date = nil
     @end_date = nil
+    @event_name = "View API Item"
   end
 
   def hub=(hub)
@@ -38,6 +39,10 @@ class ApiEvents
 
   def end_date=(end_date)
     @end_date = end_date
+  end
+
+  def event_name
+    @event_name
   end
 
   ##
@@ -130,7 +135,7 @@ class ApiEvents
       builder.profile_id = profile_id
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
-      builder.segment = segment
+      # builder.segment = segment
       builder.metrics = %w(ga:totalEvents)
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters

@@ -1,0 +1,45 @@
+<div class="item-table">
+  <h2><%= @events.label %></h2>
+
+  <% if @events.rows.count > 0 %>
+
+  <div class="result-info">
+    Showing <%= @events.start_index %>-<%= @events.end_index %> of 
+    <%= @events.total_results %> items.
+  </div>
+
+  <div class="download">
+    <%= link_to "Download all #{@events.total_results} #{@events.action.downcase}",
+                controller: :events,
+                action: :show,
+                start_date: current_start_date,
+                end_date: current_end_date,
+                format: :csv %>
+  </div>
+
+  <table>
+    <tr>
+      <th>Item</th>
+      <% unless @contributor %>
+        <th>Contributor</th>
+      <% end %>
+      <th><%= @events.action %></th>
+    </tr>
+    <% @events.rows.each do |row| %>
+    <tr>
+      <td>
+        <a href="<%= "#{Settings.dpla.base_uri}item/#{@events.id(row)}" %>">
+          <%= @events.title(row) %>
+        </a>
+      </td>
+      <% unless @contributor %>
+      <td><%= @events.contributor(row) %></td>
+      <% end %>
+      <td><%= @events.count(row) %></td>
+    </tr>
+    <% end %>
+  </table>
+  <% else %>
+    No activity to report from this time period.
+  <% end %>
+</div>
