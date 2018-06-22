@@ -6,7 +6,6 @@ class EventsController < ApplicationController
   # View helpers
   include DataMenuHelper
   include DateHelper
-  include EventsHelper
 
   def show
     assign_start_and_end_dates
@@ -32,20 +31,24 @@ class EventsController < ApplicationController
 
   def get_events(label)
     if label == "view_api"
-      ApiEvents.build do |builder|
+      events = ApiEvents.build do |builder|
         builder.hub = params[:hub_id]
         builder.contributor = params[:contributor_id] #may be nil
         builder.start_date = @start_date
         builder.end_date = @end_date
       end
+
+      ApiEventsPresenter.new(events)
     else
-      WebsiteEvents.build do |builder|
+      events = WebsiteEvents.build do |builder|
         builder.hub = params[:hub_id]
         builder.contributor = params[:contributor_id] #may be nil
         builder.start_date = @start_date
         builder.end_date = @end_date
         builder.event_name = website_event_names[label]
       end
+
+      WebsiteEventsPresenter.new(events)
     end
   end
 
