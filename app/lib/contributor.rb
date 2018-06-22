@@ -34,8 +34,4 @@ class Contributor
   def metadata_completeness
     MetadataCompleteness.new(self)
   end
-
-  def events(event_type)
-    Events.new(self, event_type)
-  end
 end

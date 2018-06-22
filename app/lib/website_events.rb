@@ -4,7 +4,7 @@ class WebsiteEvents
   # @return [WebsiteEvents]
   #
   # @example
-  #   WebsiteEventTotals.build do |builder|
+  #   WebsiteEvents.build do |builder|
   #     builder.hub = "California Digital Library"
   #     builder.contributor = "Agua Caliente Cultural Museum"
   #     builder.start_date = Date.yesterday

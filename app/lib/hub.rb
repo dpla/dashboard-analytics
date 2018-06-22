@@ -44,10 +44,6 @@ class Hub
     @mc ||= MetadataCompleteness.new(self)
   end
 
-  def events(event_id)
-    Events.new(self, event_id)
-  end
-
   def contributor_comparison
     ContributorComparison.new(self)
   end

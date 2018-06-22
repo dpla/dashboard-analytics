@@ -32,23 +32,27 @@ class EventsController < ApplicationController
 
   def get_events(label)
     if label == "view_api"
-      Events.new(@target, params[:id])
+      ApiEvents.build do |builder|
+        builder.hub = params[:hub_id]
+        builder.contributor = params[:contributor_id] #may be nil
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+      end
     else
       WebsiteEvents.build do |builder|
         builder.hub = params[:hub_id]
         builder.contributor = params[:contributor_id] #may be nil
         builder.start_date = @start_date
         builder.end_date = @end_date
-        builder.event_name = event_names[label]
+        builder.event_name = website_event_names[label]
       end
     end
   end
 
-  def event_names
+  def website_event_names
     { "view_item" => "View Item",
       "view_exhibit" => "View Exhibition Item",
       "view_pss" => "View Primary Source",
-      "click_through" => "Click Through",
-      "view_api" => "View API Item" }
+      "click_through" => "Click Through" }
   end
 end
