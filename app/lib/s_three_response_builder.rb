@@ -71,7 +71,6 @@ class SThreeResponseBuilder
       key = "#{date.year}/#{date.strftime("%m")}/#{name}"
 
       begin
-        puts "try #{key}"
         response = get_csv(key)
       rescue Aws::S3::Errors::NoSuchKey => e
         # no action, loop continues
