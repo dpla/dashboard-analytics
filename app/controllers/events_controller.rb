@@ -41,13 +41,15 @@ class EventsController < ApplicationController
 
       ApiEventsPresenter.new(events)
     else
-      WebsiteEvents.build do |builder|
+      events = WebsiteEvents.build do |builder|
         builder.hub = params[:hub_id]
         builder.contributor = params[:contributor_id] #may be nil
         builder.start_date = @start_date
         builder.end_date = @end_date
         builder.event_name = website_event_names[label]
       end
+
+      WebsiteEventsPresenter.new(events)
     end
   end
 

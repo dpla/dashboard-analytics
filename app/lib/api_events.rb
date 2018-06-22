@@ -71,56 +71,7 @@ class ApiEvents
     Array.new
   end
 
-  ##
-  # @return [Array<Hash>]
-  def results
-    parse(response)
-  end
-
-  ##
-  # Generate CSV of all events
-  def to_csv
-    attributes = ["Item", "Item ID", "Contributor", "View API Item"]
-
-    CSV.generate({ headers: true }) do |csv|
-      csv << attributes
-
-      multi_page_response.each do |response|
-        events = parse(response)
-        events.each do |event|
-          csv << [event[:title], event[:id], event[:contributor], event[:count]]
-        end
-      end
-    end
-  end
-
   private
-
-  ##
-  # @param [Google::Apis::AnalyticsV3::GaData]
-  # @return [Array<Hash>]
-  #
-  def parse(res)
-    # Create a Hash of data
-    # E.g. { contributor: "Foo", id: "123", title: "Bar", count: "4" }
-    data = []
-
-    # Handle failed response or response with no results.
-    return data unless (res && res.rows.present?)
-
-    columns = res.column_headers.map { |c| c.name }
-
-    res.rows.each do |r|
-      contributor = r[columns.index("ga:eventAction")]
-      id = r[columns.index("ga:eventLabel")].split(" : ").first rescue nil
-      title = r[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-      count = r[columns.index("ga:totalEvents")]
-
-      data.push({ contributor: contributor, id: id, title: title, count: count })
-    end
-
-    data
-  end
 
   ##
   # @return GaResponseBuilder

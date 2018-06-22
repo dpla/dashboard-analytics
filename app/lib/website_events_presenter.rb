@@ -1,11 +1,11 @@
-class ApiEventsPresenter < GaResponsePresenter
+class WebsiteEventsPresenter  < GaResponsePresenter
 
   def label
     @ga_response.event_name
   end
 
   def action
-    "Views"
+    label == "Click Through" ? "Clicks" : "Views"
   end
 
   def contributor(row)
