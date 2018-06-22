@@ -111,14 +111,4 @@ class MetadataCompleteness
   def sThree
     SThreeResponseBuilder.new(target.end_date)
   end
-
-  # @return String
-  def hub_filepath
-    Rails.root.join("public", "spreadsheets", "provider-20180504.csv")
-  end
-
-  # @return String
-  def contributor_filepath
-    Rails.root.join("public", "spreadsheets", "contributor-20180504.csv")
-  end
 end

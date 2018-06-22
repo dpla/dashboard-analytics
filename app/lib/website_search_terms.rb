@@ -1,13 +1,30 @@
-class SearchTerms
+class WebsiteSearchTerms
 
   ##
-  # @param scope [String] "api" or "website"
-  # @param start_date [Date]
-  # @param end_date [Date]
+  # @return [WebsiteSearchTerms]
   #
-  def initialize(scope, start_date, end_date)
-    @scope = scope
+  # @example
+  #   WebsiteSearchTerms.build do |builder|
+  #     builder.start_date = Date.yesterday
+  #     builder.end_date = Date.today
+  #   end
+  #
+  def self.build
+    builder = new
+    yield(builder)
+    builder
+  end
+
+  def initialize
+    @start_date = nil
+    @end_date = nil
+  end
+
+  def start_date=(start_date)
     @start_date = start_date
+  end
+
+  def end_date=(end_date)
     @end_date = end_date
   end
 
@@ -56,15 +73,7 @@ class SearchTerms
   private
 
   def profile_id
-    if(@scope == "website")
-      Settings.google_analytics.frontend_profile_id
-    elsif(@scope =="api")
-      Settings.google_analytics.api_profile_id
-    end
-  end
-
-  def segment
-    Settings.google_analytics.api_segment if @scope =="api"
+    Settings.google_analytics.frontend_profile_id
   end
 
   ##
@@ -76,10 +85,10 @@ class SearchTerms
       builder.profile_id = profile_id
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
-      builder.segment = segment
       builder.metrics = %w(ga:searchUniques)
       builder.dimensions = %w(ga:searchKeyword)
       builder.sort = %w(-ga:searchUniques) # Descending
     end
   end
+
 end
