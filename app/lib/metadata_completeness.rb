@@ -59,7 +59,7 @@ class MetadataCompleteness
     @all_contributors_data ||= get_all_contributors_data
   end
 
-  private
+  # private
 
   ##
   # Gets completeness data for the target.
@@ -75,9 +75,11 @@ class MetadataCompleteness
   # @return Hash
   def get_hub_data
     data = nil
+    response = sThree_response("provider.csv")
+    csv = csv_data(response)
 
     begin
-      sThree.provider_data.each do |row|
+      csv.each do |row|
         break if data != nil
         data = row if row["provider"] == @hub
       end
@@ -92,9 +94,11 @@ class MetadataCompleteness
   # @return Hash
   def get_contributor_data
     data = nil
+    response = sThree_response("contributor.csv")
+    csv = csv_data(response)
 
     begin
-      sThree.contributor_data.each do |row|
+      csv.each do |row|
         break if data != nil
         if row["provider"] == @hub and row["dataProvider"] == @contributor
           data = row
@@ -111,9 +115,11 @@ class MetadataCompleteness
   # @return Array[Hash]
   def get_all_contributors_data
     data = []
+    response = sThree_response("contributor.csv")
+    csv = csv_data(response)
 
     begin
-      sThree.contributor_data.each do |row|
+      csv.each do |row|
         if row["provider"] == @hub
           data.push(row.to_hash)
         end
@@ -125,7 +131,17 @@ class MetadataCompleteness
     return data
   end
 
-  def sThree
-    SThreeResponseBuilder.new(@end_date.iso8601)
+  ##
+  # @return Seahorse::Client::Response
+  def sThree_response(file_name)
+    SThreeResponseBuilder.new(file_name, @end_date).response
+  end
+
+  ##
+  # @param Seahorse::Client::Response
+  # @return CSV
+  def csv_data(response)
+    # response.body.read is instance of String
+    CSV.new(response.body.read, headers: true)
   end
 end

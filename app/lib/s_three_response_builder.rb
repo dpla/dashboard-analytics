@@ -1,35 +1,43 @@
 class SThreeResponseBuilder
 
   ##
-  # @param start_date [String] in format YYYT-MM-DD (iso8601)
-  # @param end_date [String] in format YYYT-MM-DD (iso8601)
-  #
-  def initialize(end_date)
+  # @param file_name [String] e.g. "provider.csv"
+  # @param end_date [Date]
+  def initialize(file_name, end_date)
+    @file_name = file_name
     @end_date = end_date
   end
 
   ##
-  # @return String
-  def month
-    @end_date.split("-")[1]
-  end
+  # Get data from the month specified in end_date.
+  # If no data is available for that month, get the previous month.
+  # Continue trying until data is available or min date is surpassed.
+  #
+  # @return Seahorse::Client::Response
+  def response
+    date = @end_date
+    response = nil
 
-  ##
-  # @return String
-  def year
-    @end_date.split("-").first
-  end
+    while response == nil
+      break if date < min_date
 
-  ##
-  # @return CSV | nil
-  def provider_data
-    most_recent("provider.csv")
-  end
+      # File path in format YYYY/MM/filename.csv
+      key = "#{date.year}/#{date.strftime("%m")}/#{@file_name}"
 
-  ##
-  # @return CSV | nil
-  def contributor_data
-    most_recent("contributor.csv")
+      Rails.logger.debug("trying #{key}")
+
+      begin
+        response = client.get_object({ bucket: bucket, key: key })
+      rescue Aws::S3::Errors::NoSuchKey => e
+        # no action, loop continues
+      rescue Exception => e
+        # TODO: log/handle error
+      end
+
+      date = date.last_month
+    end
+
+    return response
   end
 
   private
@@ -51,49 +59,5 @@ class SThreeResponseBuilder
   # @return Date
   def min_date
     Date.new(Settings.mc_min_date.year.to_i, Settings.mc_min_date.month.to_i)
-  end
-
-  ##
-  # Get data from the month specified in end_date.
-  # If no data is available for that month, get the previous month.
-  # Continue trying until data is available or min date is surpassed.
-  #
-  # @param String file name
-  # @return CSV | nil
-  def most_recent(name)
-    date = Date.new(year.to_i, month.to_i)
-    response = nil
-
-    while response == nil
-      break if date < min_date
-
-      # File path in format YYYY/MM/filename.csv
-      key = "#{date.year}/#{date.strftime("%m")}/#{name}"
-
-      begin
-        response = get_csv(key)
-      rescue Aws::S3::Errors::NoSuchKey => e
-        # no action, loop continues
-      rescue Exception => e
-        # TODO: log/handle error
-      end
-
-      date = date.last_month
-    end
-
-    return response
-  end
-
-  ##
-  # Get a CSV file from S3.
-  #
-  # @param String filepath
-  # @return CSV
-  # @throws Aws::S3::Errors::NoSuchKey if file does not exist
-  def get_csv(key)
-    # response is instance of Seahorse::Client::Response
-    response = client.get_object({ bucket: bucket, key: key })
-    # response.body.read is instance of String
-    CSV.new(response.body.read, headers: true)
   end
 end
