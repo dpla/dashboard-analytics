@@ -32,7 +32,10 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    @metadata_completeness = MetadataCompleteness.new(@hub)
+    @metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.end_date = @end_date
+    end
 
     @contributor_comparison = ContributorComparison.build do |builder|
       builder.contributors = contributors
@@ -77,6 +80,12 @@ class ContributorsController < ApplicationController
       builder.hub = params[:hub_id]
       builder.contributor = params[:id]
       builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    @metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:id]
       builder.end_date = @end_date
     end
 

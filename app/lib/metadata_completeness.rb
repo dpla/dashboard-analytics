@@ -7,13 +7,38 @@ class MetadataCompleteness
       'location', 'language', 'standardizedRights' ]
   end
 
-  # @param Hub || Contributor
-  def initialize(target)
-    @target = target
+  ##
+  # @return [MetadataCompleteness]
+  #
+  # @example
+  #   MetadataCompleteness.build do |builder|
+  #     builder.hub = "California Digital Library"
+  #     builder.contributor = "Agua Caliente Cultural Museum"
+  #     builder.end_date = Date.today
+  #   end
+  #
+  def self.build
+    builder = new
+    yield(builder)
+    builder
   end
 
-  def target
-    @target
+  def initialize
+    @hub = nil
+    @contributor = nil
+    @end_date = nil
+  end
+
+  def hub=(hub)
+    @hub = hub
+  end
+
+  def contributor=(contributor)
+    @contributor = contributor
+  end
+
+  def end_date=(end_date)
+    @end_date = end_date
   end
 
   # @return Hash
@@ -30,14 +55,6 @@ class MetadataCompleteness
     data['count']
   end
 
-  def hub_name
-    target.is_a?(Hub) ? target.name : target.hub.name
-  end
-
-  def contributor_name
-    target.is_a?(Contributor) ? target.name : nil
-  end
-
   def all_contributors_data
     @all_contributors_data ||= get_all_contributors_data
   end
@@ -48,10 +65,10 @@ class MetadataCompleteness
   # Gets completeness data for the target.
   # @return Hash
   def get_data
-    if target.is_a?(Hub)
-      get_hub_data
-    elsif target.is_a?(Contributor)
+    if @contributor.present?
       get_contributor_data
+    elsif @hub.present?
+      get_hub_data
     end
   end
 
@@ -62,7 +79,7 @@ class MetadataCompleteness
     begin
       sThree.provider_data.each do |row|
         break if data != nil
-        data = row if row["provider"] == hub_name
+        data = row if row["provider"] == @hub
       end
     rescue => e
       # TODO: log error
@@ -79,7 +96,7 @@ class MetadataCompleteness
     begin
       sThree.contributor_data.each do |row|
         break if data != nil
-        if row["provider"] == hub_name and row["dataProvider"] == contributor_name
+        if row["provider"] == @hub and row["dataProvider"] == @contributor
           data = row
         end
       end
@@ -97,7 +114,7 @@ class MetadataCompleteness
 
     begin
       sThree.contributor_data.each do |row|
-        if row["provider"] == hub_name
+        if row["provider"] == @hub
           data.push(row.to_hash)
         end
       end
@@ -109,6 +126,6 @@ class MetadataCompleteness
   end
 
   def sThree
-    SThreeResponseBuilder.new(target.end_date)
+    SThreeResponseBuilder.new(@end_date.iso8601)
   end
 end

@@ -40,10 +40,6 @@ class Hub
     @contributors ||= self.class.dpla_api.contributors(name).sort
   end
 
-  def metadata_completeness
-    @mc ||= MetadataCompleteness.new(self)
-  end
-
   protected
 
   def self.dpla_api
