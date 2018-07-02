@@ -36,6 +36,11 @@ class HubsController < ApplicationController
       builder.end_date = @end_date
     end
 
+    @metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:id]
+      builder.end_date = @end_date
+    end
+
     unless current_user.hub == params[:id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
     end

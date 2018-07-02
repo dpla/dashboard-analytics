@@ -30,8 +30,4 @@ class Contributor
   def end_date
     @end_date.iso8601
   end
-
-  def metadata_completeness
-    MetadataCompleteness.new(self)
-  end
 end
