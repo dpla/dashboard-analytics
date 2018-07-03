@@ -14,15 +14,16 @@ class MetadataCompletenessPresenter
 
   ##
   # @param [String]
-  # @return [Array]
+  # @return [Array<CSV::Row>]
   def all_contributors(hub)
     @metadata_completeness.contributor_csv
       .find_all { |row| row["provider"] == hub }
   end
 
   ##
-  # @param [String]
-  # @return [Hash]
+  # @param hub [String]
+  # @param contributor [String]
+  # @return [CSV::Row]
   def contributor(hub, contributor)
     @metadata_completeness.contributor_csv
       .find { |row| row["provider"] == hub && row["dataProvider"] == contributor }
@@ -30,9 +31,8 @@ class MetadataCompletenessPresenter
 
   ##
   # @param [String]
-  # @return [Hash]
+  # @return [CSV::Row]
   def hub(hub)
-    @metadata_completeness.hub_csv
-      .find { |row| row["provider"] == hub }
+    @metadata_completeness.hub_csv.find { |row| row["provider"] == hub }
   end
 end
