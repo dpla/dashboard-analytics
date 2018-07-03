@@ -18,21 +18,33 @@ class MetadataCompletenessPresenter
   def all_contributors(hub)
     @metadata_completeness.contributor_csv
       .find_all { |row| row["provider"] == hub }
+  rescue => e
+    Rails.logger.error(e)
+    Array.new
   end
 
   ##
   # @param hub [String]
   # @param contributor [String]
-  # @return [CSV::Row]
+  # @return [Hash]
   def contributor(hub, contributor)
     @metadata_completeness.contributor_csv
       .find { |row| row["provider"] == hub && row["dataProvider"] == contributor }
+      .to_hash
+  rescue => e
+    Rails.logger.error(e)
+    Hash.new
   end
 
   ##
   # @param [String]
-  # @return [CSV::Row]
+  # @return [Hash]
   def hub(hub)
-    @metadata_completeness.hub_csv.find { |row| row["provider"] == hub }
+    @metadata_completeness.hub_csv
+      .find { |row| row["provider"] == hub }
+      .to_hash
+  rescue => e
+    Rails.logger.error(e)
+    Hash.new
   end
 end
