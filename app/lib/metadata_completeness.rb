@@ -1,12 +1,6 @@
 class MetadataCompleteness
   include ActionView::Helpers::NumberHelper
 
-  # Fields to be shown in the user interface.
-  def self.fields
-    [ 'type', 'subject', 'description', 'preview', 'date', 'creator',
-      'location', 'language', 'standardizedRights' ]
-  end
-
   ##
   # @return [MetadataCompleteness]
   #
@@ -51,95 +45,6 @@ class MetadataCompleteness
     csv_data(response)
   end
 
-  # @return Hash
-  def data
-    @data ||= get_data
-  end
-
-  # @return Hash
-  def field_data
-    data.select { |k, v| self.class.fields.include? k }
-  end
-
-  def count
-    data['count']
-  end
-
-  def all_contributors_data
-    @all_contributors_data ||= get_all_contributors_data
-  end
-
-  # private
-
-  ##
-  # Gets completeness data for the target.
-  # @return Hash
-  def get_data
-    if @contributor.present?
-      get_contributor_data
-    elsif @hub.present?
-      get_hub_data
-    end
-  end
-
-  # @return Hash
-  def get_hub_data
-    data = nil
-    response = sThree_response("provider.csv")
-    csv = csv_data(response)
-
-    begin
-      csv.each do |row|
-        break if data != nil
-        data = row if row["provider"] == @hub
-      end
-    rescue => e
-      # TODO: log error
-    end
-
-    return {} if data == nil
-    return data.to_hash
-  end
-
-  # @return Hash
-  def get_contributor_data
-    data = nil
-    response = sThree_response("contributor.csv")
-    csv = csv_data(response)
-
-    begin
-      csv.each do |row|
-        break if data != nil
-        if row["provider"] == @hub and row["dataProvider"] == @contributor
-          data = row
-        end
-      end
-    rescue => e
-      # TODO: Log error
-    end
-
-    return {} if data == nil
-    return data.to_hash
-  end
-
-  # @return Array[Hash]
-  def get_all_contributors_data
-    data = []
-    response = sThree_response("contributor.csv")
-    csv = csv_data(response)
-
-    begin
-      csv.each do |row|
-        if row["provider"] == @hub
-          data.push(row.to_hash)
-        end
-      end
-    rescue => e
-      # TODO: Log error
-    end
-
-    return data
-  end
 
   ##
   # Get data from the month specified in end_date.

@@ -95,13 +95,15 @@
     </fieldset>
     <fieldset>
       <legend>Metadata Completeness</legend>
-      <% MetadataCompleteness.fields.each do |field| %>
-        <div>
-          <input type="checkbox" id="<%= field %>-input" name="column"
-                 value="<%= field %>" checked="checked"
-                 onclick="toggle_column(this)">
-          <label for="<%= field %>-input"><%= field.titleize %></label>
-        </div>
+      <% MetadataCompletenessPresenter.fields.each do |field| %>
+        <% unless field == 'count' %>
+          <div>
+            <input type="checkbox" id="<%= field %>-input" name="column"
+                   value="<%= field %>" checked="checked"
+                   onclick="toggle_column(this)">
+            <label for="<%= field %>-input"><%= field.titleize %></label>
+          </div>
+        <% end %>
       <% end %>
     </fieldset>
   </form>
@@ -128,8 +130,10 @@
           <th class="api-user">API Users/Apps</th>
         <% end %>
         <th class="item-count">Item Count</th>
-        <% MetadataCompleteness.fields.each do |field| %>
-          <th class="<%= field %>"><%= field.titleize %> Completeness</th>
+        <% MetadataCompletenessPresenter.fields.each do |field| %>
+          <% unless field == 'count' %>
+            <th class="<%= field %>"><%= field.titleize %> Completeness</th>
+          <% end %>
         <% end %>
       </tr>
     </thead>
@@ -166,11 +170,13 @@
           <td class="item-count">
             <%= totals["MetadataCompleteness"]['count'] %>
           </td>
-          <% MetadataCompleteness.fields.each do |field| %>
-            <% value = totals["MetadataCompleteness"][field] %>
-            <td class="<%= field %> <%= percentage_class(value) %>">
-              <%= render_percentage(value) %>
-            </td>
+          <% MetadataCompletenessPresenter.fields.each do |field| %>
+            <% unless field == "count" %>
+              <% value = totals["MetadataCompleteness"][field] %>
+              <td class="<%= field %> <%= percentage_class(value) %>">
+                <%= render_percentage(value) %>
+              </td>
+            <% end %>
           <% end %>
         </tr>
       <% end %>
