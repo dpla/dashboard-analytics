@@ -1,9 +1,5 @@
 class SThreeResponseBuilder
 
-  def initialize
-    @client = get_client
-  end
-
   ##
   # @param [String] S3 key (i.e. filepath)
   #
@@ -18,9 +14,9 @@ class SThreeResponseBuilder
   # Documentation about possible errors:
   # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Errors.html
   #
-  def response(key)
+  def self.response(key)
     tries ||= 0
-    response = @client.get_object({ bucket: bucket, key: key })
+    response = self.client.get_object({ bucket: self.bucket, key: key })
   rescue Aws::S3::Errors::InternalError
     # Use exponential backoff to delay next request attempt.
     sleep(2**tries + rand) and retry unless(tries += 1) == 3
@@ -28,25 +24,14 @@ class SThreeResponseBuilder
 
   private
 
-  ##
-  # @return AWS::S3::Client
-  def get_client
-    tries ||= 0
-    Aws::S3::Client.new(region: region)
-  rescue Aws::S3::Errors::InternalError
-    # Use exponential backoff to delay next request attempt.
-    sleep(2**tries + rand) and retry unless(tries += 1) == 3
+  def self.client
+    # TODO: Define region in config settings
+    @@client ||= Aws::S3::Client.new(region: 'us-east-1')
   end
 
   ##
   # @return String
-  def bucket
+  def self.bucket
     Settings.s3.bucket
-  end
-
-  ##
-  # TODO: Define in config settings
-  def region
-    'us-east-1'
   end
 end

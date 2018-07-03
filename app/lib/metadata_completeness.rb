@@ -64,7 +64,7 @@ class MetadataCompleteness
       key = "#{date.year}/#{date.strftime("%m")}/#{file_name}"
 
       begin
-        response = s_three.response(key)
+        response = SThreeResponseBuilder.response(key)
       rescue Aws::S3::Errors::NoSuchKey => e
         Rails.logger.debug("#{key} does not exist.")
         # Loop continues
@@ -77,10 +77,6 @@ class MetadataCompleteness
     end
 
     return response
-  end
-
-  def s_three
-    @s_three ||= SThreeResponseBuilder.new
   end
 
   ##
