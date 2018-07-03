@@ -7,11 +7,18 @@ class ContributorComparison
   end
 
   def initialize
+    @hub = nil
     @contributors = nil
     @website_overview = nil
     @website_events = nil
     @api_overview = nil
-    @metadata_completeness = nil
+    @mc_presenter = nil
+  end
+
+  ##
+  # @param [String]
+  def hub=(hub)
+    @hub = hub
   end
 
   # @param [Array<String>]
@@ -34,9 +41,9 @@ class ContributorComparison
     @api_overview = api_overview
   end
 
-  # @param MetadataCompleteness
-  def metadata_completeness=(metadata_completeness)
-    @metadata_completeness = metadata_completeness
+  # @param MetadataCompletenessPresenter
+  def mc_presenter=(mc_presenter)
+    @mc_presenter = mc_presenter
   end
 
   ##
@@ -78,8 +85,8 @@ class ContributorComparison
                    "API Views",
                    "API Users" ]
 
-    MetadataCompleteness.fields.each do |field|
-      attributes.push(field.titleize + " Completeness")
+    MetadataCompletenessPresenter.fields.each do |field|
+      attributes.push(field.titleize + " Completeness") unless field == "count"
     end
 
     CSV.generate({ headers: true }) do |csv|
@@ -99,7 +106,9 @@ class ContributorComparison
                 api["Views"],
                 api["Users"] ]
 
-        MetadataCompleteness.fields.each { |field| data.push(mc[field]) }
+        MetadataCompleteness.fields.each do |field| 
+          data.push(mc[field]) unless field == "count"
+        end
 
         csv << data
       end
@@ -121,6 +130,6 @@ class ContributorComparison
   end
 
   def all_contributors_mc
-    @all_contributors_mc ||= @metadata_completeness.all_contributors_data
+    @all_contributors_mc ||= @mc_presenter.all_contributors(@hub)
   end
 end

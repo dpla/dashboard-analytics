@@ -1,17 +1,19 @@
-<%# Local variables: metadata_completeness [MetadataCompleteness] %>
+<%# Local variables: mc [Hash] %>
 
 <h2>Metadata Completeness</h2>
 
-<% if metadata_completeness.field_data.present? %>
+<% if mc.present? %>
 
   <table>
-    <% metadata_completeness.field_data.each do |key, value| %>
+    <% mc.each do |key, value| %>
+      <% if MetadataCompletenessPresenter.fields.include?(key) && key != "count" %>
         <tr>
           <td><%= key.titleize %></td>
           <td class="bar <%= percentage_class(value) %>">
             <%= render_percentage(value) %>
           </td>
         </tr>
+      <% end %>
     <% end %>
   </table>
 

@@ -38,15 +38,15 @@
         <br/>
 
         <%= render partial: "shared/item_count",
-                   locals: { metadata_completeness: @metadata_completeness } %>
-
+                   locals: { mc: @mc_presenter.contributor(@contributor.hub.name,
+                                                           @contributor.name) } %>
       </div>
 
       <div class="metrics">
 
         <%= render partial: "shared/metadata_completeness",
-                   locals: { metadata_completeness: @metadata_completeness } %>
-
+                   locals: { mc: @mc_presenter.contributor(@contributor.hub.name,
+                                                           @contributor.name) } %>
       </div>
     </div>
   </div>
