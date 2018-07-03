@@ -132,9 +132,39 @@ class MetadataCompleteness
   end
 
   ##
+  # Get data from the month specified in end_date.
+  # If no data is available for that month, get the previous month.
+  # Continue trying until data is available or min date is surpassed.
+  #
   # @return Seahorse::Client::Response
   def sThree_response(file_name)
-    SThreeResponseBuilder.new(file_name, @end_date).response
+    date = @end_date
+    response = nil
+
+    while response == nil
+      break if date < min_date
+
+      # File path in format YYYY/MM/filename.csv
+      key = "#{date.year}/#{date.strftime("%m")}/#{file_name}"
+
+      begin
+        response = s_three.response(key)
+      rescue Aws::S3::Errors::NoSuchKey => e
+        Rails.logger.debug("#{key} does not exist.")
+        # Loop continues
+      rescue Exception => e
+        Rails.logger.debug(e)
+        break
+      end
+
+      date = date.last_month
+    end
+
+    return response
+  end
+
+  def s_three
+    @s_three ||= SThreeResponseBuilder.new
   end
 
   ##
@@ -143,5 +173,12 @@ class MetadataCompleteness
   def csv_data(response)
     # response.body.read is instance of String
     CSV.new(response.body.read, headers: true)
+  end
+
+  ##
+  # Minimum data that data is expected to be available.
+  # @return Date
+  def min_date
+    Date.new(Settings.mc_min_date.year.to_i, Settings.mc_min_date.month.to_i)
   end
 end

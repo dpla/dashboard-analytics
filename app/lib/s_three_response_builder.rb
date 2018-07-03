@@ -1,52 +1,32 @@
 class SThreeResponseBuilder
 
-  ##
-  # @param file_name [String] e.g. "provider.csv"
-  # @param end_date [Date]
-  def initialize(file_name, end_date)
-    @file_name = file_name
-    @end_date = end_date
+  def initialize
+    @client = Aws::S3::Client.new(region: region)
   end
 
   ##
-  # Get data from the month specified in end_date.
-  # If no data is available for that month, get the previous month.
-  # Continue trying until data is available or min date is surpassed.
+  # @param [String] S3 key (i.e. filepath)
   #
-  # @return Seahorse::Client::Response
-  def response
-    date = @end_date
-    response = nil
-
-    while response == nil
-      break if date < min_date
-
-      # File path in format YYYY/MM/filename.csv
-      key = "#{date.year}/#{date.strftime("%m")}/#{@file_name}"
-
-      Rails.logger.debug("trying #{key}")
-
-      begin
-        response = client.get_object({ bucket: bucket, key: key })
-      rescue Aws::S3::Errors::NoSuchKey => e
-        # no action, loop continues
-      rescue Exception => e
-        # TODO: log/handle error
-      end
-
-      date = date.last_month
-    end
-
-    return response
+  # @return Aws::S3::Types::GetObjectOutput
+  #
+  # @raise [Aws::S3::Errors::NoSuchKey]
+  # The specified key does not exist. Do not retry.
+  #
+  # @raise [S3::Errors::InternalError]
+  # An error occurred on the server and the request can be retried.
+  #
+  # Documentation about possible errors:
+  # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Errors.html
+  #
+  def response(key)
+    tries ||= 0
+    response = @client.get_object({ bucket: bucket, key: key })
+  rescue Aws::S3::Errors::InternalError
+    # Use exponential backoff to delay next request attempt.
+    sleep(2**tries + rand) and retry unless(tries += 1) == 3
   end
 
   private
-
-  ##
-  # @return Aws::S3::Client
-  def client
-    @client ||= Aws::S3::Client.new(region: 'us-east-1')
-  end
 
   ##
   # @return String
@@ -55,9 +35,8 @@ class SThreeResponseBuilder
   end
 
   ##
-  # Minimum data that data is expected to be available.
-  # @return Date
-  def min_date
-    Date.new(Settings.mc_min_date.year.to_i, Settings.mc_min_date.month.to_i)
+  # TODO: Define in config settings
+  def region
+    'us-east-1'
   end
 end
