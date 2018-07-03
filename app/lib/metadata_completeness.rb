@@ -51,7 +51,8 @@ class MetadataCompleteness
   # If no data is available for that month, get the previous month.
   # Continue trying until data is available or min date is surpassed.
   #
-  # @return Seahorse::Client::Response
+  # @return Aws::S3::Types::GetObjectOutput
+  #
   def sThree_response(file_name)
     date = @end_date
     response = nil
@@ -83,7 +84,7 @@ class MetadataCompleteness
   end
 
   ##
-  # @param Seahorse::Client::Response
+  # @param Aws::S3::Types::GetObjectOutput
   # @return CSV
   def csv_data(response)
     # response.body.read is instance of String
