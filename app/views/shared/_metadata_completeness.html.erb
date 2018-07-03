@@ -6,7 +6,7 @@
 
   <table>
     <% mc.each do |key, value| %>
-      <% unless key == "count" %>
+      <% if MetadataCompletenessPresenter.fields.include?(key) && key != "count" %>
         <tr>
           <td><%= key.titleize %></td>
           <td class="bar <%= percentage_class(value) %>">
