@@ -26,8 +26,6 @@ class MetadataCompletenessPresenter
   def contributor(hub, contributor)
     @metadata_completeness.contributor_csv
       .find { |row| row["provider"] == hub && row["dataProvider"] == contributor }
-      .to_hash
-      .select { |k, v| self.class.fields.include? k }
   end
 
   ##
@@ -36,7 +34,5 @@ class MetadataCompletenessPresenter
   def hub(hub)
     @metadata_completeness.hub_csv
       .find { |row| row["provider"] == hub }
-      .to_hash
-      .select { |k| self.class.fields.include? k }
   end
 end
