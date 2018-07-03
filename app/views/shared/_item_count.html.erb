@@ -1,13 +1,13 @@
-<%# Local variables: metadata_completeness [MetadataCompleteness] %>
+<%# Local variables: mc [Hash] %>
 
 <h2>Item Count</h2>
 
-<% if metadata_completeness.count.present? %>
+<% if mc['count'].present? %>
 
   <table>
     <tr>
       <td>Item count</td>
-      <td><%= metadata_completeness.count %></td>
+      <td><%= mc['count'] %></td>
     </tr>
   </table>
 

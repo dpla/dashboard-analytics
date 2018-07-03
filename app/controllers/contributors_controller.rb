@@ -32,17 +32,20 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    @metadata_completeness = MetadataCompleteness.build do |builder|
+    metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
       builder.end_date = @end_date
     end
 
+    @mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
+
     @contributor_comparison = ContributorComparison.build do |builder|
+      builder.hub = @hub.name
       builder.contributors = contributors
       builder.website_overview = @website_overview
       builder.website_events = @website_events
       builder.api_overview = @api_overview
-      builder.metadata_completeness = @metadata_completeness
+      builder.mc_presenter = @mc_presenter
     end
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
@@ -51,7 +54,7 @@ class ContributorsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_data @hub.contributor_comparison.to_csv }
+      format.csv { send_data @contributor_comparison.to_csv }
     end
   end
 
@@ -83,11 +86,13 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    @metadata_completeness = MetadataCompleteness.build do |builder|
+    metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
       builder.contributor = params[:id]
       builder.end_date = @end_date
     end
+
+    @mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)

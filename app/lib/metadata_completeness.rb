@@ -41,6 +41,16 @@ class MetadataCompleteness
     @end_date = end_date
   end
 
+  def hub_csv
+    response = sThree_response("provider.csv")
+    csv_data(response)
+  end
+
+  def contributor_csv
+    response = sThree_response("contributor.csv")
+    csv_data(response)
+  end
+
   # @return Hash
   def data
     @data ||= get_data
