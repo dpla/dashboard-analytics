@@ -1,7 +1,7 @@
 class SThreeResponseBuilder
 
   def initialize
-    @client = Aws::S3::Client.new(region: region)
+    @client = get_client
   end
 
   ##
@@ -27,6 +27,16 @@ class SThreeResponseBuilder
   end
 
   private
+
+  ##
+  # @return AWS::S3::Client
+  def get_client
+    tries ||= 0
+    Aws::S3::Client.new(region: region)
+  rescue Aws::S3::Errors::InternalError
+    # Use exponential backoff to delay next request attempt.
+    sleep(2**tries + rand) and retry unless(tries += 1) == 3
+  end
 
   ##
   # @return String
