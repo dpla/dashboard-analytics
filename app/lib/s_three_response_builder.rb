@@ -3,7 +3,7 @@ class SThreeResponseBuilder
   ##
   # @param [String] S3 key (i.e. filepath)
   #
-  # @return Aws::S3::Types::GetObjectOutput
+  # @return [Aws::S3::Types::GetObjectOutput]
   #
   # @raise [Aws::S3::Errors::NoSuchKey]
   # The specified key does not exist. Do not retry.
@@ -15,17 +15,14 @@ class SThreeResponseBuilder
   # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Errors.html
   #
   def self.response(key)
-    tries ||= 0
-    response = self.client.get_object({ bucket: self.bucket, key: key })
-  rescue Aws::S3::Errors::InternalError
-    # Use exponential backoff to delay next request attempt.
-    sleep(2**tries + rand) and retry unless(tries += 1) == 3
+    self.client.get_object({ bucket: self.bucket, key: key })
   end
 
   private
 
   def self.client
     # TODO: Define region in config settings
+    # By default, the client retries 500 and some 400 errors three times.
     @@client ||= Aws::S3::Client.new(region: 'us-east-1')
   end
 
