@@ -18,7 +18,7 @@ module DateHelper
   # @return Hash
   def end_date_form_options
     available_months.map do |date|
-      label = "#{Date::ABBR_MONTHNAMES[date.month]}, #{date.end_of_month.day}, #{date.year}"
+      label = "#{Date::ABBR_MONTHNAMES[date.month]} #{date.end_of_month.day}, #{date.year}"
       value = date.strftime("%Y-%m") # YYYY-MM
       [label, value]
     end
