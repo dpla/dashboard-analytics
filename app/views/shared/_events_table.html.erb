@@ -9,7 +9,7 @@
   </div>
 
   <div class="download">
-    <%= link_to "Download all #{@events.total_results} #{@events.action.downcase}",
+    <%= link_to "Download all #{@events.total_results} items",
                 controller: :events,
                 action: :show,
                 start_date: current_start_date,

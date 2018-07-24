@@ -4,9 +4,21 @@ module DateHelper
   # For use with the grouped_options_for_select helper.
   # @see https://apidock.com/rails/ActionView/Helpers/FormOptionsHelper/grouped_options_for_select
   # @return Hash
-  def date_form_options
+  def start_date_form_options
     available_months.map do |date|
-      label = "#{Date::ABBR_MONTHNAMES[date.month]} #{date.year}"
+      label = "#{Date::ABBR_MONTHNAMES[date.month]} #{date.beginning_of_month.day}, #{date.year}"
+      value = date.strftime("%Y-%m") # YYYY-MM
+      [label, value]
+    end
+  end
+
+  ##
+  # For use with the grouped_options_for_select helper.
+  # @see https://apidock.com/rails/ActionView/Helpers/FormOptionsHelper/grouped_options_for_select
+  # @return Hash
+  def end_date_form_options
+    available_months.map do |date|
+      label = "#{Date::ABBR_MONTHNAMES[date.month]} #{date.end_of_month.day}, #{date.year}"
       value = date.strftime("%Y-%m") # YYYY-MM
       [label, value]
     end
