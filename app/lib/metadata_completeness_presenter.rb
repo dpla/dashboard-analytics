@@ -47,4 +47,10 @@ class MetadataCompletenessPresenter
     Rails.logger.error(e)
     Hash.new
   end
+
+  ##
+  # @return Date|nil
+  def file_date
+    @metadata_completeness.file_date
+  end
 end
