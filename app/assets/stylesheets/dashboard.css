@@ -111,6 +111,7 @@ nav .divider {
   width: 20%;
   display: inline-block;
   background-color: #f9f6f0;
+  margin-bottom: 40px;
 }
 
 .data-menu ul {
@@ -145,6 +146,7 @@ nav .divider {
   width: 80%;
   display: inline-block;
   padding-left: 40px;
+  margin-bottom: 40px;
 }
 
 main {
@@ -343,3 +345,23 @@ form.comparison legend {
   float: left;
   margin-bottom: 10px;
 }
+
+footer {
+  display: block;
+  clear: both;
+  background-color: #273443;
+  color: #dadfe0;
+  padding: 20px 40px;
+  overflow: auto;
+  margin-top: 40px;
+  box-shadow: 0 50vh 0 50vh #273443;
+}
+
+footer a, footer a:hover, footer a:visited {
+  color: #dadfe0;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
