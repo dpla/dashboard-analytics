@@ -21,6 +21,7 @@ class MetadataCompleteness
     @hub = nil
     @contributor = nil
     @end_date = nil
+    @file_date = nil
   end
 
   def hub=(hub)
@@ -45,6 +46,9 @@ class MetadataCompleteness
     csv_data(response)
   end
 
+  def file_date
+    @file_date
+  end
 
   ##
   # Get data from the month specified in end_date.
@@ -76,6 +80,8 @@ class MetadataCompleteness
       date = date.last_month
     end
 
+    # set @file_date to the date for which a file was found in AWS
+    @file_date = date
     return response
   end
 
