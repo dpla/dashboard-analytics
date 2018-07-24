@@ -86,7 +86,7 @@ class ApiEvents
       builder.profile_id = profile_id
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
-      # builder.segment = segment
+      builder.segment = segment
       builder.metrics = %w(ga:totalEvents)
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
@@ -99,6 +99,6 @@ class ApiEvents
   end
 
   def segment
-    Settings.google_analytics.api_segment if @scope =="api"
+    Settings.google_analytics.api_segment
   end
 end

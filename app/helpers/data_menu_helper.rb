@@ -29,7 +29,7 @@ module DataMenuHelper
       hub_event_path(target.name, 'view_exhibit', date_opts) : 
       hub_contributor_event_path(target.hub.name, target.name, 'view_exhibit', date_opts)
 
-    link_to("Exhibit item views", path, html_opts(path))
+    link_to("Exhibition views", path, html_opts(path))
   end
 
   def render_view_pss_link(target)
@@ -37,7 +37,7 @@ module DataMenuHelper
       hub_event_path(target.name, 'view_pss', date_opts) : 
       hub_contributor_event_path(target.hub.name, target.name, 'view_pss', date_opts)
 
-    link_to("Primary source views", path, html_opts(path))
+    link_to("Primary source set views", path, html_opts(path))
   end
 
   def render_click_through_link(target)

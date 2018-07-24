@@ -1,11 +1,19 @@
 class WebsiteEventsPresenter  < GaResponsePresenter
 
   def label
-    @ga_response.event_name
+    dict = {
+      "View Item" => "Metadata record views",
+      "View Exhibition Item" => "Exhibition views",
+      "View Primary Source" => "Primary source set views",
+      "Click Through" => "Click throughs"
+    }
+
+    dict.key?(@ga_response.event_name) ? dict[@ga_response.event_name] :
+      @ga_response.event_name
   end
 
   def action
-    label == "Click Through" ? "Clicks" : "Views"
+    @ga_response.event_name == "Click Through" ? "Click throughs" : "Views"
   end
 
   def contributor(row)
