@@ -1,16 +1,29 @@
 <%# Local variables: overview [OverviewApi] %>
 
-<h2>API use</h2>
+<div class="tooltip">
+  <h2>API use</h2>
+  <span class="tooltiptext"><%= api_use_tooltip %></span>
+</div>
 
 <% if api_data_for_date_range? %>
 
   <table>
     <tr>
-      <td>View item metadata</td>
+      <td>
+        <div class="tooltip">
+          View item metadata
+          <span class="tooltiptext"><%= view_api_item_tooltip %></span>
+        </div>
+      </td>
       <td><%= overview.events %></td>
     </tr>
     <tr>
-      <td>Registered users/apps</td>
+      <td>
+        <div class="tooltip">
+          Registered users/apps
+          <span class="tooltiptext"><%= api_users_tooltip %></span>
+        </div>
+      </td>
       <td><%= overview.users %></td>
     </tr>
   </table>

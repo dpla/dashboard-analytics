@@ -7,6 +7,7 @@ class ContributorsController < ApplicationController
   include DataMenuHelper
   include DateHelper
   include MetadataCompletenessHelper
+  include TooltipsHelper
 
   def index
     assign_start_and_end_dates
