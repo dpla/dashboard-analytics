@@ -1,34 +1,72 @@
 <%# Local variables: overview [OverviewWebite], events [OverviewEvents] %>
 
-<h2>Website use</h2>
+<div class="tooltip">
+  <h2>Website use</h2>
+  <span class="tooltiptext"><%= website_use_tooltip %></span>
+</div>
 
 <table>
   <tr>
-    <td>View item</td>
+    <td>
+        <div class="tooltip">
+          Item views
+          <span class="tooltiptext"><%= view_item_tooltip %></span>
+        </div>
+    </td>
     <td><%= events.view_events %></td>
   </tr>
   <tr class="subitem">
-    <td>Metadata record</td>
+    <td>
+      <div class="tooltip">
+        Metadata record
+        <span class="tooltiptext"><%= view_metadata_record_tooltip %></span>
+      </div>
+    </td>
     <td><%= events.item_events %></td>
   </tr>
   <tr class="subitem">
-    <td>Exhibition</td>
+    <td>
+      <div class="tooltip">
+        Exhibition
+        <span class="tooltiptext"><%= view_exhibition_tooltip %></span>
+      </div>
+    </td>
     <td><%= events.exhibit_events %></td>
   </tr>
   <tr class="subitem">
-    <td>Primary source set</td>
+    <td>
+      <div class="tooltip">
+        Primary source set
+        <span class="tooltiptext"><%= view_primary_source_set_tooltip %></span>
+      </div>
+    </td>
     <td><%= events.pss_events %></td>
   </tr>
   <tr>
-    <td>Click throughs</td>
+    <td>
+      <div class="tooltip">
+        Click throughs
+        <span class="tooltiptext"><%= click_through_tooltip %></span>
+      </div>
+    </td>
     <td><%= events.click_throughs %></td>
   </tr>
   <tr>
-    <td>Users</td>
+    <td>
+      <div class="tooltip">
+        Users
+        <span class="tooltiptext"><%= users_tooltip %></span>
+      </div>
+    </td>
     <td><%= overview.users %></td>
   </tr>
   <tr>
-    <td>Sessions</td>
+    <td>
+      <div class="tooltip">
+        Sessions
+        <span class="tooltiptext"><%= sessions_tooltip %></span>
+      </div>
+    </td>
     <td><%= overview.sessions %></td>
   </tr>
 </table>

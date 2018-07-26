@@ -1,13 +1,5 @@
-@value outlineColor from "./colors.css";
-@value smallRem, mediumRem, largeRem from "./breakpoints.css";
-@value sansFont, serifFont from "./typography.css";
-
 html {
   font-size: 16px;
-
-  @media (max-width: smallRem) {
-    font-size: 18px;
-  }
 }
 
 body {
@@ -15,14 +7,6 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   line-height: 1.25;
-}
-
-body {
-  font-family: sansFont;
-}
-
-button, input, select, label, textarea {
-  font-family: sansFont;
 }
 
 button {
@@ -43,12 +27,6 @@ p, ul, ol, h1, h2, h3, h4, h5, h6 {
 button, input, optgroup, select, textarea {
   font-size: 100%;
   margin: 0;
-}
-
-a, button, input, optgroup, select, textarea {
-  &:focus {
-    outline: 0.25rem solid outlineColor;
-  }
 }
 
 figure {
