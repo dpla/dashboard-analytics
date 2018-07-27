@@ -66,7 +66,7 @@ class GaResponseBuilder
 
   # @param [Array<String>]
   def filters=(filters)
-    @filters = filters.join(';') #semicolon = "and"
+    @filters = filters.map { |f| f.gsub(',', '\,') }.join(';') #semicolon = "and"
   end
 
   # @param [String | Int] ???
@@ -82,6 +82,10 @@ class GaResponseBuilder
   # @param [String]
   def segment=(segment)
     @segment = segment
+  end
+
+  def substitute(a, b)
+
   end
 
   ##
