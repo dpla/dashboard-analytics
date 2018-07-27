@@ -84,10 +84,6 @@ class GaResponseBuilder
     @segment = segment
   end
 
-  def substitute(a, b)
-
-  end
-
   ##
   # Authorize the AnalyticsService.
   # If the AnalyticsService is not authorized, any request for data will return
