@@ -16,4 +16,12 @@ describe "hubs routing", type: :routing do
       id: "foo"
     )
   end
+
+  it "handles dots in hub ids" do
+    expect(get: "hubs/foo.bar").to route_to(
+      controller: "hubs",
+      action: "show", 
+      id: "foo.bar"
+    )
+  end
 end
