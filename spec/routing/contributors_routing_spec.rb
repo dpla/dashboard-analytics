@@ -18,4 +18,13 @@ describe "contributors routing", type: :routing do
       id: "bar"
     )
   end
+
+  it "handles dots in contributor ids" do
+    expect(get: "hubs/foo/contributors/bar.bat").to route_to(
+      controller: "contributors",
+      action: "show",
+      hub_id: "foo",
+      id: "bar.bat"
+    )
+  end
 end

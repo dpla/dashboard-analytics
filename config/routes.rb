@@ -9,8 +9,8 @@ Rails.application.routes.draw do
     resources :users
   end
 
-  resources :hubs, only: [:index, :show] do
-    resources :contributors, only: [:index, :show] do
+  resources :hubs, id: /.*/, only: [:index, :show] do
+    resources :contributors, id: /.*/, only: [:index, :show] do
       resources :events, only: [:show]
       resources :locations, only: [:index]
     end
