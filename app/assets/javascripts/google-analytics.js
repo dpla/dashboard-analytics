@@ -30,9 +30,13 @@
         }
       });
 
+      var usMapContainer = 'us-map';
+      var worldMapContainer = 'world-map';
+      var lineGraphContainer = 'line-graph';
+
       // Create map
 
-      var mapFilters = function(){
+      var filters = function(){
         var filters = ["ga:eventCategory=@" + hub, "ga:eventCategory!@Browse"];
 
         if (contributor !== "") {
@@ -48,13 +52,13 @@
           'ids': profileId,
           'dimensions': 'ga:region',
           'metrics': 'ga:users',
-          'filters': mapFilters(),
+          'filters': filters(),
           'start-date': startDate,
           'end-date': endDate,
         },
         chart: {
           type: 'GEO',
-          container: 'us-map',
+          container: usMapContainer,
           options: {
             region: 'US',
             resolution: 'provinces'
@@ -68,13 +72,31 @@
           'ids': profileId,
           'dimensions': 'ga:country',
           'metrics': 'ga:users',
-          'filters': mapFilters(),
+          'filters': filters(),
           'start-date': startDate,
           'end-date': endDate,
         },
         chart: {
           type: 'GEO',
-          container: 'world-map'
+          container: worldMapContainer
+        }
+      });
+
+      // Create line graph
+
+      var lineGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:month',
+          'metrics': 'ga:users',
+          'filters': filters(),
+          'start-date': startDate,
+          'end-date': endDate,
+        },
+        chart: {
+          type: 'LINE',
+          container: lineGraphContainer
         }
       });
       
@@ -82,8 +104,9 @@
       // If the request fails, visualizations will not render.
 
       if (gapi.analytics.auth.isAuthorized()) {
-        usMap.execute();
-        worldMap.execute();
+        if (document.getElementById(usMapContainer)) { usMap.execute() }
+        if (document.getElementById(worldMapContainer)) { worldMap.execute() }
+        if (document.getElementById(lineGraphContainer)) { lineGraph.execute() }
       }
     });
   });
