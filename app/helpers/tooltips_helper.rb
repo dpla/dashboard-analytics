@@ -7,7 +7,7 @@ module TooltipsHelper
   end
 
   def view_item_tooltip
-    "You items was viewed in any of the DPLA website's engagement points,
+    "One of your items was viewed in any of the DPLA website's engagement points,
     including the digital library catalog, exhibitions, and primary source sets.
     Comparable to \"pageview\" in Google Analytics."
   end
