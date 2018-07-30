@@ -80,7 +80,7 @@ class ContributorComparison
     attributes = [ "Contributor",
                    "Website Sessions",
                    "Website Users",
-                   "Website Views",
+                   "Website Item Views",
                    "Website Click Throughs",
                    "API Views",
                    "API Users" ]
