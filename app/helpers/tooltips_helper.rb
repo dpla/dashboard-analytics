@@ -3,32 +3,34 @@ module TooltipsHelper
   # DPLA Website
 
   def website_use_tooltip
-    "Interactions with your items anywhere on the DPLA website."
+    "Use of your items on the DPLA website."
   end
 
   def view_item_tooltip
-    "Your item was viewed on any DPLA webpage.
+    "You items was viewed in any of the DPLA website's engagement points,
+    including the digital library catalog, exhibitions, and primary source sets.
     Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_metadata_record_tooltip
-    "A metadata record for one of your items was viewed.
+    "A record for your item was viewed in the digital libary catalog.
+    Users usually find these records by searching or browsing the catalog.
     Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_exhibition_tooltip
-    "One of your items was viewed in the context of a curated DPLA exhibition.
+    "One of your items was viewed within a curated DPLA exhibition.
     Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_primary_source_set_tooltip
-    "One of your items was viewed in the context of a curated DPLA primary source set.
+    "One of your items was viewed within a curated DPLA primary source set.
     Comparable to \"pageview\" in Google Analytics."
   end
 
   def click_through_tooltip
     "A user clicked on a link to view a full item on your website or your contributor’s website.
-    Click through links appear in search results, metadata records, and curated content.
+    Click through links appear in the digital library catalog and curated content.
     Comparable to \"referral\" in Google Analytics."
   end
 

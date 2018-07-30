@@ -21,7 +21,7 @@ module DataMenuHelper
       hub_event_path(target.name, 'view_item', date_opts) :
       hub_contributor_event_path(target.hub.name, target.name, 'view_item', date_opts)
 
-    link_to("Metadata record views", path, html_opts(path))
+    link_to("Digital library catalog views", path, html_opts(path))
   end
 
   def render_view_exhibit_link(target)
