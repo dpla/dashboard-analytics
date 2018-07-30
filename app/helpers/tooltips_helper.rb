@@ -3,48 +3,50 @@ module TooltipsHelper
   # DPLA Website
 
   def website_use_tooltip
-    "Interactions with your items anywhere on the DPLA website."
+    "Use of your items on the DPLA website."
   end
 
   def view_item_tooltip
-    "Your item was viewed on any DPLA webpage.
-    Comparable to a pageview in Google Analytics."
+    "You items was viewed in any of the DPLA website's engagement points,
+    including the digital library catalog, exhibitions, and primary source sets.
+    Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_metadata_record_tooltip
-    "A metadata record for one of your items was viewed.
-    Comparable to a pageview in Google Analytics."
+    "A record for your item was viewed in the digital libary catalog.
+    Users usually find these records by searching or browsing the catalog.
+    Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_exhibition_tooltip
-    "One of your items was viewed in the context of a curated DPLA exhibition.
-    Comparable to a pageview in Google Analytics."
+    "One of your items was viewed within a curated DPLA exhibition.
+    Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_primary_source_set_tooltip
-    "One of your items was viewed in the context of a curated DPLA primary source set.
-    Comparable to a pageview in Google Analytics."
+    "One of your items was viewed within a curated DPLA primary source set.
+    Comparable to \"pageview\" in Google Analytics."
   end
 
   def click_through_tooltip
     "A user clicked on a link to view a full item on your website or your contributor’s website.
-    Click through links appear in search results, metadata records, and curated content.
-    Comparable to a referral in Google Analytics."
+    Click through links appear in the digital library catalog and curated content.
+    Comparable to \"referral\" in Google Analytics."
   end
 
   def users_tooltip
     "A user who viewed or clicked through at least one of your items on the DPLA website.
-    Equivalent to a user in Google Analytics."
+    Equivalent to \"user\" in Google Analytics."
   end
 
   def sessions_tooltip
     "A visit to the DPLA website that included a view or click through of at least one of your items.
-    Equivalent to a session in Google Analytics."
+    Equivalent to \"session\" in Google Analytics."
   end
 
   def user_location_tooltip
     "Locations of users who viewed or clicked through at least one of your items on the DPLA website.
-    Equivalent to location in Google Analytics."
+    Equivalent to \"location\" or \"geo network\" in Google Analytics."
   end
 
   # DPLA API

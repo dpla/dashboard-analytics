@@ -2,7 +2,7 @@ class WebsiteEventsPresenter  < GaResponsePresenter
 
   def label
     dict = {
-      "View Item" => "Metadata record views",
+      "View Item" => "Digital library catalog views",
       "View Exhibition Item" => "Exhibition views",
       "View Primary Source" => "Primary source set views",
       "Click Through" => "Click throughs"
