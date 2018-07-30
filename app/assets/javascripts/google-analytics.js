@@ -36,7 +36,7 @@
         var filters = ["ga:eventCategory=@" + hub, "ga:eventCategory!@Browse"];
 
         if (contributor !== "") {
-          filters = filters.concat("ga:eventAction==" + contributor);
+          filters = filters.concat("ga:eventAction==" + contributor.replace(",", "\\,"));
         }
 
         return filters.join(';');
