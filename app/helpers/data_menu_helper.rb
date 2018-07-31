@@ -11,7 +11,7 @@ module DataMenuHelper
   def render_website_timelines_link(target)
     path = target.is_a?(Hub) ?
       hub_timeline_path(target.name, 'website', date_opts) :
-      hub_contributor_timeline_path(target.hub.name, 'website', target.name, date_opts)
+      hub_contributor_timeline_path(target.hub.name, target.name, 'website', date_opts)
 
     link_to("Website usage timelines", path, html_opts(path))
   end
@@ -19,7 +19,7 @@ module DataMenuHelper
   def render_api_timelines_link(target)
     path = target.is_a?(Hub) ?
       hub_timeline_path(target.name, 'api', date_opts) :
-      hub_contributor_timeline_path(target.hub.name, 'api', target.name, date_opts)
+      hub_contributor_timeline_path(target.hub.name, target.name, 'api', date_opts)
 
     link_to("API usage timelines", path, html_opts(path))
   end

@@ -46,7 +46,7 @@ module TooltipsHelper
 
   def timelines_tooltip
     "Usage by month.  Adjust the start and end dates above.
-    Seasonal fluctuations aligned with the academic year are normal and expected."
+    You may notice seasonal fluctuations aligned with the academic calendar."
   end
 
   def user_location_tooltip
