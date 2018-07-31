@@ -23,10 +23,21 @@
 
       <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
 
-      <%= render partial: "shared/timeline",
-                 locals: { ga_token: GaAuthorizer.token,          
-                           hub: @hub.name,
-                           contributor: contributor } %>
+      <% if @id == "website" %>
+
+        <%= render partial: "shared/timeline_website",
+                   locals: { ga_token: GaAuthorizer.token,          
+                             hub: @hub.name,
+                             contributor: contributor } %>
+
+      <% elsif @id == "api" %>
+
+        <%= render partial: "shared/timeline_api",
+                   locals: { ga_token: GaAuthorizer.token,          
+                             hub: @hub.name,
+                             contributor: contributor } %>
+
+      <% end %>
 
     </div>
   </div>

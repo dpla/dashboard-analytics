@@ -21,6 +21,9 @@
       var contributor = document.getElementById("contributor").dataset.contributor;
       var startDate = document.getElementById("start-date").dataset.startDate;
       var endDate = document.getElementById("end-date").dataset.endDate;
+      
+      var segment = document.getElementById("segment") ? 
+        document.getElementById("segment").dataset.segment : "";
 
       // Authorization
 
@@ -36,6 +39,8 @@
       var sessionGraphContainer = 'session-timeline';
       var itemViewGraphContainer = 'item-view-timeline';
       var clickThroughGraphContainer = 'click-through-timeline';
+      var apiItemViewGraphContainer = 'api-item-view-timeline';
+      var apiUserGraphContainer = 'api-user-timeline';
 
       // Create map
 
@@ -65,7 +70,7 @@
           'metrics': 'ga:users',
           'filters': filters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'GEO',
@@ -85,7 +90,7 @@
           'metrics': 'ga:users',
           'filters': filters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'GEO',
@@ -103,7 +108,7 @@
           'metrics': 'ga:users',
           'filters': filters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'LINE',
@@ -119,7 +124,7 @@
           'metrics': 'ga:sessions',
           'filters': filters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'LINE',
@@ -135,7 +140,7 @@
           'metrics': 'ga:totalEvents',
           'filters': itemViewFilters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'LINE',
@@ -151,11 +156,45 @@
           'metrics': 'ga:totalEvents',
           'filters': clickThroughFilters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'LINE',
           container: clickThroughGraphContainer
+        }
+      });
+
+      var apiUserGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:users',
+          'filters': filters(),
+          'start-date': startDate,
+          'end-date': endDate,
+          'segment': segment
+        },
+        chart: {
+          type: 'LINE',
+          container: apiUserGraphContainer
+        }
+      });
+
+      var apiItemViewGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:totalEvents',
+          'filters': itemViewFilters(),
+          'start-date': startDate,
+          'end-date': endDate,
+          'segment': segment
+        },
+        chart: {
+          type: 'LINE',
+          container: apiItemViewGraphContainer
         }
       });
       
@@ -169,6 +208,8 @@
         if (document.getElementById(sessionGraphContainer)) { sessionGraph.execute() }
         if (document.getElementById(itemViewGraphContainer)) { itemViewGraph.execute() }
         if (document.getElementById(clickThroughGraphContainer)) { clickThroughGraph.execute() }
+        if (document.getElementById(apiItemViewGraphContainer)) { apiItemViewGraph.execute() }
+        if (document.getElementById(apiUserGraphContainer)) { apiUserGraph.execute() }
       }
     });
   });
