@@ -13,9 +13,11 @@ Rails.application.routes.draw do
     resources :contributors, id: /.*/, only: [:index, :show] do
       resources :events, only: [:show]
       resources :locations, only: [:index]
+      resources :timelines, only: [:index]
     end
     resources :events, only: [:show]
     resources :locations, only: [:index]
+    resources :timelines, only: [:index]
   end
 
   resources :search_terms, only: [:show]

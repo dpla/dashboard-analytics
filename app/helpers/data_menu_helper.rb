@@ -8,6 +8,14 @@ module DataMenuHelper
     link_to("Overview", path, html_opts(path))
   end
 
+  def render_timelines_link(target)
+    path = target.is_a?(Hub) ?
+      hub_timelines_path(target.name, date_opts) :
+      hub_contributor_timelines_path(target.hub.name, target.name, date_opts)
+
+    link_to("Usage timelines", path, html_opts(path))
+  end
+
   def render_locations_link(target)
     path = target.is_a?(Hub) ?
       hub_locations_path(target.name, date_opts) :

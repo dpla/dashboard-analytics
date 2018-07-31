@@ -44,6 +44,10 @@ module TooltipsHelper
     Equivalent to \"session\" in Google Analytics."
   end
 
+  def timelines_tooltip
+    "TODO"
+  end
+
   def user_location_tooltip
     "Locations of users who viewed or clicked through at least one of your items on the DPLA website.
     Equivalent to \"location\" or \"geo network\" in Google Analytics."

@@ -88,7 +88,7 @@
         reportType: 'ga',
         query: {
           'ids': profileId,
-          'dimensions': 'ga:month',
+          'dimensions': 'ga:yearMonth',
           'metrics': 'ga:users',
           'filters': filters(),
           'start-date': startDate,

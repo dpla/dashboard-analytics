@@ -1,6 +1,6 @@
-# Handles HTTP requests for locations
+# Handles HTTP requests for timelines
 
-class LocationsController < ApplicationController
+class TimelinesController < ApplicationController
   # Controller concerns
   include DateSetter
   # View helpers
