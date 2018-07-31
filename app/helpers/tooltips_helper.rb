@@ -44,6 +44,11 @@ module TooltipsHelper
     Equivalent to \"session\" in Google Analytics."
   end
 
+  def timelines_tooltip
+    "Use is shown by month.  Adjust the start and end dates above.
+    You may see seasonal fluctuations aligned with the academic calendar."
+  end
+
   def user_location_tooltip
     "Locations of users who viewed or clicked through at least one of your items on the DPLA website.
     Equivalent to \"location\" or \"geo network\" in Google Analytics."

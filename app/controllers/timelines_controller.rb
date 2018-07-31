@@ -1,13 +1,13 @@
-# Handles HTTP requests for locations
+# Handles HTTP requests for timelines
 
-class LocationsController < ApplicationController
+class TimelinesController < ApplicationController
   # Controller concerns
   include DateSetter
   # View helpers
   include DataMenuHelper
   include DateHelper
 
-  def index
+  def show
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
 
@@ -17,6 +17,8 @@ class LocationsController < ApplicationController
     end
 
     @target = params[:contributor_id] ? @contributor : @hub
+
+    @id = params[:id]
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)

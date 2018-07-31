@@ -1,0 +1,44 @@
+<%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
+
+<% content_for :head_script do %>
+  <%= javascript_include_tag 'google-analytics', 
+    'data-turbolinks-track': 'reload', defer: 'defer' %>
+<% end %>
+
+<div class="heading">
+
+  <h1><%= @target.name %></h1>
+
+  <%= render partial: "shared/date_menu" %>
+  
+</div>
+
+<main>
+
+  <%= render partial: "shared/data_menu", locals: { target: @target } %>
+
+  <div class="data-content">
+
+    <div class="data-section">
+
+      <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
+
+      <% if @id == "website" %>
+
+        <%= render partial: "shared/timeline_website",
+                   locals: { ga_token: GaAuthorizer.token,          
+                             hub: @hub.name,
+                             contributor: contributor } %>
+
+      <% elsif @id == "api" %>
+
+        <%= render partial: "shared/timeline_api",
+                   locals: { ga_token: GaAuthorizer.token,          
+                             hub: @hub.name,
+                             contributor: contributor } %>
+
+      <% end %>
+
+    </div>
+  </div>
+</main>

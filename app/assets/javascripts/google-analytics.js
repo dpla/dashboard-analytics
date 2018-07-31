@@ -21,6 +21,9 @@
       var contributor = document.getElementById("contributor").dataset.contributor;
       var startDate = document.getElementById("start-date").dataset.startDate;
       var endDate = document.getElementById("end-date").dataset.endDate;
+      
+      var segment = document.getElementById("segment") ? 
+        document.getElementById("segment").dataset.segment : "";
 
       // Authorization
 
@@ -30,10 +33,19 @@
         }
       });
 
+      var usMapContainer = 'us-map';
+      var worldMapContainer = 'world-map';
+      var userGraphContainer = 'user-timeline';
+      var sessionGraphContainer = 'session-timeline';
+      var itemViewGraphContainer = 'item-view-timeline';
+      var clickThroughGraphContainer = 'click-through-timeline';
+      var apiItemViewGraphContainer = 'api-item-view-timeline';
+      var apiUserGraphContainer = 'api-user-timeline';
+
       // Create map
 
-      var mapFilters = function(){
-        var filters = ["ga:eventCategory=@" + hub, "ga:eventCategory!@Browse"];
+      var filters = function(){
+        var filters = ["ga:eventCategory=@" + hub, "ga:eventCategory!~Browse.*"];
 
         if (contributor !== "") {
           filters = filters.concat("ga:eventAction==" + contributor.replace(",", "\\,"));
@@ -42,19 +54,27 @@
         return filters.join(';');
       };
 
+      var itemViewFilters = function() {
+        return filters().concat(";ga:eventCategory!~Click.*");
+      };
+
+      var clickThroughFilters = function() {
+        return filters().concat(";ga:eventCategory!~View.*");
+      };
+
       var usMap = new gapi.analytics.googleCharts.DataChart({
         reportType: 'ga',
         query: {
           'ids': profileId,
           'dimensions': 'ga:region',
           'metrics': 'ga:users',
-          'filters': mapFilters(),
+          'filters': filters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'GEO',
-          container: 'us-map',
+          container: usMapContainer,
           options: {
             region: 'US',
             resolution: 'provinces'
@@ -68,13 +88,113 @@
           'ids': profileId,
           'dimensions': 'ga:country',
           'metrics': 'ga:users',
-          'filters': mapFilters(),
+          'filters': filters(),
           'start-date': startDate,
-          'end-date': endDate,
+          'end-date': endDate
         },
         chart: {
           type: 'GEO',
-          container: 'world-map'
+          container: worldMapContainer
+        }
+      });
+
+      // Create line graph
+
+      var userGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:users',
+          'filters': filters(),
+          'start-date': startDate,
+          'end-date': endDate
+        },
+        chart: {
+          type: 'LINE',
+          container: userGraphContainer
+        }
+      });
+
+      var sessionGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:sessions',
+          'filters': filters(),
+          'start-date': startDate,
+          'end-date': endDate
+        },
+        chart: {
+          type: 'LINE',
+          container: sessionGraphContainer
+        }
+      });
+
+      var itemViewGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:totalEvents',
+          'filters': itemViewFilters(),
+          'start-date': startDate,
+          'end-date': endDate
+        },
+        chart: {
+          type: 'LINE',
+          container: itemViewGraphContainer
+        }
+      });
+
+      var clickThroughGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:totalEvents',
+          'filters': clickThroughFilters(),
+          'start-date': startDate,
+          'end-date': endDate
+        },
+        chart: {
+          type: 'LINE',
+          container: clickThroughGraphContainer
+        }
+      });
+
+      var apiUserGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:users',
+          'filters': filters(),
+          'start-date': startDate,
+          'end-date': endDate,
+          'segment': segment
+        },
+        chart: {
+          type: 'LINE',
+          container: apiUserGraphContainer
+        }
+      });
+
+      var apiItemViewGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:totalEvents',
+          'filters': itemViewFilters(),
+          'start-date': startDate,
+          'end-date': endDate,
+          'segment': segment
+        },
+        chart: {
+          type: 'LINE',
+          container: apiItemViewGraphContainer
         }
       });
       
@@ -82,8 +202,14 @@
       // If the request fails, visualizations will not render.
 
       if (gapi.analytics.auth.isAuthorized()) {
-        usMap.execute();
-        worldMap.execute();
+        if (document.getElementById(usMapContainer)) { usMap.execute() }
+        if (document.getElementById(worldMapContainer)) { worldMap.execute() }
+        if (document.getElementById(userGraphContainer)) { userGraph.execute() }
+        if (document.getElementById(sessionGraphContainer)) { sessionGraph.execute() }
+        if (document.getElementById(itemViewGraphContainer)) { itemViewGraph.execute() }
+        if (document.getElementById(clickThroughGraphContainer)) { clickThroughGraph.execute() }
+        if (document.getElementById(apiItemViewGraphContainer)) { apiItemViewGraph.execute() }
+        if (document.getElementById(apiUserGraphContainer)) { apiUserGraph.execute() }
       }
     });
   });

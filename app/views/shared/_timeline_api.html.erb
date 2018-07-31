@@ -1,0 +1,36 @@
+<%# Local variables: ga_token [String] google analytics authentication token
+                     hub [String] hub name
+                     contributor [String] contributor name (optional) %>
+      
+<!-- Data for google analytics javascript embed api -->
+<div id="access-token" data-access-token="<%= ga_token %>" />
+<div id="profile-id" data-profile-id="<%= Settings.google_analytics.api_profile_id %>" />
+<div id="hub" data-hub="<%= hub %>" />
+<% contributor ||= "" %>
+<div id="contributor" data-contributor="<%= contributor %>" />
+<div id="start-date" data-start-date="<%= @start_date.iso8601 %>" />
+<div id="end-date" data-end-date="<%= @end_date.iso8601 %>" />
+<div id="segment" data-segment="<%= Settings.google_analytics.api_segment %>" />
+
+
+<h2>API use timelines</h2>
+
+<div class="description-text">
+  <%= api_use_tooltip %>
+  <%= timelines_tooltip %>
+  API usage data is not available before May 2018.
+</div>
+
+<br/>
+
+<h3>Item metadata views</h3>
+<div class="description-text"><%= view_api_item_tooltip %></div>
+<section id="api-item-view-timeline">
+  If timeline does not load after a few seconds, try refreshing the page.
+</section>
+
+<h3>Registered users/apps</h3>
+<div class="description-text"><%= api_users_tooltip %></div>
+<section id="api-user-timeline">
+  If timeline does not load after a few seconds, try refreshing the page.
+</section>
