@@ -8,12 +8,20 @@ module DataMenuHelper
     link_to("Overview", path, html_opts(path))
   end
 
-  def render_timelines_link(target)
+  def render_website_timelines_link(target)
     path = target.is_a?(Hub) ?
-      hub_timelines_path(target.name, date_opts) :
-      hub_contributor_timelines_path(target.hub.name, target.name, date_opts)
+      hub_timeline_path(target.name, 'website', date_opts) :
+      hub_contributor_timeline_path(target.hub.name, 'website', target.name, date_opts)
 
-    link_to("Usage timelines", path, html_opts(path))
+    link_to("Website usage timelines", path, html_opts(path))
+  end
+
+  def render_api_timelines_link(target)
+    path = target.is_a?(Hub) ?
+      hub_timeline_path(target.name, 'api', date_opts) :
+      hub_contributor_timeline_path(target.hub.name, 'api', target.name, date_opts)
+
+    link_to("API usage timelines", path, html_opts(path))
   end
 
   def render_locations_link(target)

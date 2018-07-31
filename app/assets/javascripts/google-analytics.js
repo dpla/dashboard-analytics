@@ -32,18 +32,29 @@
 
       var usMapContainer = 'us-map';
       var worldMapContainer = 'world-map';
-      var lineGraphContainer = 'line-graph';
+      var userGraphContainer = 'user-timeline';
+      var sessionGraphContainer = 'session-timeline';
+      var itemViewGraphContainer = 'item-view-timeline';
+      var clickThroughGraphContainer = 'click-through-timeline';
 
       // Create map
 
       var filters = function(){
-        var filters = ["ga:eventCategory=@" + hub, "ga:eventCategory!@Browse"];
+        var filters = ["ga:eventCategory=@" + hub, "ga:eventCategory!~Browse.*"];
 
         if (contributor !== "") {
           filters = filters.concat("ga:eventAction==" + contributor.replace(",", "\\,"));
         }
 
         return filters.join(';');
+      };
+
+      var itemViewFilters = function() {
+        return filters().concat(";ga:eventCategory!~Click.*");
+      };
+
+      var clickThroughFilters = function() {
+        return filters().concat(";ga:eventCategory!~View.*");
       };
 
       var usMap = new gapi.analytics.googleCharts.DataChart({
@@ -84,7 +95,7 @@
 
       // Create line graph
 
-      var lineGraph = new gapi.analytics.googleCharts.DataChart({
+      var userGraph = new gapi.analytics.googleCharts.DataChart({
         reportType: 'ga',
         query: {
           'ids': profileId,
@@ -96,7 +107,55 @@
         },
         chart: {
           type: 'LINE',
-          container: lineGraphContainer
+          container: userGraphContainer
+        }
+      });
+
+      var sessionGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:sessions',
+          'filters': filters(),
+          'start-date': startDate,
+          'end-date': endDate,
+        },
+        chart: {
+          type: 'LINE',
+          container: sessionGraphContainer
+        }
+      });
+
+      var itemViewGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:totalEvents',
+          'filters': itemViewFilters(),
+          'start-date': startDate,
+          'end-date': endDate,
+        },
+        chart: {
+          type: 'LINE',
+          container: itemViewGraphContainer
+        }
+      });
+
+      var clickThroughGraph = new gapi.analytics.googleCharts.DataChart({
+        reportType: 'ga',
+        query: {
+          'ids': profileId,
+          'dimensions': 'ga:yearMonth',
+          'metrics': 'ga:totalEvents',
+          'filters': clickThroughFilters(),
+          'start-date': startDate,
+          'end-date': endDate,
+        },
+        chart: {
+          type: 'LINE',
+          container: clickThroughGraphContainer
         }
       });
       
@@ -106,7 +165,10 @@
       if (gapi.analytics.auth.isAuthorized()) {
         if (document.getElementById(usMapContainer)) { usMap.execute() }
         if (document.getElementById(worldMapContainer)) { worldMap.execute() }
-        if (document.getElementById(lineGraphContainer)) { lineGraph.execute() }
+        if (document.getElementById(userGraphContainer)) { userGraph.execute() }
+        if (document.getElementById(sessionGraphContainer)) { sessionGraph.execute() }
+        if (document.getElementById(itemViewGraphContainer)) { itemViewGraph.execute() }
+        if (document.getElementById(clickThroughGraphContainer)) { clickThroughGraph.execute() }
       }
     });
   });

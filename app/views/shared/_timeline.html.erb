@@ -12,11 +12,32 @@
 <div id="end-date" data-end-date="<%= @end_date.iso8601 %>" />
 
 
-<h2>Usage timelines</h2>
+<h2><%= @id.titlecase %> usage timelines</h2>
 
 <div class="description-text"><%= timelines_tooltip %></div>
 
-<h3>Timeline</h3>
-<section id="line-graph">
+<br/>
+
+<h3>Item views</h3>
+<div class="description-text"><%= view_item_tooltip %></div>
+<section id="item-view-timeline">
+  If timeline does not load after a few seconds, try refreshing the page.
+</section>
+
+<h3>Click throughs</h3>
+<div class="description-text"><%= click_through_tooltip %></div>
+<section id="click-through-timeline">
+  If timeline does not load after a few seconds, try refreshing the page.
+</section>
+
+<h3>Users</h3>
+<div class="description-text"><%= users_tooltip %></div>
+<section id="user-timeline">
+  If timeline does not load after a few seconds, try refreshing the page.
+</section>
+
+<h3>Sessions</h3>
+<div class="description-text"><%= sessions_tooltip %></div>
+<section id="session-timeline">
   If timeline does not load after a few seconds, try refreshing the page.
 </section>

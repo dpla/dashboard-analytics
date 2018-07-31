@@ -2,20 +2,22 @@ require 'rails_helper'
 
 describe "timelines routing", type: :routing do
 
-  it "routes /hubs/foo/timelines to timelines#index" do
-    expect(get: "hubs/foo/timelines").to route_to(
+  it "routes /hubs/foo/timelines/website to timelines#show" do
+    expect(get: "hubs/foo/timelines/website").to route_to(
       controller: "timelines",
-      action: "index",
-      hub_id: "foo"
+      action: "show",
+      hub_id: "foo",
+      id: "website"
     )
   end
 
-  it "routes /hubs/foo/contributors/bar/timelines to timelines#index" do
-    expect(get: "hubs/foo/contributors/bar/timelines").to route_to(
+  it "routes /hubs/foo/contributors/bar/timelines/api to timelines#show" do
+    expect(get: "hubs/foo/contributors/bar/timelines/api").to route_to(
       controller: "timelines",
-      action: "index",
+      action: "show",
       hub_id: "foo",
-      contributor_id: "bar"
+      contributor_id: "bar",
+      id: "api"
     )
   end
 end
