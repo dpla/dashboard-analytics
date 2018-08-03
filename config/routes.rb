@@ -16,10 +16,10 @@ Rails.application.routes.draw do
     get :metadata_completeness, controller: :hubs
 
     resources :contributors, id: /.*/, only: [:index, :show] do
-      get :contributors_website_overview, controller: :contributors
-      get :contributors_api_overview, controller: :contributors
-      get :contributors_item_count, controller: :contributors
-      get :contributors_metadata_completeness, controller: :contributors
+      get :contributor_website_overview, controller: :contributors
+      get :contributor_api_overview, controller: :contributors
+      get :contributor_item_count, controller: :contributors
+      get :contributor_metadata_completeness, controller: :contributors
       resources :events, only: [:show]
       resources :locations, only: [:index]
       resources :timelines, only: [:show]

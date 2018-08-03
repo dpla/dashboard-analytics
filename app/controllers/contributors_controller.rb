@@ -71,7 +71,7 @@ class ContributorsController < ApplicationController
     end
   end
 
-  def contributors_website_overview
+  def contributor_website_overview
     assign_start_and_end_dates
 
     @website_overview = WebsiteOverview.build do |builder|
@@ -91,7 +91,7 @@ class ContributorsController < ApplicationController
     render partial: "shared/frontend_use_metrics"
   end
 
-  def contributors_api_overview
+  def contributor_api_overview
     assign_start_and_end_dates
 
     @api_overview = ApiOverview.build do |builder|
@@ -104,14 +104,14 @@ class ContributorsController < ApplicationController
     render partial: "shared/api_use_metrics"
   end
 
-  def contributors_item_count
+  def contributor_item_count
     @item_count = DplaApiResponseBuilder.new()
       .item_count(params[:hub_id], params[:contributor_id])
 
     render partial: "shared/item_count"
   end
 
-  def contributors_metadata_completeness
+  def contributor_metadata_completeness
     assign_start_and_end_dates
 
     metadata_completeness = MetadataCompleteness.build do |builder|

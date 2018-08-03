@@ -29,7 +29,7 @@
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributors_website_overview_path(
+        <%= render_async hub_contributor_contributor_website_overview_path(
               @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
@@ -42,7 +42,7 @@
           <span class="tooltiptext"><%= api_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributors_api_overview_path(
+        <%= render_async hub_contributor_contributor_api_overview_path(
               @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
@@ -54,7 +54,7 @@
           <span class="tooltiptext"><%= item_count_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributors_item_count_path(
+        <%= render_async hub_contributor_contributor_item_count_path(
               @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
@@ -67,7 +67,7 @@
           <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributors_metadata_completeness_path(
+        <%= render_async hub_contributor_contributor_metadata_completeness_path(
               @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
