@@ -40,10 +40,6 @@ class Hub
     @contributors ||= self.class.dpla_api.contributors(name).sort
   end
 
-  def item_count
-    @item_count ||= self.class.dpla_api.hub_item_count(name)
-  end
-
   protected
 
   def self.dpla_api

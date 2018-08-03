@@ -1,16 +1,11 @@
-<%# Local variables: count [Int] %>
+<%# Local variables: @item_count [Int|Nil] %>
 
-<div class="tooltip">
-  <h2>Item Count</h2>
-  <span class="tooltiptext"><%= item_count_tooltip %></span>
-</div>
-
-<% if count != nil %>
+<% if @item_count != nil %>
 
   <table>
     <tr>
       <td>Item count</td>
-      <td><%= count %></td>
+      <td><%= @item_count %></td>
     </tr>
   </table>
 

@@ -19,12 +19,6 @@ class HubsController < ApplicationController
     assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
-    # @api_overview = ApiOverview.build do |builder|
-    #   builder.hub = params[:id]
-    #   builder.start_date = @start_date
-    #   builder.end_date = @end_date
-    # end
-
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:id]
       builder.end_date = @end_date
@@ -65,5 +59,10 @@ class HubsController < ApplicationController
     end
 
     render partial: "shared/api_use_metrics"
+  end
+
+  def item_count
+    @item_count = DplaApiResponseBuilder.new().hub_item_count(params[:hub_id])
+    render partial: "shared/item_count"
   end
 end
