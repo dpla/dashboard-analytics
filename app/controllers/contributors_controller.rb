@@ -66,14 +66,6 @@ class ContributorsController < ApplicationController
                                    @start_date,
                                    @end_date)
 
-    metadata_completeness = MetadataCompleteness.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
-      builder.end_date = @end_date
-    end
-
-    @mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
     end
@@ -104,7 +96,7 @@ class ContributorsController < ApplicationController
 
     @api_overview = ApiOverview.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
@@ -113,9 +105,23 @@ class ContributorsController < ApplicationController
   end
 
   def contributors_item_count
+    @item_count = DplaApiResponseBuilder.new()
+      .item_count(params[:hub_id], params[:contributor_id])
+
+    render partial: "shared/item_count"
   end
 
   def contributors_metadata_completeness
     assign_start_and_end_dates
+
+    metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.end_date = @end_date
+    end
+
+    mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
+    @mc_data = mc_presenter.contributor(params[:hub_id], params[:contributor_id])
+    render partial: "shared/metadata_completeness"
   end
 end

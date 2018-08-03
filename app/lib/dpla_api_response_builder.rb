@@ -42,13 +42,18 @@ class DplaApiResponseBuilder
   end
 
   ##
-  # @param [String]
-  # @return [Int]
+  # @param hub [String]
+  # @param contributor [String]
+  # @return [Int|Nil]
   #
-  def hub_item_count(hub)
-    options = { query: { :api_key => api_key,
-                         :page_size => 0, 
-                         :'provider.name' => hub } }
+  def item_count(hub, contributor = nil)
+    query = { :api_key => api_key,
+              :page_size => 0, 
+              :'provider.name' => hub }
+
+   query[:dataProvider] = contributor if contributor.present?
+
+  options = { query: query }
 
     begin
       json_response('/items', options)['count']

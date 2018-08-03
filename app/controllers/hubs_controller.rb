@@ -55,7 +55,7 @@ class HubsController < ApplicationController
   end
 
   def item_count
-    @item_count = DplaApiResponseBuilder.new().hub_item_count(params[:hub_id])
+    @item_count = DplaApiResponseBuilder.new().item_count(params[:hub_id])
     render partial: "shared/item_count"
   end
 
