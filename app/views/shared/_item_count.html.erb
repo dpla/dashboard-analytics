@@ -1,16 +1,16 @@
-<%# Local variables: mc [Hash] %>
+<%# Local variables: count [Int] %>
 
 <div class="tooltip">
   <h2>Item Count</h2>
   <span class="tooltiptext"><%= item_count_tooltip %></span>
 </div>
 
-<% if mc['count'].present? %>
+<% if count != nil %>
 
   <table>
     <tr>
       <td>Item count</td>
-      <td><%= mc['count'] %></td>
+      <td><%= count %></td>
     </tr>
   </table>
 

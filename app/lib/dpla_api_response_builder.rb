@@ -41,6 +41,22 @@ class DplaApiResponseBuilder
     end
   end
 
+  ##
+  # @param [String]
+  # @return [Int]
+  #
+  def hub_item_count(hub)
+    options = { query: { :api_key => api_key,
+                         :page_size => 0, 
+                         :'provider.name' => hub } }
+
+    begin
+      json_response('/items', options)['count']
+    rescue Exception => e
+      # TODO: Log error message
+    end
+  end
+
   private
 
   def api_key
