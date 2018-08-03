@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     get :website_overview
     get :api_overview
     get :item_count
+    get :metadata_completeness
 
     resources :contributors, id: /.*/, only: [:index, :show] do
       resources :events, only: [:show]
