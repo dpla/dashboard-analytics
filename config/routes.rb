@@ -10,9 +10,9 @@ Rails.application.routes.draw do
   end
 
   resources :hubs, id: /.*/, only: [:index, :show] do
-    get :website_overview, controller: :hubs
-    get :api_overview, controller: :hubs
-    get :item_count, controller: :hubs
+    get :website_overview
+    get :api_overview
+    get :item_count
 
     resources :contributors, id: /.*/, only: [:index, :show] do
       resources :events, only: [:show]
