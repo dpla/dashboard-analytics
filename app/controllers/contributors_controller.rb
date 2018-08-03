@@ -66,13 +66,6 @@ class ContributorsController < ApplicationController
                                    @start_date,
                                    @end_date)
 
-    @api_overview = ApiOverview.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
       builder.contributor = params[:id]
@@ -107,11 +100,22 @@ class ContributorsController < ApplicationController
   end
 
   def contributors_api_overview
+    assign_start_and_end_dates
+
+    @api_overview = ApiOverview.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    render partial: "shared/api_use_metrics"
   end
 
   def contributors_item_count
   end
 
   def contributors_metadata_completeness
+    assign_start_and_end_dates
   end
 end
