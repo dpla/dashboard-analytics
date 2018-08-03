@@ -28,37 +28,37 @@ describe "contributors routing", type: :routing do
     )
   end
 
-  it "routes /hubs/foo/contributors/bar/contributors_website_overview for bar" do
-    expect(get: "hubs/foo/contributors/bar/contributors_website_overview").to route_to(
+  it "routes /hubs/foo/contributors/bar/contributor_website_overview for bar" do
+    expect(get: "hubs/foo/contributors/bar/contributor_website_overview").to route_to(
       controller: "contributors",
-      action: "contributors_website_overview",
+      action: "contributor_website_overview",
       hub_id: "foo",
       contributor_id: "bar"
     )
   end
 
-  it "routes /hubs/foo/contributors/bar/contributors_api_overview for bar" do
-    expect(get: "hubs/foo/contributors/bar/contributors_api_overview").to route_to(
+  it "routes /hubs/foo/contributors/bar/contributor_api_overview for bar" do
+    expect(get: "hubs/foo/contributors/bar/contributor_api_overview").to route_to(
       controller: "contributors",
-      action: "contributors_api_overview",
+      action: "contributor_api_overview",
       hub_id: "foo",
       contributor_id: "bar"
     )
   end
 
-  it "routes /hubs/foo/contributors/bar/contributors_item_count for bar" do
-    expect(get: "hubs/foo/contributors/bar/contributors_item_count").to route_to(
+  it "routes /hubs/foo/contributors/bar/contributor_item_count for bar" do
+    expect(get: "hubs/foo/contributors/bar/contributor_item_count").to route_to(
       controller: "contributors",
-      action: "contributors_item_count",
+      action: "contributor_item_count",
       hub_id: "foo",
       contributor_id: "bar"
     )
   end
 
-  it "routes /hubs/foo/contributors/bar/contributors_metadata_completeness for bar" do
-    expect(get: "hubs/foo/contributors/bar/contributors_metadata_completeness").to route_to(
+  it "routes /hubs/foo/contributors/bar/contributor_metadata_completeness for bar" do
+    expect(get: "hubs/foo/contributors/bar/contributor_metadata_completeness").to route_to(
       controller: "contributors",
-      action: "contributors_metadata_completeness",
+      action: "contributor_metadata_completeness",
       hub_id: "foo",
       contributor_id: "bar"
     )
