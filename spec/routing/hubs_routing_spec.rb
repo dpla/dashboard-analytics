@@ -24,4 +24,12 @@ describe "hubs routing", type: :routing do
       id: "foo.bar"
     )
   end
+
+  it "routes /hubs/foo/website_overview for foo" do
+    expect(get: "hubs/foo/website_overview").to route_to(
+      controller: "hubs",
+      action: "website_overview",
+      hub_id: "foo"
+    )
+  end
 end

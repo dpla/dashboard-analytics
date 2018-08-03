@@ -66,20 +66,6 @@ class ContributorsController < ApplicationController
                                    @start_date,
                                    @end_date)
 
-    @website_overview = WebsiteOverview.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
-    @website_event_totals = WebsiteEventTotals.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
     @api_overview = ApiOverview.build do |builder|
       builder.hub = params[:hub_id]
       builder.contributor = params[:id]
@@ -98,5 +84,34 @@ class ContributorsController < ApplicationController
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
     end
+  end
+
+  def contributors_website_overview
+    assign_start_and_end_dates
+
+    @website_overview = WebsiteOverview.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    @website_event_totals = WebsiteEventTotals.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    render partial: "shared/frontend_use_metrics"
+  end
+
+  def contributors_api_overview
+  end
+
+  def contributors_item_count
+  end
+
+  def contributors_metadata_completeness
   end
 end
