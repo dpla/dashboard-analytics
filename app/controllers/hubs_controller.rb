@@ -61,16 +61,14 @@ class HubsController < ApplicationController
 
   def metadata_completeness
     assign_start_and_end_dates
-    
+
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
       builder.end_date = @end_date
     end
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-
     @mc_data = mc_presenter.hub(params[:hub_id])
-
     render partial: "shared/metadata_completeness"
   end
 end
