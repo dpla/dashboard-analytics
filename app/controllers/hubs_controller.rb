@@ -50,14 +50,16 @@ class HubsController < ApplicationController
   end
 
   def website_overview
+    assign_start_and_end_dates
+
     @website_overview = WebsiteOverview.build do |builder|
-      builder.hub = params[:id]
+      builder.hub = params[:hub_id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
 
     @website_event_totals = WebsiteEventTotals.build do |builder|
-      builder.hub = params[:id]
+      builder.hub = params[:hub_id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end

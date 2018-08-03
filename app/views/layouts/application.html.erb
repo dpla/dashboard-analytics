@@ -22,12 +22,11 @@
       <%= render partial: "shared/navigation" %>
     </header>
 
-    <%= content_for :render_async %>
-
     <%= yield %>
 
     <footer>
       <%= render partial: "shared/footer" %>
     </footer>
   </body>
+  <%= content_for :render_async %>
 </html>

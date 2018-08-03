@@ -23,9 +23,7 @@
 
       <div class="metrics">
 
-        <%= render partial: "shared/frontend_use_metrics",
-                   locals: { overview: @website_overview,
-                             events: @website_event_totals } %>
+        <%= render_async hub_website_overview_path(@hub.name, date_opts) %>
 
       </div>
 
