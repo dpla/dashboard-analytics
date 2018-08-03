@@ -26,6 +26,7 @@ gem 'httparty', '~> 0.16.2'
 gem 'devise', '~> 4.4.3'
 gem 'jquery-rails', '~> 4.3.1'
 gem 'aws-sdk-s3', '~> 1'
+gem 'render_async', '~> 1.2.0'
 # Set versions of following gems to fix security vulnerabilities
 gem 'rails-html-sanitizer', '>= 1.0.4'
 

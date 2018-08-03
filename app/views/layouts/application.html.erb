@@ -22,6 +22,8 @@
       <%= render partial: "shared/navigation" %>
     </header>
 
+    <%= content_for :render_async %>
+
     <%= yield %>
 
     <footer>
