@@ -1,9 +1,4 @@
-<%# Local variables: overview [OverviewApi] %>
-
-<div class="tooltip">
-  <h2>API use</h2>
-  <span class="tooltiptext"><%= api_use_tooltip %></span>
-</div>
+<%# Local variables: @api_overview [OverviewApi] %>
 
 <% if api_data_for_date_range? %>
 
@@ -15,7 +10,7 @@
           <span class="tooltiptext"><%= view_api_item_tooltip %></span>
         </div>
       </td>
-      <td><%= overview.events %></td>
+      <td><%= @api_overview.events %></td>
     </tr>
     <tr>
       <td>
@@ -24,10 +19,10 @@
           <span class="tooltiptext"><%= api_users_tooltip %></span>
         </div>
       </td>
-      <td><%= overview.users %></td>
+      <td><%= @api_overview.users %></td>
     </tr>
   </table>
 
 <% else %>
-    <div class="no-data">Data not available</div>
+    <div class="no-data">Data not available for this date range.</div>
 <% end %>
