@@ -1,14 +1,9 @@
-<%# Local variables: mc [Hash] %>
+<%# Local variables: @mc_data[Hash] %>
 
-<div class="tooltip">
-  <h2>Metadata Completeness</h2>
-  <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
-</div>
-
-<% if mc.present? %>
+<% if @mc_data.present? %>
 
   <table>
-    <% mc.each do |key, value| %>
+    <% @mc_data.each do |key, value| %>
       <% if MetadataCompletenessPresenter.fields.include?(key) && key != "count" %>
         <tr>
           <td><%= key.titleize %></td>

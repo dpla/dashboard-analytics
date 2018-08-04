@@ -23,28 +23,51 @@
 
       <div class="metrics">
 
-        <%= render partial: "shared/frontend_use_metrics",
-                   locals: { overview: @website_overview,
-                             events: @website_event_totals } %>
+        <div class="tooltip">
+          <h2>Website use</h2>
+          <span class="tooltiptext"><%= website_use_tooltip %></span>
+        </div>
+
+        <%= render_async hub_website_overview_path(@hub.name, date_opts) do %>
+          <div>Loading...</div>
+        <% end %>
 
       </div>
 
       <div class="metrics">
 
-        <%= render partial: "shared/api_use_metrics",
-                   locals: { overview: @api_overview } %>
+        <div class="tooltip">
+          <h2>API use</h2>
+          <span class="tooltiptext"><%= api_use_tooltip %></span>
+        </div>
+
+        <%= render_async hub_api_overview_path(@hub.name, date_opts) do %>
+          <div>Loading...</div>
+        <% end %>
 
         <br/>
 
-        <%= render partial: "shared/item_count",
-                   locals: { mc: @mc_presenter.hub(@hub.name) } %>
+        <div class="tooltip">
+          <h2>Item Count</h2>
+          <span class="tooltiptext"><%= item_count_tooltip %></span>
+        </div>
+
+        <%= render_async hub_item_count_path(@hub.name, date_opts) do %>
+          <div>Loading...</div>
+        <% end %>
 
       </div>
 
       <div class="metrics">
 
-        <%= render partial: "shared/metadata_completeness",
-                   locals: { mc: @mc_presenter.hub(@hub.name) } %>
+        <div class="tooltip">
+          <h2>Metadata Completeness</h2>
+          <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
+        </div>
+
+        <%= render_async hub_metadata_completeness_path(@hub.name, date_opts) do %>
+          <div>Loading...</div>
+        <% end %>
 
       </div>
     </div>

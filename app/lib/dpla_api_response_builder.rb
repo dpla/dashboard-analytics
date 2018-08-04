@@ -41,6 +41,27 @@ class DplaApiResponseBuilder
     end
   end
 
+  ##
+  # @param hub [String]
+  # @param contributor [String]
+  # @return [Int|Nil]
+  #
+  def item_count(hub, contributor = nil)
+    query = { :api_key => api_key,
+              :page_size => 0, 
+              :'provider.name' => hub }
+
+   query[:dataProvider] = contributor if contributor.present?
+
+  options = { query: query }
+
+    begin
+      json_response('/items', options)['count']
+    rescue Exception => e
+      # TODO: Log error message
+    end
+  end
+
   private
 
   def api_key
