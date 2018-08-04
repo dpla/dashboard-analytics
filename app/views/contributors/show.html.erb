@@ -30,7 +30,8 @@
         </div>
 
         <%= render_async hub_contributor_contributor_website_overview_path(
-              @contributor.hub.name, @contributor.name, date_opts) do %>
+              @contributor.hub.name, @contributor.name, date_opts),
+              'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>
       </div>
@@ -43,7 +44,8 @@
         </div>
 
         <%= render_async hub_contributor_contributor_api_overview_path(
-              @contributor.hub.name, @contributor.name, date_opts) do %>
+              @contributor.hub.name, @contributor.name, date_opts),
+              'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>
 
@@ -55,7 +57,8 @@
         </div>
 
         <%= render_async hub_contributor_contributor_item_count_path(
-              @contributor.hub.name, @contributor.name, date_opts) do %>
+              @contributor.hub.name, @contributor.name, date_opts),
+              'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>
       </div>
@@ -68,7 +71,8 @@
         </div>
 
         <%= render_async hub_contributor_contributor_metadata_completeness_path(
-              @contributor.hub.name, @contributor.name, date_opts) do %>
+              @contributor.hub.name, @contributor.name, date_opts),
+              'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>
 
