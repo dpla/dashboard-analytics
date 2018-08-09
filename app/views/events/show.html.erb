@@ -21,7 +21,7 @@
 
     <div class="data-section">
 
-      <% if @label == "view_api" %>
+      <% if params[:id] == "view_api" %>
 
         <% if api_data_for_date_range? %>
           <%= render_async api_events_path({ hub_id: params[:hub_id],

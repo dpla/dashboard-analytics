@@ -18,9 +18,6 @@ class EventsController < ApplicationController
 
     @target = params[:contributor_id] ? @contributor : @hub
 
-    # File extension may be included in params[:id], e.g. "view_item.csv"
-    @label = params[:id].split(".").first
-
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
     end
@@ -54,15 +51,12 @@ class EventsController < ApplicationController
   def website_events
     assign_start_and_end_dates
 
-    # File extension may be included in params[:id], e.g. "view_item.csv"
-    label = params[:event_id].split(".").first
-
     events = WebsiteEvents.build do |builder|
         builder.hub = params[:hub_id]
         builder.contributor = params[:contributor_id] #may be nil
         builder.start_date = @start_date
         builder.end_date = @end_date
-        builder.event_name = website_event_names[label]
+        builder.event_name = website_event_names[params[:event_id]]
       end
 
     @events = WebsiteEventsPresenter.new(events)
