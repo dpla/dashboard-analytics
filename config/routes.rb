@@ -31,5 +31,8 @@ Rails.application.routes.draw do
 
   resources :search_terms, only: [:show]
 
+  get :api_events, controller: :events
+  get :website_events, controller: :events
+
   root 'hubs#index'
 end
