@@ -106,7 +106,7 @@ class ContributorComparison
                 api["Views"],
                 api["Users"] ]
 
-        MetadataCompleteness.fields.each do |field| 
+        MetadataCompletenessPresenter.fields.each do |field| 
           data.push(mc[field]) unless field == "count"
         end
 
