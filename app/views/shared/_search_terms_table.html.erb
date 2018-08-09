@@ -1,0 +1,35 @@
+<% if @search_terms.response.present? %>
+
+  <div class="result-info">
+    Showing <%= @search_terms.response.query.start_index %>-
+    <%= end_index(@search_terms.response) %>
+    of <%= @search_terms.response.total_results %> search terms.
+  </div>
+
+  <div class="download">
+    <%= link_to "Download all #{@search_terms.response.total_results} terms",
+                controller: :search_terms,
+                action: params[:action],
+                hub_id: params[:hub_id],
+                contributor_id: params[:contributor_id],
+                start_date: current_start_date,
+                end_date: current_end_date,
+                format: :csv %>
+  </div>
+
+  <table>
+    <tr>
+      <th>Search Term</th>
+      <th>Total Unique Searches</th>
+    </tr>
+    <% @search_terms.response.rows.each do |row| %>
+      <tr>
+        <td><%= row[0] %></td>
+        <td><%= row[1] %></td>
+      </tr>
+    <% end %>
+  </table>
+
+<% else %>
+  Data not available.
+<% end %>
