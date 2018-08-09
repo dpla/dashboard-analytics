@@ -20,7 +20,9 @@ Rails.application.routes.draw do
       get :contributor_api_overview
       get :contributor_item_count
       get :contributor_metadata_completeness
-      resources :events, only: [:show]
+      resources :events, only: [:show] do
+        get :api_events
+      end
       resources :locations, only: [:index]
       resources :timelines, only: [:show]
     end

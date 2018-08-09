@@ -15,10 +15,12 @@
   <div class="download">
     <%= link_to "Download all #{@events.total_results} items",
                 controller: :events,
-                action: :show,
+                action: params[:action],
                 start_date: current_start_date,
                 end_date: current_end_date,
-                id: params[:event_id],
+                hub_id: params[:hub_id],
+                contributor_id: params[:contributor_id],
+                event_id: params[:event_id],
                 format: :csv %>
   </div>
 

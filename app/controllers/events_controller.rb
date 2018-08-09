@@ -28,32 +28,32 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_data @events.to_csv }
+      format.csv { send_data get_events_presenter(@label).to_csv }
     end
   end
 
-  # def get_events(label)
-  #   if label == "view_api"
-  #     events = ApiEvents.build do |builder|
-  #       builder.hub = params[:hub_id]
-  #       builder.contributor = params[:contributor_id] #may be nil
-  #       builder.start_date = @start_date
-  #       builder.end_date = @end_date
-  #     end
+  def get_events_presenter(label)
+    if label == "view_api"
+      events = ApiEvents.build do |builder|
+        builder.hub = params[:hub_id]
+        builder.contributor = params[:contributor_id] #may be nil
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+      end
 
-  #     ApiEventsPresenter.new(events)
-  #   else
-  #     events = WebsiteEvents.build do |builder|
-  #       builder.hub = params[:hub_id]
-  #       builder.contributor = params[:contributor_id] #may be nil
-  #       builder.start_date = @start_date
-  #       builder.end_date = @end_date
-  #       builder.event_name = website_event_names[label]
-  #     end
+      ApiEventsPresenter.new(events)
+    else
+      events = WebsiteEvents.build do |builder|
+        builder.hub = params[:hub_id]
+        builder.contributor = params[:contributor_id] #may be nil
+        builder.start_date = @start_date
+        builder.end_date = @end_date
+        builder.event_name = website_event_names[label]
+      end
 
-  #     WebsiteEventsPresenter.new(events)
-  #   end
-  # end
+      WebsiteEventsPresenter.new(events)
+    end
+  end
 
   def website_event_names
     { "view_item" => "View Item",
@@ -74,16 +74,12 @@ class EventsController < ApplicationController
 
     @events = ApiEventsPresenter.new(events)
 
-    render partial: "shared/events_table.html.erb"
+    respond_to do |format|
+      format.html { render partial: "shared/events_table.html.erb" }
+      format.csv { send_data @events.to_csv }
+    end
   end
 
-  ##
-  # Expected params:
-  #   hub_id
-  #   contributor_id (optional)
-  #   id
-  #   start_date
-  #   end_date
   def website_events
     assign_start_and_end_dates
 
