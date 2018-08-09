@@ -13,49 +13,8 @@ class ContributorsController < ApplicationController
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
 
-    contributors = @hub.contributors
-
-    @website_overview = WebsiteOverviewByContributor.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
-    @website_events = WebsiteEventsByContributor.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
-    @api_overview = ApiOverviewByContributor.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
-    metadata_completeness = MetadataCompleteness.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.end_date = @end_date
-    end
-
-    @mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-
-    @contributor_comparison = ContributorComparison.build do |builder|
-      builder.hub = @hub.name
-      builder.contributors = contributors
-      builder.website_overview = @website_overview
-      builder.website_events = @website_events
-      builder.api_overview = @api_overview
-      builder.mc_presenter = @mc_presenter
-    end
-
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_contributors_path(current_user.hub)
-    end
-
-    respond_to do |format|
-      format.html
-      format.csv { send_data @contributor_comparison.to_csv }
     end
   end
 
@@ -123,5 +82,50 @@ class ContributorsController < ApplicationController
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     @mc_data = mc_presenter.contributor(params[:hub_id], params[:contributor_id])
     render partial: "shared/metadata_completeness"
+  end
+
+  def contributor_comparison
+    assign_start_and_end_dates
+    @hub = Hub.new(params[:hub_id], @start_date, @end_date)
+    contributors = @hub.contributors
+
+    website_overview = WebsiteOverviewByContributor.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    website_events = WebsiteEventsByContributor.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    api_overview = ApiOverviewByContributor.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.end_date = @end_date
+    end
+
+    mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
+
+    @contributor_comparison = ContributorComparison.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributors = contributors
+      builder.website_overview = website_overview
+      builder.website_events = website_events
+      builder.api_overview = api_overview
+      builder.mc_presenter = mc_presenter
+    end
+
+    respond_to do |format|
+      format.html { render partial: "shared/contributor_comparison" }
+      format.csv { send_data @contributor_comparison.to_csv }
+    end
   end
 end

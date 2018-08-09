@@ -1,0 +1,143 @@
+<form class="comparison">
+  <fieldset>
+    <legend>Website use</legend>
+    <div>
+      <input type="checkbox" id="website-view-input" name="column" 
+             value="website-view" checked="checked"
+             onclick="toggle_column(this)">
+      <label for="website-view-input">Website Item Views</label>
+    </div>
+    <div>
+      <input type="checkbox" id="click-through-input" name="column"
+             value="click-through" checked="checked"
+             onclick="toggle_column(this)">
+      <label for="click-through-input">Website Click Throughs</label>
+    </div>
+    <div>
+      <input type="checkbox" id="website-session-input" name="column" 
+             value="website-session" checked="checked"
+             onclick="toggle_column(this)">
+      <label for="website-session-input">Website Sessions</label>
+    </div>
+    <div>
+      <input type="checkbox" id="website-user-input" name="column"
+             value="website-user" checked="checked"
+             onclick="toggle_column(this)">
+      <label for="website-user-input">Website Users</label>
+    </div>
+  </fieldset>
+  <% if api_data_for_date_range? %>
+    <fieldset>
+      <legend>API use</legend>
+      <div>
+        <input type="checkbox" id="api-view-input" name="column"
+               value="api-view" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="api-view-input">API Views</label>
+      </div>
+      <div>
+        <input type="checkbox" id="api-user-input" name="column"
+               value="api-user" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="api-user-input">API Users/Apps</label>
+      </div>
+    </fieldset>
+  <% end %>
+  <fieldset>
+    <legend>Item count</legend>
+    <div>
+      <input type="checkbox" id="item-count-input" name="column"
+               value="item-count" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="item-count-input">Item count</label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Metadata Completeness</legend>
+    <% MetadataCompletenessPresenter.fields.each do |field| %>
+      <% unless field == 'count' %>
+        <div>
+          <input type="checkbox" id="<%= field %>-input" name="column"
+                 value="<%= field %>" checked="checked"
+                 onclick="toggle_column(this)">
+          <label for="<%= field %>-input"><%= field.titleize %></label>
+        </div>
+      <% end %>
+    <% end %>
+  </fieldset>
+</form>
+
+<div class='download'>
+  <%= link_to 'Download CSV', controller: :contributors,
+                              action: params[:action],
+                              hub_id: params[:hub_id],
+                              start_date: current_start_date,
+                              end_date: current_end_date,
+                              format: :csv %>
+</div>
+
+<table id='comparison'>
+  <thead>
+    <tr>
+      <th>Contributor</th>
+      <th class="website-view">Website Item Views</th>
+      <th class="click-through">Website Click Throughs</th>
+      <th class="website-session">Website Sessions</th>
+      <th class="website-user">Website Users</th>
+      <% if api_data_for_date_range? %>
+        <th class="api-view">API Views</th>
+        <th class="api-user">API Users/Apps</th>
+      <% end %>
+      <th class="item-count">Item Count</th>
+      <% MetadataCompletenessPresenter.fields.each do |field| %>
+        <% unless field == 'count' %>
+          <th class="<%= field %>"><%= field.titleize %> Completeness</th>
+        <% end %>
+      <% end %>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @contributor_comparison.totals.each do |contributor, totals| %>
+      <tr>
+        <td>
+          <%= link_to contributor, controller: :contributors, action: :show,
+                                   hub_id: params[:hub_id], id: contributor,
+                                   start_date: current_start_date,
+                                   end_date: current_end_date %>
+        </td>
+        <td class="website-view">
+          <%= totals["Website"]["Views"] %>
+        </td>
+        <td class="click-through">
+          <%= totals["Website"]["Click Throughs"] %>
+        </td>
+        <td class="website-session">
+          <%= totals["Website"]["Sessions"] %>
+        </td>
+        <td class="website-user">
+          <%= totals["Website"]["Users"] %>
+        </td>
+        <% if api_data_for_date_range? %>
+          <td class="api-view">
+            <%= totals["Api"]["Views"] %>
+          </td>
+          <td class="api-user">
+            <%= totals["Api"]["Users"] %>
+          </td>
+        <% end %>
+        <td class="item-count">
+          <%= totals["MetadataCompleteness"]['count'] %>
+        </td>
+        <% MetadataCompletenessPresenter.fields.each do |field| %>
+          <% unless field == "count" %>
+            <% value = totals["MetadataCompleteness"][field] %>
+            <td class="<%= field %> <%= percentage_class(value) %>">
+              <%= render_percentage(value) %>
+            </td>
+          <% end %>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
