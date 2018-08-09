@@ -21,7 +21,7 @@
 
     <div class="data-section">
 
-      <% if params[:id] == "view_api" %>
+      <% if @label == "view_api" %>
 
         <% if api_data_for_date_range? %>
           <%= render_async hub_event_api_events_path({ hub_id: params[:hub_id],
@@ -33,13 +33,19 @@
             <div>Loading...</div>
           <% end %>
         <% else %>
-          <!-- Data is not available for this date range. -->
+          Data is not available for this date range.
         <% end %>
         
       <% else %>
-        <%= render partial: 'shared/events_table' %>
+        <%= render_async hub_event_website_events_path({ hub_id: params[:hub_id],
+                                                         contributor_id: params[:contributor_id],
+                                                         event_id: params[:id],
+                                                         start_date: current_start_date,
+                                                         end_date: current_end_date }),
+              'data-turbolinks-track': 'reload' do %>
+          <div>Loading...</div>
+        <% end %>
       <% end %>
-
     </div>
   </div>
 </main>
