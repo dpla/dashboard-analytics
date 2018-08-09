@@ -17,7 +17,10 @@ class EventsController < ApplicationController
     end
 
     @target = params[:contributor_id] ? @contributor : @hub
-    @events = get_events(params[:id])
+
+    # File extension may be included in params[:id], e.g. "view_item.csv"
+    label = params[:id].split(".").first
+    @events = get_events(label)
 
     unless current_user.hub == params[:hub_id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
