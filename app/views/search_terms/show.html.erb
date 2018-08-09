@@ -23,38 +23,23 @@
           Top search terms across the DPLA <%= scope_label %> for all hubs and contributors.
         </div>
 
-        <% if @search_terms.response.present? %>
+        <% if params[:id] == "website" %>
 
-          <div class="result-info">
-            Showing <%= @search_terms.response.query.start_index %>-
-            <%= end_index(@search_terms.response) %>
-            of <%= @search_terms.response.total_results %> search terms.
-          </div>
+          <%= render_async website_search_terms_path({ start_date: current_start_date,
+                                                       end_date: current_end_date }),
+                'data-turbolinks-track': 'reload' do %>
+            <div>Loading...</div>
+          <% end %>
 
-          <div class="download">
-            <%= link_to "Download all #{@search_terms.response.total_results} terms",
-                        controller: :search_terms,
-                        action: :show,
-                        start_date: current_start_date,
-                        end_date: current_end_date,
-                        format: :csv %>
-          </div>
-
-          <table>
-            <tr>
-              <th>Search Term</th>
-              <th>Total Unique Searches</th>
-            </tr>
-            <% @search_terms.response.rows.each do |row| %>
-              <tr>
-                <td><%= row[0] %></td>
-                <td><%= row[1] %></td>
-              </tr>
-            <% end %>
-          </table>
+        <% elsif params[:id] == "api" %>
+           <%= render_async api_search_terms_path({ start_date: current_start_date,
+                                                    end_date: current_end_date }),
+                'data-turbolinks-track': 'reload' do %>
+            <div>Loading...</div>
+          <% end %>
 
         <% else %>
-          Data not available.
+          The ID in the URI, "<%= params[:id] %>", is not recognized.
         <% end %>
       </div>
     </div>

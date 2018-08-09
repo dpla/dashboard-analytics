@@ -33,6 +33,8 @@ Rails.application.routes.draw do
 
   get :api_events, controller: :events
   get :website_events, controller: :events
+  get :api_search_terms, controller: :search_terms
+  get :website_search_terms, controller: :search_terms
 
   root 'hubs#index'
 end
