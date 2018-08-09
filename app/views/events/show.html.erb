@@ -24,11 +24,11 @@
       <% if @label == "view_api" %>
 
         <% if api_data_for_date_range? %>
-          <%= render_async hub_event_api_events_path({ hub_id: params[:hub_id],
-                                                       contributor_id: params[:contributor_id],
-                                                       event_id: params[:id],
-                                                       start_date: current_start_date,
-                                                       end_date: current_end_date }),
+          <%= render_async api_events_path({ hub_id: params[:hub_id],
+                                             contributor_id: params[:contributor_id],
+                                             event_id: params[:id],
+                                             start_date: current_start_date,
+                                             end_date: current_end_date }),
                 'data-turbolinks-track': 'reload' do %>
             <div>Loading...</div>
           <% end %>
@@ -37,11 +37,11 @@
         <% end %>
         
       <% else %>
-        <%= render_async hub_event_website_events_path({ hub_id: params[:hub_id],
-                                                         contributor_id: params[:contributor_id],
-                                                         event_id: params[:id],
-                                                         start_date: current_start_date,
-                                                         end_date: current_end_date }),
+        <%= render_async website_events_path({ hub_id: params[:hub_id],
+                                               contributor_id: params[:contributor_id],
+                                               event_id: params[:id],
+                                               start_date: current_start_date,
+                                               end_date: current_end_date }),
               'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>

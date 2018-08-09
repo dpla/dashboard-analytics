@@ -20,22 +20,19 @@ Rails.application.routes.draw do
       get :contributor_api_overview
       get :contributor_item_count
       get :contributor_metadata_completeness
-      resources :events, only: [:show] do
-        get :api_events
-        get :website_events
-      end
+      resources :events, only: [:show]
       resources :locations, only: [:index]
       resources :timelines, only: [:show]
     end
-    resources :events, only: [:show] do
-      get :api_events
-      get :website_events
-    end
+    resources :events, only: [:show]
     resources :locations, only: [:index]
     resources :timelines, only: [:show]
   end
 
   resources :search_terms, only: [:show]
+
+  get :api_events, controller: :events
+  get :website_events, controller: :events
 
   root 'hubs#index'
 end
