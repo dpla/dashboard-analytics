@@ -24,7 +24,10 @@ Rails.application.routes.draw do
       resources :locations, only: [:index]
       resources :timelines, only: [:show]
     end
-    resources :events, only: [:show]
+    resources :events, only: [:show] do
+      get :api_events
+      get :website_events
+    end
     resources :locations, only: [:index]
     resources :timelines, only: [:show]
   end
