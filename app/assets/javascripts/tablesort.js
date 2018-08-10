@@ -1,6 +1,6 @@
 (function(){
   // This is the turbolinks equivalent to a page load.
-  document.addEventListener("turbolinks:load", function(){
+  document.addEventListener("contributor-comparison-loaded", function(){
 
     $(document).ready(function() {
       
