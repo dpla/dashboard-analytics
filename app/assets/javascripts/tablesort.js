@@ -1,5 +1,5 @@
 (function(){
-  // This is the turbolinks equivalent to a page load.
+  // Event listener executes when async partial load is completed.
   document.addEventListener("contributor-comparison-loaded", function(){
 
     $(document).ready(function() {
