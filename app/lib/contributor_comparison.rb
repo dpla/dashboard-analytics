@@ -8,7 +8,7 @@ class ContributorComparison
 
   def initialize
     @hub = nil
-    @contributors = nil
+    @contributors_item_count = nil
     @website_overview = nil
     @website_events = nil
     @api_overview = nil
@@ -21,9 +21,9 @@ class ContributorComparison
     @hub = hub
   end
 
-  # @param [Array<String>]
-  def contributors=(contributors)
-    @contributors = contributors
+  # @param [Array<Hash>]
+  def contributors_item_count=(contributors_item_count)
+    @contributors_item_count = contributors_item_count
   end
 
   # @param WebsiteOverviewByContributor
@@ -46,6 +46,10 @@ class ContributorComparison
     @mc_presenter = mc_presenter
   end
 
+  def contributors
+    @contributors_item_count.map { |c| c['term'] }
+  end
+
   ##
   # Get all contributors and their associated key metrics.
   # @return [Hash]
@@ -54,15 +58,18 @@ class ContributorComparison
   def totals
     data = {}
 
-    @contributors.map do |c|
-      f_use = frontend_use_by_contributor[c] || {}
-      f_events = frontend_events_by_contributor[c] || {}
+    @contributors_item_count.map do |c|
+      contributor = c["term"]
+      count = c["count"]
+      f_use = frontend_use_by_contributor[contributor] || {}
+      f_events = frontend_events_by_contributor[contributor] || {}
       # TODO: only call API if date range applies
-      a_use = api_use_by_contributor[c] || {}
-      mc = contributor_mc(c) || {}
-      data[c] = { "Website" => f_use.merge(f_events),
-                  "Api" => a_use,
-                  "MetadataCompleteness" => mc }
+      a_use = api_use_by_contributor[contributor] || {}
+      mc = contributor_mc(contributor) || {}
+      data[contributor] = { "Website" => f_use.merge(f_events),
+                            "Api" => a_use,
+                            "MetadataCompleteness" => mc,
+                            "ItemCount" => count }
     end
 
     data
@@ -83,7 +90,8 @@ class ContributorComparison
                    "Website Item Views",
                    "Website Click Throughs",
                    "API Views",
-                   "API Users" ]
+                   "API Users",
+                   "Item Count" ]
 
     MetadataCompletenessPresenter.fields.each do |field|
       attributes.push(field.titleize + " Completeness") unless field == "count"
@@ -97,6 +105,7 @@ class ContributorComparison
         website = contributor[1]["Website"]
         api = contributor[1]["Api"]
         mc = contributor[1]["MetadataCompleteness"]
+        count = contributor[1]["ItemCount"]
 
         data =[ contributor[0],
                 website["Sessions"],
@@ -104,7 +113,8 @@ class ContributorComparison
                 website["Views"],
                 website["Click Throughs"],
                 api["Views"],
-                api["Users"] ]
+                api["Users"],
+                count ]
 
         MetadataCompletenessPresenter.fields.each do |field| 
           data.push(mc[field]) unless field == "count"
