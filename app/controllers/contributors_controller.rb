@@ -87,7 +87,9 @@ class ContributorsController < ApplicationController
   def contributor_comparison
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
-    contributors = @hub.contributors
+    
+    contributors_item_count = DplaApiResponseBuilder.new
+      .contributors_item_count(params[:hub_id])
 
     website_overview = WebsiteOverviewByContributor.build do |builder|
       builder.hub = params[:hub_id]
@@ -116,7 +118,7 @@ class ContributorsController < ApplicationController
 
     @contributor_comparison = ContributorComparison.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributors = contributors
+      builder.contributors_item_count = contributors_item_count
       builder.website_overview = website_overview
       builder.website_events = website_events
       builder.api_overview = api_overview

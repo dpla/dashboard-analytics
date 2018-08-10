@@ -42,6 +42,25 @@ class DplaApiResponseBuilder
   end
 
   ##
+  # @param [String]
+  # @return [Array<Hash>]
+  #
+  def contributors_item_count(hub)
+    options = { query: { :api_key => api_key,
+                         :facets => 'dataProvider',
+                         :page_size => 0, 
+                         :facet_size => 2000,
+                         :'provider.name' => hub } }
+
+    begin
+      json_response('/items', options)['facets']['dataProvider']['terms']
+    rescue Exception => e
+      # TODO: Log error message
+      Array.new
+    end
+  end
+
+  ##
   # @param hub [String]
   # @param contributor [String]
   # @return [Int|Nil]
