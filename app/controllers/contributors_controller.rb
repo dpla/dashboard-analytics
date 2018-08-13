@@ -86,7 +86,6 @@ class ContributorsController < ApplicationController
 
   def contributor_comparison
     assign_start_and_end_dates
-    @hub = Hub.new(params[:hub_id], @start_date, @end_date)
     
     contributors_item_count = DplaApiResponseBuilder.new
       .contributors_item_count(params[:hub_id])
