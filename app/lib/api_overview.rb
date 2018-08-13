@@ -1,10 +1,10 @@
 class ApiOverview
 
   ##
-  # @return [WebsiteEventTotals]
+  # @return [ApiOverview]
   #
   # @example
-  #   WebsiteEventTotals.build do |builder|
+  #   ApiOverview.build do |builder|
   #     builder.hub = "California Digital Library"
   #     builder.contributor = "Agua Caliente Cultural Museum"
   #     builder.start_date = Date.yesterday
