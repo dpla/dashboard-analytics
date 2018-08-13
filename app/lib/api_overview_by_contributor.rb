@@ -86,6 +86,6 @@ class ApiOverviewByContributor
   end
 
   def profile_id
-    Settings.google_analytics.frontend_profile_id
+    Settings.google_analytics.api_profile_id
   end
 end
