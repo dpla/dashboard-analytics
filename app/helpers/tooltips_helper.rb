@@ -13,7 +13,7 @@ module TooltipsHelper
   end
 
   def view_metadata_record_tooltip
-    "A record for your item was viewed in the digital libary catalog.
+    "A record for your item was viewed in the digital library catalog.
     Users usually find these records by searching or browsing the catalog.
     Comparable to \"pageview\" in Google Analytics."
   end
