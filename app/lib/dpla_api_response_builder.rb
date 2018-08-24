@@ -8,7 +8,7 @@ class DplaApiResponseBuilder
   # @return [Array<String>]
   #
   def hubs
-    options = { query: { #api_key: api_key,
+    options = { query: { api_key: api_key,
                          facets: 'provider.name',
                          page_size: 0 } }
 
