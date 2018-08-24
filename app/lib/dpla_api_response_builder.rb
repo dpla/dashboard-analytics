@@ -77,7 +77,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['count']
     rescue Exception => e
-      # TODO: Log error message
+      Rails.logger.debug(e)
     end
   end
 
