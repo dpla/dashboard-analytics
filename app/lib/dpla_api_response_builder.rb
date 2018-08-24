@@ -16,7 +16,7 @@ class DplaApiResponseBuilder
       json_response('/items', options)['facets']['provider.name']['terms']
         .map{ |f| f['term'] }
     rescue Exception => e
-      # TODO: Log error message
+      Rails.logger.debug(e)
       Array.new
     end
   end
@@ -36,7 +36,7 @@ class DplaApiResponseBuilder
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |f| f['term'] }
     rescue Exception => e
-      # TODO: Log error message
+      Rails.logger.debug(e)
       Array.new
     end
   end
@@ -55,7 +55,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
     rescue Exception => e
-      # TODO: Log error message
+      Rails.logger.debug(e)
       Array.new
     end
   end
@@ -77,7 +77,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['count']
     rescue Exception => e
-      # TODO: Log error message
+      Rails.logger.debug(e)
     end
   end
 
@@ -92,20 +92,25 @@ class DplaApiResponseBuilder
   end
 
   ##
-  # Make HTTP request
+  # Make HTTP request.
+  # Retry in event of relevant server error.
   #
   # @return [HTTParty::Response] | nil
   #
-  # TODO: Improve exceptions based on response code
-  # TODO: Retry request if appropriate
-  #
   def response(path, options)
+    tries ||= 0
     res = self.class.get(path, options)
-    
+
     if res.code != 200
-      raise "A #{res.code} error occurred when attempting to call the DPLA API" 
+      Rails.logger.debug("A #{res.code} error occurred when attempting to call the DPLA API")
+      raise HttpServerError if res.code.in? [500, 502, 503, 504]
     end
 
     res
+  rescue HttpServerError
+    # Use exponential backoff to delay next request attempt.
+    sleep(2**tries + rand) and retry unless(tries += 1) == 3
   end
 end
+
+class HttpServerError < StandardError; end
