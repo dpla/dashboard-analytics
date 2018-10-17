@@ -2,7 +2,7 @@ class MetadataCompletenessPresenter
 
   # Fields to be shown in the user interface.
   def self.fields
-    [ 'type', 'subject', 'description', 'preview', 'date', 'creator',
+    [ 'title', 'type', 'subject', 'description', 'preview', 'date', 'creator',
       'spatial', 'language', 'rights', 'standardizedRights', 'count' ]
   end
 
