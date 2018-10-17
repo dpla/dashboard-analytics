@@ -7,6 +7,7 @@ google_analytics:
   frontend_profile_id: ga:XXXXXXXX
   api_profile_id: ga:XXXXXXXX
   api_segment: gaid::XXX
+  tracking_id: UA-xxxxxxxx-xx
 
 dpla_api:
   # include trailing backslash

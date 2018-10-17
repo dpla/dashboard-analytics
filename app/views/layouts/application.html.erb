@@ -13,6 +13,26 @@
 
     <%= favicon_link_tag '/assets/dpla-favicon-black.png' %>
 
+    <% if defined? Settings.google_analytics.tracking_id %>
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=<%= Settings.google_analytics.tracking_id %>"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', <%= Settings.google_analytics.tracking_id %>);
+
+        document.addEventListener('turbolinks:load', event => {
+          if (typeof gtag === 'function') {
+            gtag('config', <%= Settings.google_analytics.tracking_id %>, {
+              'page_location': event.data.url
+            });
+          }
+        });
+      </script>
+
+    <% end %>
+
     <%= yield :head_script %>
   </head>
 
