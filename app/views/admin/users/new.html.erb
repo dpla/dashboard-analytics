@@ -26,7 +26,11 @@
 
     <div>
       <%= f.label :hub %>
-      <%= f.select :hub, Hub.all.unshift("All") %>
+      <% if current_user.hub == "All" %>
+          <%= f.select :hub, Hub.all.unshift("All") %>
+      <% else %>
+          <%= f.select :hub, [current_user.hub] %>
+      <% end %>
     </div>
 
     <div>

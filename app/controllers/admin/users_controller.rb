@@ -2,7 +2,9 @@ module Admin
   class UsersController < ApplicationController
 
     def index
-      @users = User.all
+      @users = current_user.hub == "All" ? User.all : 
+        User.where("hub = ?", current_user.hub)
+
       redirect_to admin_user_path(current_user) unless current_user.admin
     end
 
