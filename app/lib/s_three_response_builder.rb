@@ -18,6 +18,10 @@ class SThreeResponseBuilder
     self.client.get_object({ bucket: self.bucket, key: key })
   end
 
+  def self.list(prefix)
+    self.client.list_objects({ bucket: self.bucket, prefix: prefix })
+  end
+
   private
 
   def self.client

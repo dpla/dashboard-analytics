@@ -65,16 +65,27 @@ class MetadataCompleteness
       break if date < min_date
 
       # File path in format YYYY/MM/filename.csv
-      key = "#{date.year}/#{date.strftime("%m")}/#{file_name}"
+      prefix = "#{date.year}/#{date.strftime("%m")}/#{file_name}"
+      key = nil
 
       begin
-        response = SThreeResponseBuilder.response(key)
-      rescue Aws::S3::Errors::NoSuchKey => e
-        Rails.logger.debug("#{key} does not exist.")
-        # Loop continues
+        list = SThreeResponseBuilder.list(prefix).contents
+        key = list.first.key if not list.empty?
       rescue Exception => e
         Rails.logger.debug(e)
         break
+      end
+
+      if key
+        begin
+          response = SThreeResponseBuilder.response(key)
+        rescue Aws::S3::Errors::NoSuchKey => e
+          Rails.logger.debug("#{key} does not exist.")
+          # Loop continues
+        rescue Exception => e
+          Rails.logger.debug(e)
+          break
+        end
       end
 
       date = date.last_month
