@@ -69,8 +69,9 @@ class MetadataCompleteness
       key = nil
 
       begin
-        list = SThreeResponseBuilder.list(prefix).contents
-        key = list.first.key if not list.empty?
+        csv_files = SThreeResponseBuilder.list(prefix).contents
+          .select{ |c| c.key.ends_with?(".csv") }
+        key = csv_files.first.key unless csv_files.empty?
       rescue Exception => e
         Rails.logger.debug(e)
         break
