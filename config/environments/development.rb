@@ -29,6 +29,8 @@ Rails.application.configure do
   # Required for Devise.
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
+  config.action_mailer.delivery_method = :aws_sdk
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
