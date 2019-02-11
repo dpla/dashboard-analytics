@@ -62,7 +62,13 @@ Rails.application.configure do
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
   # config.active_job.queue_name_prefix = "dashboard-analytics_#{Rails.env}"
+
+  # Required for Devise.
+  config.action_mailer.default_url_options = { host: 'analytics-dashboard.dp.la' }
+
   config.action_mailer.perform_caching = false
+
+  config.action_mailer.delivery_method = :aws_sdk
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
