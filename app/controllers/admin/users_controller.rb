@@ -41,6 +41,7 @@ module Admin
 
       if @user.save
         UserMailer.with(user: @user).welcome_email.deliver
+        flash[:notice] = "User #{@user.email} was successfully created."
         redirect_to admin_users_path
       else
         render 'new'

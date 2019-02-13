@@ -3,6 +3,10 @@
 
   <div class="clear" />
 
+  <% if flash[:notice] %>
+    <div class="notice"><%= flash[:notice] %></div>
+  <% end %>
+
   <p>
     <%= button_to "Sign up a new user", new_admin_user_path, method: :get %>
   </p>

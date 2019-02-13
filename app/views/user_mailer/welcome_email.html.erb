@@ -7,13 +7,27 @@
     <h1>Welcome to the DPLA Analytics Dashboard</h1>
     <p>
       An account has been created for you on the DPLA Analtyics Dashboard.
+      This dashboard provides up-to-date information about how your materials
+      are being used on DPLA's website and API.
+    </p>
+    <p>
       Your username is: <%= @user.email %>.<br/>
     </p>
     <p>
       Please log in and  
-      <%= link_to "change your password", 
+      <%= link_to "set your password", 
                   edit_password_url(@user, reset_password_token: @token) %>.
     </p>
-    <p>Put some info here.</p>
+    <p>
+      For more information about how to use the dashboard, please see this 
+      <a href="https://www.youtube.com/watch?v=pCJNmwg6a7U&feature=youtu.be">
+        recorded webinar
+      </a>.
+      You can also read this brief 
+      <a href="https://dp.la/news/analytics-dashboards-provide-new-data-for-dpla-members">
+        overview 
+      </a>
+      from our blog.
+    </p>
   </body>
 </html>
