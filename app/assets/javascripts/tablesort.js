@@ -11,4 +11,13 @@
       });
     });
   });
+
+  document.addEventListener("turbolinks:load", function(){
+    console.log("hello");
+    $("#users").tablesorter({
+      cssHeader: 'header',
+      cssAsc: 'headerSortUp',
+      cssDesc: 'headerSortDown'
+    });
+  });
 })();
