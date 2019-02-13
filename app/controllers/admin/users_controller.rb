@@ -32,9 +32,16 @@ module Admin
     end
 
     def create
-      @user = User.new(user_params)
+      generated_password = Devise.friendly_token.first(8)
+      create_params = user_params
+      create_params[:password] = generated_password
+      create_params[:password_confirmation] = generated_password
+
+      @user = User.new(create_params)
 
       if @user.save
+        UserMailer.with(user: @user).welcome_email.deliver
+        flash[:notice] = "User #{@user.email} was successfully created."
         redirect_to admin_users_path
       else
         render 'new'
