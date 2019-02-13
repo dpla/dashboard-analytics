@@ -32,6 +32,8 @@ gem 'render_async', '~> 1.2.0'
 # Set versions of following gems to fix security vulnerabilities
 gem 'rails-html-sanitizer', '>= 1.0.4'
 gem 'sprockets', '~> 3.7.2'
+gem 'rubyzip', '>= 1.2.2'
+gem 'ffi', '>= 1.9.24'
 
 group :production do
   gem 'pg', '~> 1.0.0'

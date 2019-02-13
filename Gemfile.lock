@@ -123,7 +123,7 @@ GEM
     execjs (2.7.0)
     faraday (0.15.2)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.23)
+    ffi (1.10.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     google-api-client (0.22.0)
@@ -245,7 +245,7 @@ GEM
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
     ruby_dep (1.5.0)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -314,6 +314,7 @@ DEPENDENCIES
   capybara (~> 2.13)
   config (= 1.7.0)
   devise (~> 4.4.3)
+  ffi (>= 1.9.24)
   google-api-client (~> 0.11)
   googleauth (~> 0.6)
   httparty (~> 0.16.2)
@@ -327,6 +328,7 @@ DEPENDENCIES
   render_async (~> 1.2.0)
   rspec-core (~> 3.7)
   rspec-rails (~> 3.7)
+  rubyzip (>= 1.2.2)
   sass-rails (~> 5.0)
   selenium-webdriver
   spring
