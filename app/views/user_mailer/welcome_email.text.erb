@@ -1,0 +1,8 @@
+Welcome to the DPLA Analytics Dashboard
+ 
+An account has been created for you on the DPLA Analtyics Dashboard.
+Your username is: <%= @user.email %>.
+ 
+Please log in and  
+<%= link_to "change your password", edit_password_url(@user, reset_password_token: @token) %>.
+ 

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Welcome to the DPLA Analytics Dashboard</h1>
+    <p>
+      An account has been created for you on the DPLA Analtyics Dashboard.
+      Your username is: <%= @user.email %>.<br/>
+    </p>
+    <p>
+      Please log in and  
+      <%= link_to "change your password", 
+                  edit_password_url(@user, reset_password_token: @token) %>.
+    </p>
+    <p>Put some info here.</p>
+  </body>
+</html>
