@@ -75,7 +75,12 @@ class DplaApiResponseBuilder
   options = { query: query }
 
     begin
-      json_response('/items', options)['count']
+      count = json_response('/items', options)['count']
+      if (count.is_a? Integer)
+        count # ElasticSearch 6
+      else
+        count['value'] # ElasticSearch 7
+      end
     rescue Exception => e
       Rails.logger.debug(e)
     end
