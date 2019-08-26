@@ -23,7 +23,7 @@ gem 'config', '1.7.0'
 gem 'google-api-client', '~> 0.11'
 gem 'googleauth', '~> 0.6'
 gem 'httparty', '~> 0.16.2'
-gem 'devise', '~> 4.4.3'
+gem "devise", ">= 4.6.0"
 gem 'jquery-rails', '~> 4.3.1'
 gem 'aws-sdk-rails', '~> 2', '>= 2.0.1'
 gem 'aws-sdk-core', '~> 3.46'
@@ -34,6 +34,7 @@ gem 'rails-html-sanitizer', '>= 1.0.4'
 gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.2.2'
 gem 'ffi', '>= 1.9.24'
+
 
 group :production do
   gem 'pg', '~> 1.0.0'
