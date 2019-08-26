@@ -27,7 +27,7 @@ Inital user:
 
 Create an initial user account from the rails console:
 
-    User.create(email: "user@example.com", admin: true, hub: "All", password: "password", password_confimration: "password")
+    User.create(email: "user@example.com", admin: true, hub: "All", password: "password")
 
 ## Testing
 
