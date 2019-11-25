@@ -102,7 +102,8 @@ class MetadataCompleteness
   # @return CSV
   def csv_data(response)
     # response.body.read is instance of String
-    CSV.new(response.body.read, headers: true)
+    # strip all \" from the body of the CSV to avoid parsing error
+    CSV.new(response.body.read.gsub('\\"', ''), headers: true)
   end
 
   ##
