@@ -81,7 +81,9 @@ module TooltipsHelper
   def metadata_completeness_tooltip
     "For each field, the percentage of all your metadata records that have a non-null value for that field.
     These fields are used most heavily in our search and discovery systems,
-    and therefore a higher percentage of completeness can lead to more use."
+    and therefore a higher percentage of completeness can lead to more use.
+    If a document has mediaAccess, that means that it has either a IIIF manifest
+    or a full-frame media file."
   end
 
   def find_tooltip(key)
