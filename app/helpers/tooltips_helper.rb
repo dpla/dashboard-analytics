@@ -83,7 +83,7 @@ module TooltipsHelper
     These fields are used most heavily in our search and discovery systems,
     and therefore a higher percentage of completeness can lead to more use.
     If a document has mediaAccess, that means that it has either a IIIF manifest
-    or a full-frame media file."
+    or full-frame media file(s)."
   end
 
   def find_tooltip(key)
