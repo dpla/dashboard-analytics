@@ -141,7 +141,9 @@
         </td>
         <%= wr_value = totals["WikimediaIntegration"]["wikimediaReady"] %>
         <td class="wikimedia-ready <%= percentage_class(wr_value) %>">
-          <%= render_percentage(wr_value) %>
+          <% if wr_value %>
+            <%= render_percentage(wr_value) %>
+          <% end %>
         </td>
         <% MetadataCompletenessPresenter.fields.each do |field| %>
           <% unless field == "count" %>
