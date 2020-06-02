@@ -6,7 +6,14 @@
     <% @mc_data.each do |key, value| %>
       <% if MetadataCompletenessPresenter.fields.include?(key) && key != "count" %>
         <tr>
-          <td><%= key.titleize %></td>
+          <td>
+            <div class="tooltip">
+              <span><%= key.titleize %></span>
+              <% if key == 'mediaAccess' %>
+                <span class="tooltiptext"><%= media_access_tooltip %></span>
+              <% end %>
+            </div>
+          </td>
           <td class="bar <%= percentage_class(value) %>">
             <%= render_percentage(value) %>
           </td>

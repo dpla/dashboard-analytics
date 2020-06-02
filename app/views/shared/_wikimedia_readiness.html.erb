@@ -16,22 +16,26 @@
   <br/>
 </div>
 
-<% if @wp_data.present? %>
+<div class="metrics">
 
-  <table>
+  <% if @wp_data.present? %>
 
-    <% @wp_data.each do |key, value| %>
-      <% if WikimediaPreparationsPresenter.fields.include?(key) %>
-        <tr>
-          <td><%= key.titleize %></td>
-          <td class="bar <%= percentage_class(value) %>">
-            <%= render_percentage(value) %>
-          </td>
-        </tr>
+    <table>
+
+      <% @wp_data.each do |key, value| %>
+        <% if WikimediaPreparationsPresenter.fields.include?(key) %>
+          <tr>
+            <td><%= key.titleize %></td>
+            <td class="bar <%= percentage_class(value) %>">
+              <%= render_percentage(value) %>
+            </td>
+          </tr>
+        <% end %>
       <% end %>
-    <% end %>
-  </table>
+    </table>
 
-<% else %>
-  <div class="no-data">Data not available</div>
-<% end %>
+  <% else %>
+    <div class="no-data">Data not available</div>
+  <% end %>
+
+</div>
