@@ -139,7 +139,7 @@
         <td class="item-count">
           <%= totals["ItemCount"] %>
         </td>
-        <%= wr_value = totals["WikimediaIntegration"]["wikimediaReady"] %>
+        <% wr_value = totals["WikimediaIntegration"]["wikimediaReady"] %>
         <td class="wikimedia-ready <%= percentage_class(wr_value) %>">
           <% if wr_value %>
             <%= render_percentage(wr_value) %>
