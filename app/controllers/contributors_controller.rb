@@ -134,6 +134,7 @@ class ContributorsController < ApplicationController
     end
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
+    wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
 
     @contributor_comparison = ContributorComparison.build do |builder|
       builder.hub = params[:hub_id]
@@ -142,6 +143,7 @@ class ContributorsController < ApplicationController
       builder.website_events = website_events
       builder.api_overview = api_overview
       builder.mc_presenter = mc_presenter
+      builder.wp_presenter = wp_presenter
     end
 
     respond_to do |format|

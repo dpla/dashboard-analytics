@@ -13,6 +13,7 @@ class ContributorComparison
     @website_events = nil
     @api_overview = nil
     @mc_presenter = nil
+    @wp_presenter = nil
   end
 
   ##
@@ -46,6 +47,11 @@ class ContributorComparison
     @mc_presenter = mc_presenter
   end
 
+  # @param WikimediaPreparationsPresenter
+  def wp_presenter=(wp_presenter)
+    @wp_presenter = wp_presenter
+  end
+
   def contributors
     @contributors_item_count.map { |c| c['term'] }
   end
@@ -66,17 +72,30 @@ class ContributorComparison
       # TODO: only call API if date range applies
       a_use = api_use_by_contributor[contributor] || {}
       mc = contributor_mc(contributor) || {}
+      wiki_int = wiki_integration(contributor)
       data[contributor] = { "Website" => f_use.merge(f_events),
                             "Api" => a_use,
                             "MetadataCompleteness" => mc,
-                            "ItemCount" => count }
+                            "ItemCount" => count,
+                            "WikimediaIntegration" => wiki_int }
     end
 
     data
   end
 
+  def wiki_integration(contributor)
+    wp = contributor_wp(contributor) || {}
+    { 'wikimediaReady' => wp['wikimediaReady'] }
+  end
+
   def contributor_mc(contributor)
     all_contributors_mc.find do |row|
+      row['dataProvider'] == contributor
+    end
+  end
+
+  def contributor_wp(contributor)
+    all_contributors_wp.find do |row|
       row['dataProvider'] == contributor
     end
   end
@@ -97,6 +116,10 @@ class ContributorComparison
       attributes.push(field.titleize + " Completeness") unless field == "count"
     end
 
+    wiki_integration.keys.each do |key|
+      attributes.push(field.titleize)
+    end
+
     CSV.generate({ headers: true }) do |csv|
       csv << attributes
 
@@ -106,6 +129,7 @@ class ContributorComparison
         api = contributor[1]["Api"]
         mc = contributor[1]["MetadataCompleteness"]
         count = contributor[1]["ItemCount"]
+        wiki = contributor[1]["WikimediaIntegration"]
 
         data =[ contributor[0],
                 website["Sessions"],
@@ -118,6 +142,10 @@ class ContributorComparison
 
         MetadataCompletenessPresenter.fields.each do |field| 
           data.push(mc[field]) unless field == "count"
+        end
+
+        wiki_integration.keys.each do |key|
+          data.push(wiki[key])
         end
 
         csv << data
@@ -141,5 +169,9 @@ class ContributorComparison
 
   def all_contributors_mc
     @all_contributors_mc ||= @mc_presenter.all_contributors(@hub)
+  end
+
+  def all_contributors_wp
+    @all_contributors_wp ||= @wp_presenter.all_contributors(@hub)
   end
 end

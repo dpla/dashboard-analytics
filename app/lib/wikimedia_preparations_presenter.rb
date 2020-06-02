@@ -11,6 +11,17 @@ class WikimediaPreparationsPresenter
     @metadata_completeness = metadata_completeness
   end
 
+    ##
+  # @param [String]
+  # @return [Array<CSV::Row>]
+  def all_contributors(hub)
+    @metadata_completeness.contributor_csv
+      .find_all { |row| row["provider"] == hub }
+  rescue => e
+    Rails.logger.error(e)
+    Array.new
+  end
+
   ##
   # @param hub [String]
   # @param contributor [String]
