@@ -14,12 +14,14 @@ Rails.application.routes.draw do
     get :api_overview
     get :item_count
     get :metadata_completeness
+    get :wikimedia_overview
 
     resources :contributors, id: /.*/, only: [:index, :show] do
       get :contributor_website_overview
       get :contributor_api_overview
       get :contributor_item_count
       get :contributor_metadata_completeness
+      get :contributor_wikimedia_overview
       resources :events, only: [:show]
       resources :locations, only: [:index]
       resources :timelines, only: [:show]

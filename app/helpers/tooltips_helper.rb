@@ -89,6 +89,11 @@ module TooltipsHelper
     or full-frame media file(s)."
   end
 
+  def wikimedia_readiness_tooltip
+    "The number of documents eligible for upload into Wikimedia.  These items
+    have both media access and open licences."
+  end
+
   def find_tooltip(key)
     case key
     when "view_item"

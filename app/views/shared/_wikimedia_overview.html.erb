@@ -1,0 +1,30 @@
+<%# Local variables: @wp_data[Hash] @target[Hub|Contributor] %>
+
+<% key = 'wikimediaReady' %>
+
+<% if @wp_data.present? && @wp_data.key?(key) %>
+  <% value = @wp_data[key] %>
+
+  <table>
+    <% if WikimediaPreparationsPresenter.fields.include?(key) %>
+      <tr>
+        <td>
+          <div class="tooltip">
+            <span><%= key.titleize %></span>
+            <span class="tooltiptext"><%= wikimedia_readiness_tooltip %></span>
+          </div>
+        </td>
+        <td class="bar <%= percentage_class(value) %>">
+          <%= render_percentage(value) %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+
+<% else %>
+  <div class="no-data">Data not available</div>
+<% end %>
+
+<br/>
+
+<p>More data about <%= render_wikimedia_readiness_link(@target) %></p>
