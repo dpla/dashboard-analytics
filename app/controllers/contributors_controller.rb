@@ -84,6 +84,26 @@ class ContributorsController < ApplicationController
     render partial: "shared/metadata_completeness"
   end
 
+  def contributor_wikimedia_overview
+    assign_start_and_end_dates
+
+    metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.end_date = @end_date
+    end
+
+    wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
+    @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
+
+    @target = Contributor.new(params[:contributor_id],
+                              params[:hub_id],
+                              @start_date,
+                              @end_date)
+
+    render partial: "shared/wikimedia_overview"
+  end
+
   def contributor_comparison
     assign_start_and_end_dates
     
