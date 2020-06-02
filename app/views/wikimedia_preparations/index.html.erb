@@ -23,8 +23,10 @@
 
       <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
 
-      <p>Hello world</p>
-
+      <%= render partial: "shared/wikimedia_readiness",
+                 locals: { ga_token: GaAuthorizer.token,          
+                           hub: @hub.name,
+                           contributor: contributor } %>
     </div>
   </div>
 </main>

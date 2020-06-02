@@ -86,6 +86,11 @@ module TooltipsHelper
     or full-frame media file(s)."
   end
 
+  def media_access_tooltip
+    "If a document has mediaAccess, that means that it has either a IIIF manifest
+    or full-frame media file(s)."
+  end
+
   def find_tooltip(key)
     case key
     when "view_item"

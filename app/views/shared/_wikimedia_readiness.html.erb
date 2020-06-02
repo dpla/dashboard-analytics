@@ -1,0 +1,34 @@
+<%# Local variables: @wr_data[Hash] %>
+
+<h2>Wikimedia Readiness</h2>
+
+<p>To be eligible for uploaded into Wikimedia, items must have both of the following:</p>
+<br/>
+<p>
+  <strong>Media access</strong> - either a IIIF manifest or 
+  full-frame media file(s) (i.e. <em>media master</em>)
+</p>
+<p>
+  <strong>Open license</strong> - a standardized rights statement compatible
+   with wikimedia's licensing policy.
+<p>
+
+<% if @wp_data.present? %>
+
+  <table>
+
+    <% @wp_data.each do |key, value| %>
+      <% if WikimediaPreparationsPresenter.fields.include?(key) %>
+        <tr>
+          <td><%= key.titleize %></td>
+          <td class="bar <%= percentage_class(value) %>">
+            <%= render_percentage(value) %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+
+<% else %>
+  <div class="no-data">Data not available</div>
+<% end %>

@@ -14,9 +14,9 @@ class WikimediaPreparationsController < ApplicationController
     if params[:contributor_id]
       @contributor = Contributor.new(params[:contributor_id], params[:hub_id],
                                      @start_date, @end_date)
-      initiate_contributor_mc_presenter
+      initiate_contributor_wp_presenter
     else
-      initiate_hub_mc_presenter
+      initiate_hub_wp_presenter
     end
 
     @target = params[:contributor_id] ? @contributor : @hub
@@ -30,24 +30,24 @@ class WikimediaPreparationsController < ApplicationController
 
   private
 
-  def initiate_hub_mc_presenter
+  def initiate_hub_wp_presenter
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
       builder.end_date = @end_date
     end
 
-    mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-    @mc_data = mc_presenter.hub(params[:hub_id])
+    wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
+    @wp_data = wp_presenter.hub(params[:hub_id])
   end
 
-  def initiate_contributor_mc_presenter
+  def initiate_contributor_wp_presenter
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
       builder.contributor = params[:contributor_id]
       builder.end_date = @end_date
     end
 
-    mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-    @mc_data = mc_presenter.contributor(params[:hub_id], params[:contributor_id])
+    wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
+    @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
   end
 end
