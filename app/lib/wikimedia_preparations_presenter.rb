@@ -2,7 +2,7 @@ class WikimediaPreparationsPresenter
 
   # Fields to be shown in the user interface.
   def self.fields
-    [ 'mediaAccess', 'iiifManifest', 'mediaMaster', 'openLicense', 'wikimediaReady' ]
+    [ 'wikimediaReady', 'mediaAccess', 'openLicense' ]
   end
 
   ##
