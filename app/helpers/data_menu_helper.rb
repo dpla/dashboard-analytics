@@ -82,6 +82,14 @@ module DataMenuHelper
     link_to("API", path, html_opts(path))
   end
 
+  def render_wikimedia_readiness_link(target)
+    path = target.is_a?(Hub) ?
+      hub_wikimedia_preparations_path(target.name, date_opts) :
+      hub_contributor_wikimedia_preparations_path(target.hub.name, target.name, date_opts)
+
+    link_to("Wikimedia readiness", path, html_opts(path))
+  end
+
   ##
   # Set HTML class to selected if the given path matches the current request
   # path. Parameters (e.g. start_date and end_date) are ignored.

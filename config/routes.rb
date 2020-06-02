@@ -23,11 +23,12 @@ Rails.application.routes.draw do
       resources :events, only: [:show]
       resources :locations, only: [:index]
       resources :timelines, only: [:show]
+      resources :wikimedia_preparations, only: [:index]
     end
     resources :events, only: [:show]
     resources :locations, only: [:index]
     resources :timelines, only: [:show]
-    resources :wikimedia_readiness, only: [:show]
+    resources :wikimedia_preparations, only: [:index]
   end
 
   resources :search_terms, only: [:show]
