@@ -110,14 +110,11 @@ class ContributorComparison
                    "Website Click Throughs",
                    "API Views",
                    "API Users",
-                   "Item Count" ]
+                   "Item Count",
+                   "Wikimedia Ready" ]
 
     MetadataCompletenessPresenter.fields.each do |field|
       attributes.push(field.titleize + " Completeness") unless field == "count"
-    end
-
-    wiki_integration.keys.each do |key|
-      attributes.push(field.titleize)
     end
 
     CSV.generate({ headers: true }) do |csv|
@@ -138,14 +135,11 @@ class ContributorComparison
                 website["Click Throughs"],
                 api["Views"],
                 api["Users"],
-                count ]
+                count,
+                wiki["wikimediaReady"] ]
 
         MetadataCompletenessPresenter.fields.each do |field| 
           data.push(mc[field]) unless field == "count"
-        end
-
-        wiki_integration.keys.each do |key|
-          data.push(wiki[key])
         end
 
         csv << data
