@@ -85,7 +85,7 @@ module TooltipsHelper
   end
 
   def media_access_tooltip
-    "If a document has mediaAccess, that means that it has either a IIIF manifest
+    "If an item has Media Access, that means that it has either a IIIF manifest
     or full-frame media file(s)."
   end
 
