@@ -91,7 +91,7 @@ module TooltipsHelper
 
   def wikimedia_readiness_tooltip
     "The number of documents eligible for upload into Wikimedia.  These items
-    have both media access and open licences."
+    have both media access and open rights."
   end
 
   def find_tooltip(key)
