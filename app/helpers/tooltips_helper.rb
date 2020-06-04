@@ -90,7 +90,7 @@ module TooltipsHelper
   end
 
   def wikimedia_readiness_tooltip
-    "The number of documents eligible for upload into Wikimedia.  These items
+    "The number of items eligible for upload into Wikimedia.  These items
     have both media access and open rights."
   end
 
