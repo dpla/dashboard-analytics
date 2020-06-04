@@ -53,6 +53,15 @@
     </div>
   </fieldset>
   <fieldset>
+    <legend>Wikimedia Integration</legend>
+      <div>
+        <input type="checkbox" id="wikimedia-ready-input" name="column"
+                 value="wikimedia-ready" checked="checked"
+                 onclick="toggle_column(this)">
+        <label for="wikimedia-ready-input">Wikimedia ready</label>
+      </div>
+  </fieldset>
+  <fieldset>
     <legend>Metadata Completeness</legend>
     <% MetadataCompletenessPresenter.fields.each do |field| %>
       <% unless field == 'count' %>
@@ -89,6 +98,7 @@
         <th class="api-user">API Users/Apps</th>
       <% end %>
       <th class="item-count">Item Count</th>
+      <th class="wikimedia-ready">Wikimedia Ready</th>
       <% MetadataCompletenessPresenter.fields.each do |field| %>
         <% unless field == 'count' %>
           <th class="<%= field %>"><%= field.titleize %> Completeness</th>
@@ -128,6 +138,12 @@
         <% end %>
         <td class="item-count">
           <%= totals["ItemCount"] %>
+        </td>
+        <% wr_value = totals["WikimediaIntegration"]["wikimediaReady"] %>
+        <td class="wikimedia-ready <%= percentage_class(wr_value) %>">
+          <% if wr_value %>
+            <%= render_percentage(wr_value) %>
+          <% end %>
         </td>
         <% MetadataCompletenessPresenter.fields.each do |field| %>
           <% unless field == "count" %>

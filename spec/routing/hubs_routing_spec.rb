@@ -56,4 +56,12 @@ describe "hubs routing", type: :routing do
       hub_id: "foo"
     )
   end
+
+  it "routes /hubs/foo/wikimedia_overview for foo" do
+    expect(get: "hubs/foo/wikimedia_overview").to route_to(
+      controller: "hubs",
+      action: "wikimedia_overview",
+      hub_id: "foo"
+    )
+  end
 end

@@ -69,6 +69,23 @@ class HubsController < ApplicationController
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     @mc_data = mc_presenter.hub(params[:hub_id])
+
     render partial: "shared/metadata_completeness"
+  end
+
+  def wikimedia_overview
+    assign_start_and_end_dates
+
+    metadata_completeness = MetadataCompleteness.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.end_date = @end_date
+    end
+
+    wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
+    @wp_data = wp_presenter.hub(params[:hub_id])
+
+    @target = Hub.new(params[:hub_id], @start_date, @end_date)
+
+    render partial: "shared/wikimedia_overview"
   end
 end

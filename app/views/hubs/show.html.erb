@@ -33,9 +33,7 @@
           <div>Loading...</div>
         <% end %>
 
-      </div>
-
-      <div class="metrics">
+        <br/>
 
         <div class="tooltip">
           <h2>API use</h2>
@@ -47,7 +45,9 @@
           <div>Loading...</div>
         <% end %>
 
-        <br/>
+      </div>
+
+      <div class="metrics">
 
         <div class="tooltip">
           <h2>Item Count</h2>
@@ -55,6 +55,17 @@
         </div>
 
         <%= render_async hub_item_count_path(@hub.name, date_opts),
+              'data-turbolinks-track': 'reload' do %>
+          <div>Loading...</div>
+        <% end %>
+
+        <br/>
+
+        <div class="tooltip">
+          <h2>Wikimedia Integration</h2>
+        </div>
+
+        <%= render_async  hub_wikimedia_overview_path(@hub.name, date_opts),
               'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>
