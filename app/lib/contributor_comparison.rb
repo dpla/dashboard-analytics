@@ -83,11 +83,6 @@ class ContributorComparison
     data
   end
 
-  # def wiki_integration(contributor)
-  #   wp = contributor_wp(contributor) || {}
-  #   { 'wikimediaReady' => wp['wikimediaReady'] }
-  # end
-
   def contributor_mc(contributor)
     all_contributors_mc.find do |row|
       row['dataProvider'] == contributor
