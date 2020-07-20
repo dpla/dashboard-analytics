@@ -72,21 +72,21 @@ class ContributorComparison
       # TODO: only call API if date range applies
       a_use = api_use_by_contributor[contributor] || {}
       mc = contributor_mc(contributor) || {}
-      wiki_int = wiki_integration(contributor)
+      wp = contributor_wp(contributor) || {}
       data[contributor] = { "Website" => f_use.merge(f_events),
                             "Api" => a_use,
                             "MetadataCompleteness" => mc,
                             "ItemCount" => count,
-                            "WikimediaIntegration" => wiki_int }
+                            "WikimediaIntegration" => wp }
     end
 
     data
   end
 
-  def wiki_integration(contributor)
-    wp = contributor_wp(contributor) || {}
-    { 'wikimediaReady' => wp['wikimediaReady'] }
-  end
+  # def wiki_integration(contributor)
+  #   wp = contributor_wp(contributor) || {}
+  #   { 'wikimediaReady' => wp['wikimediaReady'] }
+  # end
 
   def contributor_mc(contributor)
     all_contributors_mc.find do |row|
@@ -110,8 +110,11 @@ class ContributorComparison
                    "Website Click Throughs",
                    "API Views",
                    "API Users",
-                   "Item Count",
-                   "Wikimedia Ready" ]
+                   "Item Count" ]
+
+    WikimediaPreparationsPresenter.fields.each do |field|
+      attributes.push(field.titleize)
+    end
 
     MetadataCompletenessPresenter.fields.each do |field|
       attributes.push(field.titleize + " Completeness") unless field == "count"
@@ -125,8 +128,8 @@ class ContributorComparison
         website = contributor[1]["Website"]
         api = contributor[1]["Api"]
         mc = contributor[1]["MetadataCompleteness"]
+        wp = contributor[1]["WikimediaIntegration"]
         count = contributor[1]["ItemCount"]
-        wiki = contributor[1]["WikimediaIntegration"]
 
         data =[ contributor[0],
                 website["Sessions"],
@@ -135,8 +138,11 @@ class ContributorComparison
                 website["Click Throughs"],
                 api["Views"],
                 api["Users"],
-                count,
-                wiki["wikimediaReady"] ]
+                count ]
+
+        WikimediaPreparationsPresenter.fields.each do |field|
+          data.push(wp[field])
+        end
 
         MetadataCompletenessPresenter.fields.each do |field| 
           data.push(mc[field]) unless field == "count"
