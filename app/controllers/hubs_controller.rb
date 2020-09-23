@@ -54,6 +54,22 @@ class HubsController < ApplicationController
     render partial: "shared/api_use_metrics"
   end
 
+  def bws_overview
+    @bws_overview = BwsOverview.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    @bws_event_totals = BwsEventTotals.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    render partial: "shared/bws_use_metrics"
+  end
+
   def item_count
     @item_count = DplaApiResponseBuilder.new().item_count(params[:hub_id])
     render partial: "shared/item_count"
