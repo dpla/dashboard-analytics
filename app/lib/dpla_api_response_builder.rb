@@ -70,9 +70,36 @@ class DplaApiResponseBuilder
               :page_size => 0, 
               :'provider.name' => hub }
 
-   query[:dataProvider] = contributor if contributor.present?
+    query[:dataProvider] = contributor if contributor.present?
 
-  options = { query: query }
+    options = { query: query }
+
+    begin
+      count = json_response('/items', options)['count']
+      if (count.is_a? Integer)
+        count # ElasticSearch 6
+      else
+        count['value'] # ElasticSearch 7
+      end
+    rescue Exception => e
+      Rails.logger.debug(e)
+    end
+  end
+
+  ##
+  # @param hub [String]
+  # @param contributor [String]
+  # @return [Int|Nil]
+  #
+  def bws_item_count(hub, contributor = nil)
+    query = { :api_key => api_key,
+              :page_size => 0, 
+              :'provider.name' => hub,
+              :filter => "tags:blackwomensuffrage"}
+
+    query[:dataProvider] = contributor if contributor.present?
+
+    options = { query: query }
 
     begin
       count = json_response('/items', options)['count']

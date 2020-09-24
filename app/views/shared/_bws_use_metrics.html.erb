@@ -1,8 +1,17 @@
 <%# Local variables: @bws_overiew [BwsOverview],
                      @bws_event_totals [BwsEventTotals] %>
-<%# if bws_data_for_date_range? %>
+<% if bws_data_for_date_range? %>
 
   <table>
+    <tr>
+      <td>
+          <div class="tooltip">
+            Item count
+            <span class="tooltiptext"><%=  %></span>
+          </div>
+      </td>
+      <td><%= @bws_item_count %></td>
+    </tr>
     <tr>
       <td>
           <div class="tooltip">
@@ -41,7 +50,7 @@
     </tr>
   </table>
 
-<%# else %>
+<% else %>
     <div class="no-data">Data not available for this date range.</div>
-<%# end %>
+<% end %>
 

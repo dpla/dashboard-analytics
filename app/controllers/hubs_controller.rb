@@ -56,6 +56,9 @@ class HubsController < ApplicationController
 
   def bws_overview
     assign_start_and_end_dates
+
+    @bws_item_count = DplaApiResponseBuilder.new()
+      .bws_item_count(params[:hub_id])
     
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
