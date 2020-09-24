@@ -55,6 +55,8 @@ class HubsController < ApplicationController
   end
 
   def bws_overview
+    assign_start_and_end_dates
+    
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
       builder.start_date = @start_date

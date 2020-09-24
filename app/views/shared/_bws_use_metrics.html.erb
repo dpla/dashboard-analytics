@@ -1,41 +1,47 @@
 <%# Local variables: @bws_overiew [BwsOverview],
                      @bws_event_totals [BwsEventTotals] %>
+<%# if bws_data_for_date_range? %>
 
-<table>
-  <tr>
-    <td>
+  <table>
+    <tr>
+      <td>
+          <div class="tooltip">
+            Item views
+            <span class="tooltiptext"><%= view_item_tooltip %></span>
+          </div>
+      </td>
+      <td><%= @bws_event_totals.item_events %></td>
+    </tr>
+    <tr>
+      <td>
         <div class="tooltip">
-          Item views
-          <span class="tooltiptext"><%= view_item_tooltip %></span>
+          Click throughs
+          <span class="tooltiptext"><%= click_through_tooltip %></span>
         </div>
-    </td>
-    <td><%= @bws_event_totals.item_events %></td>
-  </tr>
-  <tr>
-    <td>
-      <div class="tooltip">
-        Click throughs
-        <span class="tooltiptext"><%= click_through_tooltip %></span>
-      </div>
-    </td>
-    <td><%= @bws_event_totals.click_throughs %></td>
-  </tr>
-  <tr>
-    <td>
-      <div class="tooltip">
-        Users
-        <span class="tooltiptext"><%= users_tooltip %></span>
-      </div>
-    </td>
-    <td><%= @bws_overview.users %></td>
-  </tr>
-  <tr>
-    <td>
-      <div class="tooltip">
-        Sessions
-        <span class="tooltiptext"><%= sessions_tooltip %></span>
-      </div>
-    </td>
-    <td><%= @bws_overview.sessions %></td>
-  </tr>
-</table>
+      </td>
+      <td><%= @bws_event_totals.click_throughs %></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="tooltip">
+          Users
+          <span class="tooltiptext"><%= users_tooltip %></span>
+        </div>
+      </td>
+      <td><%= @bws_overview.users %></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="tooltip">
+          Sessions
+          <span class="tooltiptext"><%= sessions_tooltip %></span>
+        </div>
+      </td>
+      <td><%= @bws_overview.sessions %></td>
+    </tr>
+  </table>
+
+<%# else %>
+    <div class="no-data">Data not available for this date range.</div>
+<%# end %>
+

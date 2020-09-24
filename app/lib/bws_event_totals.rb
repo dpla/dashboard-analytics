@@ -72,7 +72,7 @@ class BwsEventTotals
   # @throws exception if HTTP request fails
   #
   def event_overview_builder
-    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
+    filters = %W(ga:eventCategory=@#{@hub})
     filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
 
     GaResponseBuilder.build do |builder|
