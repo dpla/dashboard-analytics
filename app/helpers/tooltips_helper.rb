@@ -35,12 +35,12 @@ module TooltipsHelper
   end
 
   def users_tooltip
-    "A user who viewed or clicked through at least one of your items on the DPLA website.
+    "A user who viewed or clicked through at least one of your items on the website.
     Equivalent to \"user\" in Google Analytics."
   end
 
   def sessions_tooltip
-    "A visit to the DPLA website that included a view or click through of at least one of your items.
+    "A visit to the website that included a view or click through of at least one of your items.
     Equivalent to \"session\" in Google Analytics."
   end
 
@@ -71,11 +71,27 @@ module TooltipsHelper
     only the app itself is counted as a single user."
   end
 
+  # BWS
+
+  def bws_use_tooltip
+    "Use of your items on the Black Women's Suffrage website."
+  end
+
+  def view_bws_item_tooltip
+    "One of your items was viewed on the Black Women's Suffrage website.
+    Comparable to \"pageview\" in Google Analytics."
+  end
+
+  def bws_item_count_tooltip
+    "The total number of items you currently have in the Black Women's Suffrage collection.
+    Items for the Black Women's Suffrage collection are selected algorithmically
+    from the DPLA index."
+  end
+
   # Metadata quality
 
   def item_count_tooltip
-    "The number of items you have indexed in DPLA,
-    based on the most recent snapshot for the given time period."
+    "The total number of items you currently have indexed in DPLA."
   end
 
   def metadata_completeness_tooltip
