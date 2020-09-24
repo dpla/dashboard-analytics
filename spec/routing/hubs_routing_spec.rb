@@ -41,6 +41,14 @@ describe "hubs routing", type: :routing do
     )
   end
 
+  it "routes /hubs/foo/bws_overview for foo" do
+    expect(get: "hubs/foo/bws_overview").to route_to(
+      controller: "hubs",
+      action: "bws_overview",
+      hub_id: "foo"
+    )
+  end
+
   it "routes /hubs/foo/item_count for foo" do
     expect(get: "hubs/foo/item_count").to route_to(
       controller: "hubs",
