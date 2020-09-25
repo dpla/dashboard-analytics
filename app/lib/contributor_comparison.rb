@@ -11,6 +11,7 @@ class ContributorComparison
     @contributors_item_count = nil
     @website_overview = nil
     @website_events = nil
+    @bws_item_count = nil
     @bws_overview = nil
     @bws_events = nil
     @api_overview = nil
@@ -37,6 +38,11 @@ class ContributorComparison
   # @param WebsiteEventsByContributor
   def website_events=(website_events)
     @website_events = website_events
+  end
+
+  # @param [Array<Hash>]
+  def bws_item_count=(bws_item_count)
+    @bws_item_count = bws_item_count
   end
 
   # @param BwsOverviewByContributor
@@ -81,6 +87,8 @@ class ContributorComparison
       count = c["count"]
       f_use = frontend_use_by_contributor[contributor] || {}
       f_events = frontend_events_by_contributor[contributor] || {}
+      b_count = { "ItemCount" => @bws_item_count[contributor] || nil }
+      #b_count = { "ItemCount" => 77 }
       b_use = bws_use_by_contributor[contributor] || {}
       b_events = bws_events_by_contributor[contributor] || {}
       # TODO: only call API if date range applies
@@ -88,7 +96,7 @@ class ContributorComparison
       mc = contributor_mc(contributor) || {}
       wp = contributor_wp(contributor) || {}
       data[contributor] = { "Website" => f_use.merge(f_events),
-                            "BWS" => b_use.merge(b_events),
+                            "BWS" => b_use.merge(b_events).merge(b_count),
                             "Api" => a_use,
                             "MetadataCompleteness" => mc,
                             "ItemCount" => count,

@@ -34,7 +34,7 @@
         <input type="checkbox" id="bws-item-count-input" name="column" 
                value="bws-item-count" checked="checked"
                onclick="toggle_column(this)">
-        <label for="bws-item-count-input">BWS Item Views</label>
+        <label for="bws-item-count-input">BWS Item Count</label>
       </div>
       <div>
         <input type="checkbox" id="bws-view-input" name="column" 
@@ -140,7 +140,7 @@
       <th class="website-session">dp.la Sessions</th>
       <th class="website-user">dp.la Users</th>
       <% if bws_data_for_date_range? %>
-        <th class="bws-item-count"
+        <th class="bws-item-count">BWS Item Count</th>
         <th class="bws-view">BWS Item Views</th>
         <th class="bws-click-through">BWS Click Throughs</th>
         <th class="bws-session">BWS Sessions</th>
@@ -185,7 +185,7 @@
         </td>
         <% if bws_data_for_date_range? %>
           <td class="bws-item-count">
-            TODO
+            <%= totals["BWS"]["ItemCount"] %>
           </td>
           <td class="bws-view">
             <%= totals["BWS"]["Views"] %>

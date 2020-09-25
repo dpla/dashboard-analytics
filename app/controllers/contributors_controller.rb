@@ -145,6 +145,9 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
+    bws_item_count = DplaApiResponseBuilder.new
+      .contributors_bws_item_count(params[:hub_id])
+
     bws_overview = BwsOverviewByContributor.build do |builder|
       builder.hub = params[:hub_id]
       builder.start_date = @start_date
@@ -176,6 +179,7 @@ class ContributorsController < ApplicationController
       builder.contributors_item_count = contributors_item_count
       builder.website_overview = website_overview
       builder.website_events = website_events
+      builder.bws_item_count = bws_item_count
       builder.bws_overview = bws_overview
       builder.bws_events = bws_events
       builder.api_overview = api_overview

@@ -95,7 +95,7 @@ class DplaApiResponseBuilder
     query = { :api_key => api_key,
               :page_size => 0, 
               :'provider.name' => hub,
-              :filter => "tags:blackwomensuffrage"}
+              :filter => "tags:blackwomensuffrage" }
 
     query[:dataProvider] = contributor if contributor.present?
 
@@ -110,6 +110,27 @@ class DplaApiResponseBuilder
       end
     rescue Exception => e
       Rails.logger.debug(e)
+    end
+  end
+
+  ##
+  # @param [String]
+  # @return [Array<Hash>]
+  #
+  def contributors_bws_item_count(hub)
+    options = { query: { :api_key => api_key,
+                         :facets => 'dataProvider',
+                         :page_size => 0, 
+                         :facet_size => 2000,
+                         :'provider.name' => hub,
+                         :filter => "tags:blackwomensuffrage" } }
+
+    begin
+      json_response('/items', options)['facets']['dataProvider']['terms']
+        .map{ |t| [t["term"], t["count"]] }.to_h
+    rescue Exception => e
+      Rails.logger.debug(e)
+      Array.new
     end
   end
 
