@@ -3,7 +3,7 @@ module TooltipsHelper
   # DPLA Website
 
   def website_use_tooltip
-    "Use of your items on the DPLA website."
+    "Use of your items on the DPLA website (dp.la)."
   end
 
   def view_item_tooltip
@@ -74,7 +74,7 @@ module TooltipsHelper
   # BWS
 
   def bws_use_tooltip
-    "Use of your items on the Black Women's Suffrage website."
+    "Use of your items on the Black Women's Suffrage website (blackwomenssuffrage.dp.la)."
   end
 
   def view_bws_item_tooltip
@@ -91,7 +91,9 @@ module TooltipsHelper
   # Metadata quality
 
   def item_count_tooltip
-    "The total number of items you currently have indexed in DPLA."
+    "The total number of items you currently have indexed in DPLA.
+    This is the number of items available in the DPLA Website (dp.la)
+    and the DPLA API."
   end
 
   def metadata_completeness_tooltip

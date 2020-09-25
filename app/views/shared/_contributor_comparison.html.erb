@@ -1,34 +1,73 @@
 <form class="comparison">
   <fieldset>
-    <legend>Website use</legend>
+    <legend>DPLA Website</legend>
     <div>
       <input type="checkbox" id="website-view-input" name="column" 
              value="website-view" checked="checked"
              onclick="toggle_column(this)">
-      <label for="website-view-input">Website Item Views</label>
+      <label for="website-view-input">dp.la Item Views</label>
     </div>
     <div>
       <input type="checkbox" id="click-through-input" name="column"
              value="click-through" checked="checked"
              onclick="toggle_column(this)">
-      <label for="click-through-input">Website Click Throughs</label>
+      <label for="click-through-input">dp.la Click Throughs</label>
     </div>
     <div>
       <input type="checkbox" id="website-session-input" name="column" 
              value="website-session" checked="checked"
              onclick="toggle_column(this)">
-      <label for="website-session-input">Website Sessions</label>
+      <label for="website-session-input">dp.la Sessions</label>
     </div>
     <div>
       <input type="checkbox" id="website-user-input" name="column"
              value="website-user" checked="checked"
              onclick="toggle_column(this)">
-      <label for="website-user-input">Website Users</label>
+      <label for="website-user-input">dp.la Users</label>
     </div>
   </fieldset>
-  <% if api_data_for_date_range? %>
-    <fieldset>
-      <legend>API use</legend>
+
+  <fieldset>
+    <legend>Black Women's Suffrage</legend>
+    <% if bws_data_for_date_range? %>
+      <div>
+        <input type="checkbox" id="bws-item-count-input" name="column" 
+               value="bws-item-count" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="bws-item-count-input">BWS Item Views</label>
+      </div>
+      <div>
+        <input type="checkbox" id="bws-view-input" name="column" 
+               value="bws-view" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="bws-view-input">BWS Item Views</label>
+      </div>
+      <div>
+        <input type="checkbox" id="bws-click-through-input" name="column"
+               value="bws-click-through" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="bws-click-through-input">BWS Click Throughs</label>
+      </div>
+      <div>
+        <input type="checkbox" id="bws-session-input" name="column" 
+               value="bws-session" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="bws-session-input">BWS Sessions</label>
+      </div>
+      <div>
+        <input type="checkbox" id="bws-user-input" name="column"
+               value="bws-user" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="bws-user-input">BWS Users</label>
+      </div>
+    <% else %>
+      <div class="no-data">Data not available for this date range.</div>
+    <% end %>
+  </fieldset>
+
+  <fieldset>
+    <legend>DPLA API</legend>
+    <% if api_data_for_date_range? %>
       <div>
         <input type="checkbox" id="api-view-input" name="column"
                value="api-view" checked="checked"
@@ -41,8 +80,11 @@
                onclick="toggle_column(this)">
         <label for="api-user-input">API Users/Apps</label>
       </div>
-    </fieldset>
-  <% end %>
+    <% else %>
+      <div class="no-data">Data not available for this date range.</div>
+    <% end %>
+  </fieldset>
+
   <fieldset>
     <legend>Item count</legend>
     <div>
@@ -52,6 +94,7 @@
         <label for="item-count-input">Item count</label>
     </div>
   </fieldset>
+
   <fieldset>
     <legend>Wikimedia Integration</legend>
       <% WikimediaPreparationsPresenter.fields.each do |field| %>
@@ -63,6 +106,7 @@
       </div>
     <% end %>
   </fieldset>
+
   <fieldset>
     <legend>Metadata Completeness</legend>
     <% MetadataCompletenessPresenter.fields.each do |field| %>
@@ -91,10 +135,17 @@
   <thead>
     <tr>
       <th>Contributor</th>
-      <th class="website-view">Website Item Views</th>
-      <th class="click-through">Website Click Throughs</th>
-      <th class="website-session">Website Sessions</th>
-      <th class="website-user">Website Users</th>
+      <th class="website-view">dp.la Item Views</th>
+      <th class="click-through">dp.la Click Throughs</th>
+      <th class="website-session">dp.la Sessions</th>
+      <th class="website-user">dp.la Users</th>
+      <% if bws_data_for_date_range? %>
+        <th class="bws-item-count"
+        <th class="bws-view">BWS Item Views</th>
+        <th class="bws-click-through">BWS Click Throughs</th>
+        <th class="bws-session">BWS Sessions</th>
+        <th class="bws-user">BWS Users</th>
+      <% end %>
       <% if api_data_for_date_range? %>
         <th class="api-view">API Views</th>
         <th class="api-user">API Users/Apps</th>
@@ -132,6 +183,23 @@
         <td class="website-user">
           <%= totals["Website"]["Users"] %>
         </td>
+        <% if bws_data_for_date_range? %>
+          <td class="bws-item-count">
+            TODO
+          </td>
+          <td class="bws-view">
+            <%= totals["BWS"]["Views"] %>
+          </td>
+          <td class="bws-click-through">
+            <%= totals["BWS"]["Click Throughs"] %>
+          </td>
+          <td class="bws-session">
+            <%= totals["BWS"]["Sessions"] %>
+          </td>
+          <td class="bws-user">
+            <%= totals["BWS"]["Users"] %>
+          </td>
+        <% end %>
         <% if api_data_for_date_range? %>
           <td class="api-view">
             <%= totals["Api"]["Views"] %>
