@@ -88,7 +88,6 @@ class ContributorComparison
       f_use = frontend_use_by_contributor[contributor] || {}
       f_events = frontend_events_by_contributor[contributor] || {}
       b_count = { "ItemCount" => @bws_item_count[contributor] || nil }
-      #b_count = { "ItemCount" => 77 }
       b_use = bws_use_by_contributor[contributor] || {}
       b_events = bws_events_by_contributor[contributor] || {}
       # TODO: only call API if date range applies
@@ -149,6 +148,7 @@ class ContributorComparison
       totals.each do |contributor|
 
         website = contributor[1]["Website"]
+        bws = contributor[1]["BWS"]
         api = contributor[1]["Api"]
         mc = contributor[1]["MetadataCompleteness"]
         wp = contributor[1]["WikimediaIntegration"]
@@ -159,6 +159,11 @@ class ContributorComparison
                 website["Users"],
                 website["Views"],
                 website["Click Throughs"],
+                bws["ItemCount"],
+                bws["Sessions"],
+                bws["Users"],
+                bws["Views"],
+                bws["Click Throughs"],
                 api["Views"],
                 api["Users"],
                 count ]
