@@ -13,7 +13,7 @@ module DataMenuHelper
       hub_timeline_path(target.name, 'website', date_opts) :
       hub_contributor_timeline_path(target.hub.name, target.name, 'website', date_opts)
 
-    link_to("Website use timelines", path, html_opts(path))
+    link_to("DPLA website use timelines", path, html_opts(path))
   end
 
   def render_api_timelines_link(target)
@@ -29,7 +29,7 @@ module DataMenuHelper
       hub_locations_path(target.name, date_opts) :
       hub_contributor_locations_path(target.hub.name, target.name, date_opts)
 
-    link_to("Website user locations", path, html_opts(path))
+    link_to("DPLA website user locations", path, html_opts(path))
   end
 
   def render_view_item_link(target)
@@ -61,7 +61,7 @@ module DataMenuHelper
       hub_event_path(target.name, 'click_through', date_opts) :
       hub_contributor_event_path(target.hub.name, target.name, 'click_through', date_opts)
 
-    link_to("Click throughs", path, html_opts(path))
+    link_to("DPLA website click throughs", path, html_opts(path))
   end
 
   def render_view_api_link(target)

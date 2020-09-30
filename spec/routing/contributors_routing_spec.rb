@@ -46,6 +46,15 @@ describe "contributors routing", type: :routing do
     )
   end
 
+  it "routes /hubs/foo/contributors/bar/contributor_bws_overview for bar" do
+    expect(get: "hubs/foo/contributors/bar/contributor_bws_overview").to route_to(
+      controller: "contributors",
+      action: "contributor_bws_overview",
+      hub_id: "foo",
+      contributor_id: "bar"
+    )
+  end
+
   it "routes /hubs/foo/contributors/bar/contributor_item_count for bar" do
     expect(get: "hubs/foo/contributors/bar/contributor_item_count").to route_to(
       controller: "contributors",

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :hubs, id: /.*/, only: [:index, :show] do
     get :website_overview
     get :api_overview
+    get :bws_overview
     get :item_count
     get :metadata_completeness
     get :wikimedia_overview
@@ -19,6 +20,7 @@ Rails.application.routes.draw do
     resources :contributors, id: /.*/, only: [:index, :show] do
       get :contributor_website_overview
       get :contributor_api_overview
+      get :contributor_bws_overview
       get :contributor_item_count
       get :contributor_metadata_completeness
       get :contributor_wikimedia_overview
@@ -37,6 +39,7 @@ Rails.application.routes.draw do
 
   get :api_events, controller: :events
   get :website_events, controller: :events
+  get :bws_events, controller: :events
   get :api_search_terms, controller: :search_terms
   get :website_search_terms, controller: :search_terms
   get :contributor_comparison, controller: :contributors

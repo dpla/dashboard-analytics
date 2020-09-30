@@ -63,6 +63,29 @@ class ContributorsController < ApplicationController
     render partial: "shared/api_use_metrics"
   end
 
+  def contributor_bws_overview
+    assign_start_and_end_dates
+
+    @bws_item_count = DplaApiResponseBuilder.new()
+      .bws_item_count(params[:hub_id], params[:contributor_id])
+
+    @bws_overview = BwsOverview.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    @bws_event_totals = BwsEventTotals.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    render partial: "shared/bws_use_metrics"
+  end
+
   def contributor_item_count
     @item_count = DplaApiResponseBuilder.new()
       .item_count(params[:hub_id], params[:contributor_id])
@@ -122,6 +145,21 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
+    bws_item_count = DplaApiResponseBuilder.new
+      .contributors_bws_item_count(params[:hub_id])
+
+    bws_overview = BwsOverviewByContributor.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
+    bws_events = BwsEventsByContributor.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end
+
     api_overview = ApiOverviewByContributor.build do |builder|
       builder.hub = params[:hub_id]
       builder.start_date = @start_date
@@ -141,6 +179,9 @@ class ContributorsController < ApplicationController
       builder.contributors_item_count = contributors_item_count
       builder.website_overview = website_overview
       builder.website_events = website_events
+      builder.bws_item_count = bws_item_count
+      builder.bws_overview = bws_overview
+      builder.bws_events = bws_events
       builder.api_overview = api_overview
       builder.mc_presenter = mc_presenter
       builder.wp_presenter = wp_presenter

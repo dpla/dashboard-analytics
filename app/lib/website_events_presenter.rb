@@ -5,7 +5,7 @@ class WebsiteEventsPresenter  < GaResponsePresenter
       "View Item" => "Digital library catalog views",
       "View Exhibition Item" => "Exhibition views",
       "View Primary Source" => "Primary source set views",
-      "Click Through" => "Click throughs"
+      "Click Through" => "DPLA website click throughs"
     }
 
     dict.key?(@ga_response.event_name) ? dict[@ga_response.event_name] :

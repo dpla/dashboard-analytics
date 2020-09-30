@@ -11,6 +11,9 @@ class ContributorComparison
     @contributors_item_count = nil
     @website_overview = nil
     @website_events = nil
+    @bws_item_count = nil
+    @bws_overview = nil
+    @bws_events = nil
     @api_overview = nil
     @mc_presenter = nil
     @wp_presenter = nil
@@ -35,6 +38,21 @@ class ContributorComparison
   # @param WebsiteEventsByContributor
   def website_events=(website_events)
     @website_events = website_events
+  end
+
+  # @param [Array<Hash>]
+  def bws_item_count=(bws_item_count)
+    @bws_item_count = bws_item_count
+  end
+
+  # @param BwsOverviewByContributor
+  def bws_overview=(bws_overview)
+    @bws_overview = bws_overview
+  end
+
+  # @param BwsEventsByContributor
+  def bws_events=(bws_events)
+    @bws_events = bws_events
   end
 
   # @param ApiOverviewByContributor
@@ -69,11 +87,15 @@ class ContributorComparison
       count = c["count"]
       f_use = frontend_use_by_contributor[contributor] || {}
       f_events = frontend_events_by_contributor[contributor] || {}
+      b_count = { "ItemCount" => @bws_item_count[contributor] || nil }
+      b_use = bws_use_by_contributor[contributor] || {}
+      b_events = bws_events_by_contributor[contributor] || {}
       # TODO: only call API if date range applies
       a_use = api_use_by_contributor[contributor] || {}
       mc = contributor_mc(contributor) || {}
       wp = contributor_wp(contributor) || {}
       data[contributor] = { "Website" => f_use.merge(f_events),
+                            "BWS" => b_use.merge(b_events).merge(b_count),
                             "Api" => a_use,
                             "MetadataCompleteness" => mc,
                             "ItemCount" => count,
@@ -103,6 +125,11 @@ class ContributorComparison
                    "Website Users",
                    "Website Item Views",
                    "Website Click Throughs",
+                   "BWS Item Count",
+                   "BWS Sessions",
+                   "BWS Users",
+                   "BWS Item Views",
+                   "BWS Click Throughs",
                    "API Views",
                    "API Users",
                    "Item Count" ]
@@ -121,6 +148,7 @@ class ContributorComparison
       totals.each do |contributor|
 
         website = contributor[1]["Website"]
+        bws = contributor[1]["BWS"]
         api = contributor[1]["Api"]
         mc = contributor[1]["MetadataCompleteness"]
         wp = contributor[1]["WikimediaIntegration"]
@@ -131,6 +159,11 @@ class ContributorComparison
                 website["Users"],
                 website["Views"],
                 website["Click Throughs"],
+                bws["ItemCount"],
+                bws["Sessions"],
+                bws["Users"],
+                bws["Views"],
+                bws["Click Throughs"],
                 api["Views"],
                 api["Users"],
                 count ]
@@ -156,6 +189,14 @@ class ContributorComparison
 
   def frontend_events_by_contributor
     @website_events.parse_data
+  end
+
+  def bws_use_by_contributor
+    @bws_overview.parse_data
+  end
+
+  def bws_events_by_contributor
+    @bws_events.parse_data
   end
 
   def api_use_by_contributor

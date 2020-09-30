@@ -24,7 +24,7 @@
       <div class="metrics">
 
         <div class="tooltip">
-          <h2>Website use</h2>
+          <h2>DPLA Website (dp.la)</h2>
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
@@ -36,11 +36,11 @@
         <br/>
 
         <div class="tooltip">
-          <h2>API use</h2>
-          <span class="tooltiptext"><%= api_use_tooltip %></span>
+          <h2>Black Women's Suffrage</h2>
+          <span class="tooltiptext"><%= bws_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_api_overview_path(@hub.name, date_opts),
+        <%= render_async hub_bws_overview_path(@hub.name, date_opts),
               'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>
@@ -48,6 +48,18 @@
       </div>
 
       <div class="metrics">
+
+        <div class="tooltip">
+          <h2>DPLA API</h2>
+          <span class="tooltiptext"><%= api_use_tooltip %></span>
+        </div>
+
+        <%= render_async hub_api_overview_path(@hub.name, date_opts),
+              'data-turbolinks-track': 'reload' do %>
+          <div>Loading...</div>
+        <% end %>
+        
+        <br/>
 
         <div class="tooltip">
           <h2>Item Count</h2>

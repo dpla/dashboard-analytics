@@ -40,10 +40,21 @@ module DateHelper
   end
 
   def api_data_for_date_range?
-    api_min_date = Date.new(Settings.api_min_date.year, 
-                            Settings.api_min_date.month)
+    api_min_date = Date.new(Settings.api_min_date.year.to_i, 
+                            Settings.api_min_date.month.to_i)
 
     if (@start_date && @start_date >= api_min_date)
+      true
+    else
+      false
+    end
+  end
+
+  def bws_data_for_date_range?
+    bws_min_date = Date.new(Settings.bws_min_date.year.to_i, 
+                            Settings.bws_min_date.month.to_i)
+
+    if (@start_date && @start_date >= bws_min_date)
       true
     else
       false
