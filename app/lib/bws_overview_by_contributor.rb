@@ -35,7 +35,8 @@ class BwsOverviewByContributor
   end
 
   def parse_data
-   # Create Hash of data
+    return Hash.new unless (response.rows.present? rescue false)
+    # Create Hash of data
     # e.g. "The Library" => { "Sessions" => 4, "Users" => 2 }
     columns = response.column_headers.map { |c| c.name }
     data = {}
