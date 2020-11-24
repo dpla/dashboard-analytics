@@ -35,7 +35,7 @@ class BwsEventsByContributor
   end
 
   def parse_data
-    return Hash.new unless response.present?
+    return Hash.new unless (response.rows.present? rescue false)
     # Create Hash of data
     # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
     data = {}
