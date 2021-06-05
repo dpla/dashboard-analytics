@@ -154,7 +154,7 @@ class ContributorComparison
     end
 
     WikimediaAnalyticsPresenter.fields.each do |field|
-      attributes.push(field.titleize)
+      attributes.push("Wikimedia " + field.titleize)
     end
 
     MetadataCompletenessPresenter.fields.each do |field|
