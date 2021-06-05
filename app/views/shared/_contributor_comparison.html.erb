@@ -105,6 +105,14 @@
         <label for="<%= field %>-input"><%= field.titleize %></label>
       </div>
     <% end %>
+    <% WikimediaAnalyticsPresenter.fields.each do |field| %>
+      <div>
+        <input type="checkbox" id="<%= field %>-input" name="column"
+               value="<%= field %>" checked="checked"
+               onclick="toggle_column(this)">
+        <label for="<%= field %>-input"><%= field.titleize %></label>
+      </div>
+    <% end %>
   </fieldset>
 
   <fieldset>
@@ -153,6 +161,9 @@
       <th class="item-count">Item Count</th>
       <% WikimediaPreparationsPresenter.fields.each do |field| %>
         <th class="<%= field %>"><%= field.titleize %></th>
+      <% end %>
+      <% WikimediaAnalyticsPresenter.fields.each do |field| %>
+        <th class="<%= field %>">Wikimedia <%= field.titleize %></th>
       <% end %>
       <% MetadataCompletenessPresenter.fields.each do |field| %>
         <% unless field == 'count' %>
@@ -212,9 +223,15 @@
           <%= totals["ItemCount"] %>
         </td>
         <% WikimediaPreparationsPresenter.fields.each do |field| %>
-          <% value = totals["WikimediaIntegration"][field] %>
+          <% value = totals["WikimediaPreparations"][field] %>
           <td class="<%= field %> <%= percentage_class(value) %>">
             <%= render_percentage(value) %>
+          </td>
+        <% end %>
+        <% WikimediaAnalyticsPresenter.fields.each do |field| %>
+          <% value = totals["WikimediaAnalytics"][field] %>
+          <td>
+            <%= value %>
           </td>
         <% end %>
         <% MetadataCompletenessPresenter.fields.each do |field| %>

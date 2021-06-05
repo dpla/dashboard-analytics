@@ -105,6 +105,14 @@ class HubsController < ApplicationController
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
     @wp_data = wp_presenter.hub(params[:hub_id])
 
+    wikimedia_analytics = WikimediaAnalytics.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.end_date = @end_date
+    end
+
+    wa_presenter = WikimediaAnalyticsPresenter.new(wikimedia_analytics)
+    @wa_data = wa_presenter.hub(params[:hub_id])
+
     @target = Hub.new(params[:hub_id], @start_date, @end_date)
 
     render partial: "shared/wikimedia_overview"

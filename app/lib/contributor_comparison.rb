@@ -17,6 +17,7 @@ class ContributorComparison
     @api_overview = nil
     @mc_presenter = nil
     @wp_presenter = nil
+    @wa_presenter = nil
   end
 
   ##
@@ -70,6 +71,11 @@ class ContributorComparison
     @wp_presenter = wp_presenter
   end
 
+  # @param WikimediaAnalyticsPresenter
+  def wa_presenter=(wa_presenter)
+    @wa_presenter = wa_presenter
+  end
+
   def contributors
     @contributors_item_count.map { |c| c['term'] }
   end
@@ -94,12 +100,15 @@ class ContributorComparison
       a_use = api_use_by_contributor[contributor] || {}
       mc = contributor_mc(contributor) || {}
       wp = contributor_wp(contributor) || {}
+      wa = contributor_wa(contributor) || {}
+
       data[contributor] = { "Website" => f_use.merge(f_events),
                             "BWS" => b_use.merge(b_events).merge(b_count),
                             "Api" => a_use,
                             "MetadataCompleteness" => mc,
                             "ItemCount" => count,
-                            "WikimediaIntegration" => wp }
+                            "WikimediaPreparations" => wp,
+                            "WikimediaAnalytics" => wa }
     end
 
     data
@@ -114,6 +123,12 @@ class ContributorComparison
   def contributor_wp(contributor)
     all_contributors_wp.find do |row|
       row['dataProvider'] == contributor
+    end
+  end
+
+  def contributor_wa(contributor)
+    all_contributors_wa.find do |row|
+      row['Institution'] == contributor
     end
   end
 
@@ -138,6 +153,10 @@ class ContributorComparison
       attributes.push(field.titleize)
     end
 
+    WikimediaAnalyticsPresenter.fields.each do |field|
+      attributes.push("Wikimedia " + field.titleize)
+    end
+
     MetadataCompletenessPresenter.fields.each do |field|
       attributes.push(field.titleize + " Completeness") unless field == "count"
     end
@@ -151,7 +170,8 @@ class ContributorComparison
         bws = contributor[1]["BWS"]
         api = contributor[1]["Api"]
         mc = contributor[1]["MetadataCompleteness"]
-        wp = contributor[1]["WikimediaIntegration"]
+        wp = contributor[1]["WikimediaPreparations"]
+        wa = contributor[1]["WikimediaAnalytics"]
         count = contributor[1]["ItemCount"]
 
         data =[ contributor[0],
@@ -170,6 +190,10 @@ class ContributorComparison
 
         WikimediaPreparationsPresenter.fields.each do |field|
           data.push(wp[field])
+        end
+
+        WikimediaAnalyticsPresenter.fields.each do |field|
+          data.push(wa[field])
         end
 
         MetadataCompletenessPresenter.fields.each do |field| 
@@ -209,5 +233,9 @@ class ContributorComparison
 
   def all_contributors_wp
     @all_contributors_wp ||= @wp_presenter.all_contributors(@hub)
+  end
+
+  def all_contributors_wa
+    @all_contributors_wa ||= @wa_presenter.all_contributors(@hub)
   end
 end

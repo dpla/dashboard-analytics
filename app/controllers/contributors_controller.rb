@@ -119,6 +119,15 @@ class ContributorsController < ApplicationController
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
     @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
 
+    wikimedia_analytics = WikimediaAnalytics.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.end_date = @end_date
+    end
+
+    wa_presenter = WikimediaAnalyticsPresenter.new(wikimedia_analytics)
+    @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
+
     @target = Contributor.new(params[:contributor_id],
                               params[:hub_id],
                               @start_date,
@@ -171,8 +180,15 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
+    wikimedia_analytics = WikimediaAnalytics.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id]
+      builder.end_date = @end_date
+    end
+
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
+    wa_presenter = WikimediaAnalyticsPresenter.new(wikimedia_analytics)
 
     @contributor_comparison = ContributorComparison.build do |builder|
       builder.hub = params[:hub_id]
@@ -185,6 +201,7 @@ class ContributorsController < ApplicationController
       builder.api_overview = api_overview
       builder.mc_presenter = mc_presenter
       builder.wp_presenter = wp_presenter
+      builder.wa_presenter = wa_presenter
     end
 
     respond_to do |format|

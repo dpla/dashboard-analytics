@@ -10,7 +10,9 @@
           <span class="tooltiptext"><%= view_api_item_tooltip %></span>
         </div>
       </td>
-      <td><%= @api_overview.events %></td>
+      <td>
+        <%= number_with_delimiter(@api_overview.events, :delimiter => ',') %>
+      </td>
     </tr>
     <tr>
       <td>
@@ -19,7 +21,9 @@
           <span class="tooltiptext"><%= api_users_tooltip %></span>
         </div>
       </td>
-      <td><%= @api_overview.users %></td>
+      <td>
+        <%= number_with_delimiter(@api_overview.users, :delimiter => ',') %>
+      </td>
     </tr>
   </table>
 
