@@ -10,7 +10,9 @@
             <span class="tooltiptext"><%= bws_item_count_tooltip %></span>
           </div>
       </td>
-      <td><%= @bws_item_count %></td>
+      <td>
+        <%= number_with_delimiter(@bws_item_count, :delimiter => ',') %>
+      </td>
     </tr>
     <tr>
       <td>
@@ -19,7 +21,9 @@
             <span class="tooltiptext"><%= view_bws_item_tooltip %></span>
           </div>
       </td>
-      <td><%= @bws_event_totals.item_events %></td>
+      <td>
+        <%= number_with_delimiter(@bws_event_totals.item_events, :delimiter => ',') %>
+      </td>
     </tr>
     <tr>
       <td>
@@ -28,7 +32,9 @@
           <span class="tooltiptext"><%= click_through_tooltip %></span>
         </div>
       </td>
-      <td><%= @bws_event_totals.click_throughs %></td>
+      <td>
+        <%= number_with_delimiter(@bws_event_totals.click_throughs, :delimiter => ',') %>
+      </td>
     </tr>
     <tr>
       <td>
@@ -37,7 +43,9 @@
           <span class="tooltiptext"><%= users_tooltip %></span>
         </div>
       </td>
-      <td><%= @bws_overview.users %></td>
+      <td>
+        <%= number_with_delimiter(@bws_overview.users, :delimiter => ',') %>
+      </td>
     </tr>
     <tr>
       <td>
@@ -46,7 +54,9 @@
           <span class="tooltiptext"><%= sessions_tooltip %></span>
         </div>
       </td>
-      <td><%= @bws_overview.sessions %></td>
+      <td>
+        <%= number_with_delimiter(@bws_overview.sessions, :delimiter => ',') %>
+      </td>
     </tr>
   </table>
 

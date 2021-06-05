@@ -5,7 +5,9 @@
   <table>
     <tr>
       <td>Item count</td>
-      <td><%= @item_count %></td>
+      <td>
+        <%= number_with_delimiter(@item_count, :delimiter => ',') %>
+      </td>
     </tr>
   </table>
 

@@ -112,6 +112,14 @@ module TooltipsHelper
     have both media access and open rights."
   end
 
+  def wikimidea_uploads_tooltip
+    "The number of items that have been uploaded into Wikimedia."
+  end
+
+  def wikimidea_views_tooltip
+    "The number of item page views in Wikimedia."
+  end
+
   def find_tooltip(key)
     case key
     when "view_item"
@@ -124,6 +132,10 @@ module TooltipsHelper
       click_through_tooltip
     when "view_api"
       view_api_item_tooltip
+    when "Upload count"
+      wikimidea_uploads_tooltip
+    when "Page views"
+      wikimidea_views_tooltip
     end
   end
 end
