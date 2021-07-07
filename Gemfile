@@ -20,8 +20,8 @@ gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
 gem 'config', '1.7.0'
-gem 'google-api-client', '~> 0.11'
-gem 'googleauth', '~> 0.6'
+gem 'google-api-client', '~> 0.30', '>= 0.30.8'
+gem 'googleauth', '~> 0.9', '>= 0.9.0'
 gem 'httparty', '~> 0.16.2'
 gem "devise", ">= 4.6.0"
 gem 'jquery-rails', '~> 4.3.1'
@@ -44,7 +44,7 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '~> 2.13'
+  gem 'capybara', '~> 2.18', '>= 2.18.0'
   gem 'selenium-webdriver'
   gem 'rspec-core', '~> 3.7'
   gem 'rspec-rails', '~> 3.7'
