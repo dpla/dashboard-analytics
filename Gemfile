@@ -6,7 +6,11 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+<<<<<<< HEAD
 gem 'rails', '~> 5.1.6', '>= 5.1.6.2'
+=======
+gem 'rails', '~> 5.1.6'
+>>>>>>> origin/snyk-fix-e6e8f7337a6cbfd350baf9d6a0aa2c35
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.3.13'
 # Use Puma as the app server
@@ -28,8 +32,12 @@ gem 'devise', '~> 4.6.0'
 gem 'jquery-rails', '~> 4.3.3'
 =======
 gem 'devise', '~> 4.4.3'
+<<<<<<< HEAD
 gem 'jquery-rails', '~> 4.3.4'
 >>>>>>> origin/snyk-fix-a78655332224bacc2a39b3f45c172294
+=======
+gem 'jquery-rails', '~> 4.3.3'
+>>>>>>> origin/snyk-fix-e6e8f7337a6cbfd350baf9d6a0aa2c35
 gem 'aws-sdk-rails', '~> 2', '>= 2.0.1'
 gem 'aws-sdk-core', '~> 3.46'
 gem 'aws-sdk-s3', '~> 1.30'
@@ -49,7 +57,7 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '~> 2.13'
+  gem 'capybara', '~> 2.18', '>= 2.18.0'
   gem 'selenium-webdriver'
   gem 'rspec-core', '~> 3.7'
   gem 'rspec-rails', '~> 3.7', '>= 3.7.2'
