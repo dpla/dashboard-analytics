@@ -32,7 +32,7 @@ gem 'render_async', '~> 1.2.0'
 # Set versions of following gems to fix security vulnerabilities
 gem 'rails-html-sanitizer', '>= 1.0.4'
 gem 'sprockets', '~> 3.7.2'
-gem 'rubyzip', '>= 1.2.2'
+gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
 
 
@@ -45,7 +45,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.18', '>= 2.18.0'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '>= 3.142.3'
   gem 'rspec-core', '~> 3.7'
   gem 'rspec-rails', '~> 3.7', '>= 3.7.2'
   gem 'awesome_print', '1.8.0'
