@@ -6,13 +6,13 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0.3', '>= 6.0.3.5'
+gem 'rails', '~> 5.2.4', '>= 5.2.4.6'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.3.13'
 # Use Puma as the app server
 gem 'puma', '~> 3.12', '>= 3.12.6'
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0', '>= 5.0.8'
+gem 'sass-rails', '~> 5.0', '>= 5.0.7'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
