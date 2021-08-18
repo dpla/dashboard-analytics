@@ -87,7 +87,7 @@ GEM
     declarative (0.0.10)
     declarative-option (0.1.0)
     deep_merge (1.2.1)
-    devise (4.4.3)
+    devise (4.6.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 4.1.0, < 6.0)
@@ -316,7 +316,7 @@ DEPENDENCIES
   byebug
   capybara (~> 2.13)
   config (= 1.7.0)
-  devise (~> 4.4.3)
+  devise (~> 4.6.0)
   ffi (>= 1.9.24)
   google-api-client (~> 0.11)
   googleauth (~> 0.6)
