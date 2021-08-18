@@ -6,7 +6,7 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.4', '>= 5.2.4.3'
+gem 'rails', '~> 5.1.7'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.3.13'
 # Use Puma as the app server
@@ -24,7 +24,7 @@ gem 'google-api-client', '~> 0.11'
 gem 'googleauth', '~> 0.6'
 gem 'httparty', '~> 0.16.2'
 gem 'devise', '~> 4.7.0'
-gem 'jquery-rails', '~> 4.3.5'
+gem 'jquery-rails', '~> 4.4.0'
 gem 'aws-sdk-rails', '~> 2', '>= 2.1.0'
 gem 'aws-sdk-core', '~> 3.46'
 gem 'aws-sdk-s3', '~> 1.30'
