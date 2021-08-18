@@ -353,7 +353,7 @@ DEPENDENCIES
   config (= 1.7.0)
   devise (~> 4.7.0)
   ffi (>= 1.9.24)
-  google-api-client (~> 0.30, >= 0.30.8)
+  google-api-client (~> 0.53, >= 0.53.0)
   googleauth (~> 0.9, >= 0.9.0)
   httparty (~> 0.16.2)
   jbuilder (~> 2.9, >= 2.9.1)
@@ -379,4 +379,4 @@ DEPENDENCIES
   web-console (>= 3.7.0)
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
