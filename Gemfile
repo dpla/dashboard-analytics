@@ -23,8 +23,13 @@ gem 'config', '1.7.0'
 gem 'google-api-client', '~> 0.11'
 gem 'googleauth', '~> 0.6'
 gem 'httparty', '~> 0.16.2'
+<<<<<<< HEAD
 gem 'devise', '~> 4.6.0'
 gem 'jquery-rails', '~> 4.3.3'
+=======
+gem 'devise', '~> 4.4.3'
+gem 'jquery-rails', '~> 4.3.4'
+>>>>>>> origin/snyk-fix-a78655332224bacc2a39b3f45c172294
 gem 'aws-sdk-rails', '~> 2', '>= 2.0.1'
 gem 'aws-sdk-core', '~> 3.46'
 gem 'aws-sdk-s3', '~> 1.30'
