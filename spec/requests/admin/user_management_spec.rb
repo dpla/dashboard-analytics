@@ -95,7 +95,7 @@ RSpec.describe "User management", :type => :request do
     end
 
     it "redirects edit to show" do
-      get "/admin/users/1/edit"
+      get "/admin/users/#{user.id}/edit"
       expect(response).to redirect_to(admin_user_path(user))
     end
   end
