@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-    ruby v2.4.1
-    rails v5.1.5
+    ruby v2.6.5
+    rails v5.1.7
 
 ## Installation and setup
 
@@ -34,6 +34,43 @@ Create an initial user account from the rails console:
 To run rspec tests in your console:
 
     bundle exec rspec
+
+## Using Docker
+
+Copy `docker-compose.yml.example` to `docker-compose.yml` and set appropriate values.
+
+To start the application:
+
+    docker-compose build
+    docker-compose up
+
+If the database has not yet been created, run:
+
+    docker-compose run web bundle exec rake db:create
+
+If any database migrations need to be executed, run:
+
+    docker-compose run web bundle exec rake db:migrate
+
+To shut down:
+
+    docker-compose down
+
+### Testing
+
+Before testing with Docker, run `docker compose up`.
+
+To create the test database:
+
+    docker-compose run -e "RAILS_ENV=test" web bundle exec rake db:create
+
+To run migrations on the test database:
+
+    docker-compose run -e "RAILS_ENV=test" web bundle exec rake db:migrate
+
+To execute the tests:
+
+    docker-compose run -e "RAILS_ENV=test" web bundle exec rspec
 
 ## Copyright & License
 
