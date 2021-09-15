@@ -1,4 +1,4 @@
-FROM ruby:2.4.1
+FROM ruby:2.6.5
 
 ENV RAILS_ENV production
 ENV RAILS_SERVE_STATIC_FILES true
@@ -11,5 +11,6 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle install --deployment
 COPY . .
 RUN bundle exec rake assets:precompile
+# ENTRYPOINT ["bundle", "exec"]
 EXPOSE 3000
-CMD ["rails", "s"]
+CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-p", "3000"]
