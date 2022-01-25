@@ -39,3 +39,4 @@ To run rspec tests in your console:
 
 * Copyright Digital Public Library of America, 2018
 * License: MIT
+
