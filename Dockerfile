@@ -1,4 +1,4 @@
-FROM ruby:2.4.1
+FROM ruby:2.6.5
 
 ENV RAILS_ENV production
 ENV RAILS_SERVE_STATIC_FILES true
@@ -10,6 +10,8 @@ WORKDIR /opt/dashboard-analytics
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --deployment
 COPY . .
-RUN bundle exec rake assets:precompile
+# Devise checks for the presence of SECRET_KEY_BASE during precompile, but the
+# environmental vars set in docker-compose are not available in RUN context.
+RUN SECRET_KEY_BASE=decoy-token bundle exec rake assets:precompile
 EXPOSE 3000
-CMD ["rails", "s"]
+CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-p", "3000"]
