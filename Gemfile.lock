@@ -219,7 +219,11 @@ GEM
     os (1.1.1)
     pg (1.0.0)
     public_suffix (4.0.6)
+<<<<<<< HEAD
     puma (4.3.10)
+=======
+    puma (4.3.11)
+>>>>>>> origin/dependabot/bundler/puma-4.3.11
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
