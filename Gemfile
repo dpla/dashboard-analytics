@@ -34,6 +34,7 @@ gem 'rails-html-sanitizer', '>= 1.3.0'
 gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
+gem 'nokogiri', '>= 1.13.2'
 
 
 group :production do
