@@ -6,11 +6,11 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.7'
+gem 'rails', '~> 5.2.6', '>= 5.2.6.2'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.3.13'
 # Use Puma as the app server
-gem 'puma', '~> 4.3'
+gem 'puma', '~> 4.3', '>= 4.3.11'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0', '>= 5.0.7'
 # Use Uglifier as compressor for JavaScript assets
@@ -23,17 +23,18 @@ gem 'config', '1.7.0'
 gem 'google-api-client', '~> 0.53', '>= 0.53.0'
 gem 'googleauth', '~> 0.9', '>= 0.9.0'
 gem 'httparty', '~> 0.16.2'
-gem 'devise', '~> 4.7.0'
+gem 'devise', '~> 4.7.3'
 gem 'jquery-rails', '~> 4.3.5'
 gem 'aws-sdk-rails', '~> 2', '>= 2.1.0'
 gem 'aws-sdk-core', '~> 3.46'
 gem 'aws-sdk-s3', '~> 1.30'
 gem 'render_async', '~> 1.2.0'
 # Set versions of following gems to fix security vulnerabilities
-gem 'rails-html-sanitizer', '>= 1.2.0'
+gem 'rails-html-sanitizer', '>= 1.3.0'
 gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
+gem 'nokogiri', '>= 1.13.2'
 
 
 group :production do
@@ -47,7 +48,7 @@ group :development, :test do
   gem 'capybara', '~> 2.18', '>= 2.18.0'
   gem 'selenium-webdriver', '>= 3.142.3'
   gem 'rspec-core', '~> 3.7'
-  gem 'rspec-rails', '~> 3.8', '>= 3.8.2'
+  gem 'rspec-rails', '~> 3.9', '>= 3.9.1'
   gem 'awesome_print', '1.8.0'
 end
 
