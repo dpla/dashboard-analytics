@@ -20,7 +20,7 @@ gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.9', '>= 2.9.1'
 gem 'config', '1.7.0'
-gem 'google-api-client', '~> 0.53', '>= 0.53.0'
+gem 'google-apis-analytics_v3', '~> 0.7.0'
 gem 'googleauth', '~> 0.9', '>= 0.9.0'
 gem 'httparty', '~> 0.16.2'
 gem 'devise', '~> 4.7.3'
