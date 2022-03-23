@@ -78,7 +78,7 @@ class ContributorComparison
   # Get all contributors and their associated key metrics.
   # @return [Hash]
   # e.g. { "The Library" => { "Website" => { "Users" => 4 },
-  #                           "Api" => { "Users" => 6 } } }
+  #                           "Api" => { "Views" => 60 } } }
   def totals
     data = {}
 
