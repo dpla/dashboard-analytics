@@ -74,12 +74,6 @@
                onclick="toggle_column(this)">
         <label for="api-view-input">API Views</label>
       </div>
-      <div>
-        <input type="checkbox" id="api-user-input" name="column"
-               value="api-user" checked="checked"
-               onclick="toggle_column(this)">
-        <label for="api-user-input">API Users/Apps</label>
-      </div>
     <% else %>
       <div class="no-data">Data not available for this date range.</div>
     <% end %>
@@ -148,7 +142,6 @@
       <% end %>
       <% if api_data_for_date_range? %>
         <th class="api-view">API Views</th>
-        <th class="api-user">API Users/Apps</th>
       <% end %>
       <th class="item-count">Item Count</th>
       <% WikimediaPreparationsPresenter.fields.each do |field| %>
@@ -203,9 +196,6 @@
         <% if api_data_for_date_range? %>
           <td class="api-view">
             <%= totals["Api"]["Views"] %>
-          </td>
-          <td class="api-user">
-            <%= totals["Api"]["Users"] %>
           </td>
         <% end %>
         <td class="item-count">

@@ -57,10 +57,6 @@ class ApiOverview
     response.present? ? response.totals_for_all_results['ga:totalEvents'] : nil
   end
 
-  def users
-    response.present? ? response.totals_for_all_results['ga:users'] : nil
-  end
-
   private
 
   ##
@@ -76,7 +72,7 @@ class ApiOverview
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
       builder.segment = segment
-      builder.metrics = %w(ga:totalEvents ga:users)
+      builder.metrics = %w(ga:totalEvents)
       builder.filters = filters
     end
   end
