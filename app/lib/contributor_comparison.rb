@@ -131,7 +131,6 @@ class ContributorComparison
                    "BWS Item Views",
                    "BWS Click Throughs",
                    "API Views",
-                   "API Users",
                    "Item Count" ]
 
     WikimediaPreparationsPresenter.fields.each do |field|
@@ -165,7 +164,6 @@ class ContributorComparison
                 bws["Views"],
                 bws["Click Throughs"],
                 api["Views"],
-                api["Users"],
                 count ]
 
         WikimediaPreparationsPresenter.fields.each do |field|
