@@ -30,11 +30,11 @@ gem 'aws-sdk-core', '~> 3.46'
 gem 'aws-sdk-s3', '~> 1.30'
 gem 'render_async', '~> 1.2.0'
 # Set versions of following gems to fix security vulnerabilities
-gem 'rails-html-sanitizer', '>= 1.3.0'
+gem 'rails-html-sanitizer', '>= 1.4.2'
 gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
-gem 'nokogiri', '>= 1.13.2'
+gem 'nokogiri', '>= 1.13.4'
 
 
 group :production do
