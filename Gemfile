@@ -10,7 +10,7 @@ gem 'rails', '~> 5.2.6', '>= 5.2.6.3'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.3.13'
 # Use Puma as the app server
-gem 'puma', '~> 4.3', '>= 4.3.11'
+gem 'puma', '~> 4.3', '>= 4.3.12'
 # Use SCSS for stylesheets
 gem 'sassc-rails', '~> 2.1', '>= 2.1.2'
 # Use Uglifier as compressor for JavaScript assets
@@ -30,11 +30,11 @@ gem 'aws-sdk-core', '~> 3.46'
 gem 'aws-sdk-s3', '~> 1.30'
 gem 'render_async', '~> 1.2.0'
 # Set versions of following gems to fix security vulnerabilities
-gem 'rails-html-sanitizer', '>= 1.3.0'
+gem 'rails-html-sanitizer', '>= 1.4.2'
 gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
-gem 'nokogiri', '>= 1.13.2'
+gem 'nokogiri', '>= 1.13.4'
 
 
 group :production do
