@@ -95,7 +95,7 @@ class DplaApiResponseBuilder
     query = { :api_key => api_key,
               :page_size => 0, 
               :'provider.name' => hub,
-              :filter => "tags:blackwomensuffrage" }
+              :tags => "blackwomensuffrage" }
 
     query[:dataProvider] = contributor if contributor.present?
 
@@ -123,7 +123,7 @@ class DplaApiResponseBuilder
                          :page_size => 0, 
                          :facet_size => 2000,
                          :'provider.name' => hub,
-                         :filter => "tags:blackwomensuffrage" } }
+                         :tags => "blackwomensuffrage" } }
 
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
