@@ -40,10 +40,12 @@ class ApiOverviewByContributor
     columns = response.column_headers.map { |c| c.name }
     data = {}
 
-    response.rows.map do |r|
-      contributor = r[columns.index("ga:eventAction")]
-      views = r[columns.index("ga:totalEvents")]
-      data[contributor] = { 'Views' => views }
+    if (response.total_results > 0)
+      response.rows.map do |r|
+        contributor = r[columns.index("ga:eventAction")]
+        views = r[columns.index("ga:totalEvents")]
+        data[contributor] = { 'Views' => views }
+      end
     end
 
     data
