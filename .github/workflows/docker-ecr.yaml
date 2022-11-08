@@ -14,9 +14,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Read .nvmrc
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
-        id: nvm
+      # - name: Read .nvmrc
+      #   run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+      #   id: nvm
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -50,6 +50,13 @@ jobs:
         if: github.event_name == 'pull_request'
         shell: bash
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
+
+      # Rename config files 
+      - name: Rename config files 
+        run: |
+          mv ./conf/settings.yml.template ./conf/settings.yml
+          mv ./conf/database.yml.template ./conf/database.yml
+          mv ./config/google-analytics-key.json.template ./config/google-analytics-key.json
 
       # Push to ECR
       - name: Build, tag, and push image to Amazon ECR
