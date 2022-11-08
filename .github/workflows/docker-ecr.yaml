@@ -54,8 +54,8 @@ jobs:
       # Rename config files 
       - name: Rename config files 
         run: |
-          mv ./conf/settings.yml.template ./conf/settings.yml
-          mv ./conf/database.yml.template ./conf/database.yml
+          mv ./config/settings.yml.template ./config/settings.yml
+          mv ./config/database.yml.template ./config/database.yml
           mv ./config/google-analytics-key.json.template ./config/google-analytics-key.json
 
       # Push to ECR
