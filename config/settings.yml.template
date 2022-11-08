@@ -1,0 +1,43 @@
+##
+# The service account must have read permissions for the views.
+# Segments must be shared.
+google_analytics:
+  # File path to the service account JSON key.
+  service_account_json_key: <%= File.join Rails.root, 'config', 'google-analytics-key.json' %>
+  frontend_profile_id: <%= ENV["FRONTEND_PROFILE_ID"] %>
+  bws_profile_id: <%= ENV["BWS_PROFILE_ID"] %>
+  api_profile_id: <%= ENV["API_PROFILE_ID"] %>
+  api_segment: <%= ENV["API_SEGMENT"] %>
+  tracking_id: <%= ENV["TRACKING_ID"] %>
+
+dpla_api:
+  # include trailing backslash
+  base_uri: api.dp.la/v2/
+  key: <%= ENV["DPLA_API_KEY"] %>
+
+dpla:
+  # include trailing backslash
+  base_uri: https://dp.la/
+
+s3:
+  bucket: <%= ENV["S3_BUCKET"] %>
+
+# Minimum date for which any dashboard data is available
+min_date:
+  month: 01
+  year: 2018
+
+# Minimum date for which api usage data is available
+api_min_date:
+  month: 05
+  year: 2018
+
+# Minimum date for which BWS usage date is available
+bws_min_date:
+  month: 09
+  year: 2020
+
+# Minimum date for which metadata completeness data is available
+mc_min_date:
+  month: 04
+  year: 2018
