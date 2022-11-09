@@ -15,4 +15,30 @@ services:
     depends_on: 
       - db
     environment:
-      SECRET_KEY_BASE: CHANGEME
+      # config/settings.yml
+      API_PROFILE_ID: CHANGE ME
+      API_SEGMENT: CHANGE ME
+      BWS_PROFILE_ID: CHANGE ME
+      DPLA_API_KEY: CHANGE ME
+      FRONTEND_PROFILE_ID: CHANGE ME      
+      S3_BUCKET: CHANGE ME
+      TRACKING_ID: CHANGE ME
+      
+      # config/database.yml
+      DATABASE_HOST: CHANGE ME
+      DATABASE_NAME: CHANGE ME
+      USERNAME: CHANGE ME
+      PASSWORD: CHANGE ME
+
+      # config/google-analytics-key.json
+      CLIENT_EMAIL: CHANGE ME
+      CLIENT_ID: CHANGE ME
+      CLIENT_X509_CERT_URL: CHANGE ME
+      PRIVATE_KEY: CHANGE ME
+      PRIVATE_KEY_ID: CHANGE ME
+      PROJECT_ID: CHANGE ME
+      
+      SECRET_BASE_KEY: CHANGE ME
+
+      
+
