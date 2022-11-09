@@ -4,23 +4,23 @@
 google_analytics:
   # File path to the service account JSON key.
   service_account_json_key: <%= File.join Rails.root, 'config', 'google-analytics-key.json' %>
-  frontend_profile_id: ga:XXXXXXXX
-  bws_profile_id: ga:XXXXXXXX
-  api_profile_id: ga:XXXXXXXX
-  api_segment: gaid::XXX
-  tracking_id: UA-xxxxxxxx-xx
+  frontend_profile_id: <%= ENV["FRONTEND_PROFILE_ID"] %>
+  bws_profile_id: <%= ENV["BWS_PROFILE_ID"] %>
+  api_profile_id: <%= ENV["API_PROFILE_ID"] %>
+  api_segment: <%= ENV["API_SEGMENT"] %>
+  tracking_id: <%= ENV["TRACKING_ID"] %>
 
 dpla_api:
   # include trailing backslash
   base_uri: api.dp.la/v2/
-  key: CHANGEME
+  key: <%= ENV["DPLA_API_KEY"] %>
 
 dpla:
   # include trailing backslash
   base_uri: https://dp.la/
 
 s3:
-  bucket: CHANGEME
+  bucket: <%= ENV["S3_BUCKET"] %>
 
 # Minimum date for which any dashboard data is available
 min_date:
