@@ -20,5 +20,5 @@ test:
 
 production:
   <<: *default
-  database: dashboard-analytics_production
+  database: <%= ENV["DB_NAME"] %>
   host: <%= ENV["DB_HOST"] %>
