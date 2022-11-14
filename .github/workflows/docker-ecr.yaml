@@ -58,6 +58,11 @@ jobs:
           mv ./config/database.yml.template ./config/database.yml
           mv ./config/google-analytics-key.json.template ./config/google-analytics-key.json
 
+      - name: Print config files 
+        run: | 
+          cat ./config/settings.yml
+          cat ./config/database.yml
+          cat ./config/google-analytics-key.json
       # Push to ECR
       - name: Build, tag, and push image to Amazon ECR
         if: ${{ !env.ACT }}
