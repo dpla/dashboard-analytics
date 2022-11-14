@@ -1,12 +1,12 @@
 {
   "_comments": "The key can be generated at https://console.developers.google.com. The key does not have to be stored at this file path. Set the file path in config/settings.yml under google_analytics.service_account_json_key. The service account JSON key should be kept private at all times. More information: https://developers.google.com/identity/protocols/OAuth2ServiceAccount.",
   "type": "service_account",
-  "project_id": "<%= ENV["PROJECT_ID"] %>",
-  "private_key_id": "<%= ENV["PRIVATE_KEY_ID"] %>",
-  "private_key": "<%= ENV["PRIVATE_KEY"] %>",
-  "client_email": "<%= ENV["CLIENT_EMAIL"] %>",
-  "client_id": "<%= ENV["CLIENT_ID"] %>",
-  "client_x509_cert_url": "<%= ENV["CLIENT_X509_CERT_URL"] %>",
+  "project_id": "<%= ENV[\"PROJECT_ID\"] %>",
+  "private_key_id": "<%= ENV[\"PRIVATE_KEY_ID\"] %>",
+  "private_key": "<%= ENV[\"PRIVATE_KEY\"] %>",
+  "client_email": "<%= ENV[\"CLIENT_EMAIL\"] %>",
+  "client_id": "<%= ENV[\"CLIENT_ID\"] %>",
+  "client_x509_cert_url": "<%= ENV[\"CLIENT_X509_CERT_URL\"] %>",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://accounts.google.com/o/oauth2/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
