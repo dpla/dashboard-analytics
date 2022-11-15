@@ -25,10 +25,9 @@ services:
       TRACKING_ID: CHANGE ME
       
       # config/database.yml
-      DATABASE_HOST: CHANGE ME
-      DATABASE_NAME: CHANGE ME
-      USERNAME: CHANGE ME
-      PASSWORD: CHANGE ME
+      DB_HOST: CHANGE ME
+      DB_USERNAME: CHANGE ME
+      DB_PASSWORD: CHANGE ME
 
       # config/google-analytics-key.json
       CLIENT_EMAIL: CHANGE ME
