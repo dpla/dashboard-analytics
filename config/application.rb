@@ -1,5 +1,7 @@
 require_relative 'boot'
 
+File.open("google-analytics-key.json", "w") {|f| f.write(ENV["GOOGLE_ANALYTICS_KEY"]) }
+
 require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
