@@ -30,12 +30,7 @@ services:
       DB_PASSWORD: CHANGE ME
 
       # config/google-analytics-key.json
-      CLIENT_EMAIL: CHANGE ME
-      CLIENT_ID: CHANGE ME
-      CLIENT_X509_CERT_URL: CHANGE ME
-      PRIVATE_KEY: CHANGE ME
-      PRIVATE_KEY_ID: CHANGE ME
-      PROJECT_ID: CHANGE ME
+      GOOGLE_ANALYTICS_KEY: CHANGE ME
       
       SECRET_BASE_KEY: CHANGE ME
 
