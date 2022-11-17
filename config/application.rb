@@ -1,5 +1,7 @@
 require_relative 'boot'
 
+# Copy the google analtyics key to a local JSON file.
+# This code runs before rails itself is loaded.
 File.open("google-analytics-key.json", "w") {|f| f.write(ENV["GOOGLE_ANALYTICS_KEY"]) }
 
 require 'rails/all'
