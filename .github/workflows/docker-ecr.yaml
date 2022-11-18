@@ -56,7 +56,6 @@ jobs:
         run: |
           mv ./config/settings.yml.template ./config/settings.yml
           mv ./config/database.yml.template ./config/database.yml
-          mv ./config/google-analytics-key.json.template ./config/google-analytics-key.json
 
       # Push to ECR
       - name: Build, tag, and push image to Amazon ECR
