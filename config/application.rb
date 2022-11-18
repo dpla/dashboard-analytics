@@ -7,12 +7,12 @@ require 'logger'
 
 logger = Logger.new(STDOUT)
 logger.level = Logger::DEBUG
-logger.debug(ENV["GOOGLE_ANALYTICS_KEY"])
-logger.debug(ENV["GOOGLE_ANALYTICS_KEY"].gsub("\\\\\\"","""))
+logger.debug("RAW KEY " + ENV["GOOGLE_ANALYTICS_KEY"])
+logger.debug("Unescapted KEY " + ENV["GOOGLE_ANALYTICS_KEY"]).gsub("\\\\\\"",""")
 
 # Copy the google analtyics key to a local JSON file.
 # This code runs before rails itself is loaded.
-File.open("google-analytics-key.json", "w") {|f| f.write(ENV["GOOGLE_ANALYTICS_KEY"].gsub("\\\\\\"",""")) }
+File.open("google-analytics-key.json", "w") {|f| f.write(ENV["GOOGLE_ANALYTICS_KEY"]) }
 
 require 'rails/all'
 
