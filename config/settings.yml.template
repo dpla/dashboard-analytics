@@ -3,7 +3,7 @@
 # Segments must be shared.
 google_analytics:
   # File path to the service account JSON key.
-  service_account_json_key: <%= File.join Rails.root, 'config', 'google-analytics-key.json' %>
+  service_account_json_key: <%= File.join Rails.root, 'google-analytics-key.json' %>
   frontend_profile_id: <%= ENV["FRONTEND_PROFILE_ID"] %>
   bws_profile_id: <%= ENV["BWS_PROFILE_ID"] %>
   api_profile_id: <%= ENV["API_PROFILE_ID"] %>
