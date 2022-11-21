@@ -1,14 +1,5 @@
 require_relative 'boot'
 
-require 'logger'
-
-# Copy the google analtyics key to a local JSON file.
-# This code runs before rails itself is loaded.
-
-
-logger = Logger.new(STDOUT)
-logger.level = Logger::DEBUG
-
 # Regex to unescape JSON loaded from ENV var
 re = /\\\"/m
 subst = '"'
