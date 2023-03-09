@@ -29,6 +29,7 @@ gem 'aws-sdk-rails', '~> 3.7.1'
 gem 'aws-sdk-core', '~> 3.170'
 gem 'aws-sdk-s3', '~> 1.119'
 gem 'render_async', '~> 2.1.11'
+gem 'coffee-rails', '~> 5.0'
 # Set versions of following gems to fix security vulnerabilities
 gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'sprockets', '~> 3.7.2'
