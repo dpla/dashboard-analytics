@@ -12,7 +12,7 @@
 //
 //= require rails-ujs
 //= require jquery
-//= require turbo
+//= require turbolinks
 //= google-analytics
 //= jquery-tablesorter
 //= tablesort
