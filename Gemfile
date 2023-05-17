@@ -13,10 +13,7 @@ gem 'sqlite3', '~> 1.3.13'
 gem 'puma', '~> 4.3', '>= 4.3.12'
 # Use SCSS for stylesheets
 gem 'sassc-rails', '~> 2.1', '>= 2.1.2'
-# Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 1.3.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
+gem 'turbo-rails', '~> 1.4'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.9', '>= 2.9.1'
 gem 'config', '1.7.0'
