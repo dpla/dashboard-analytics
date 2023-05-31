@@ -43,7 +43,7 @@ class EventsController < ApplicationController
     @events = ApiEventsPresenter.new(events)
 
     respond_to do |format|
-      format.html { render partial: "shared/events_table.html.erb" }
+      format.html { render partial: "shared/events_table" }
       format.csv { send_data @events.to_csv }
     end
   end
@@ -62,7 +62,7 @@ class EventsController < ApplicationController
     @events = WebsiteEventsPresenter.new(events)
 
     respond_to do |format|
-      format.html { render partial: "shared/events_table.html.erb" }
+      format.html { render partial: "shared/events_table" }
       format.csv { send_data @events.to_csv }
     end
   end
