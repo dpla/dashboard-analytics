@@ -360,8 +360,6 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
-    uglifier (4.2.0)
-      execjs (>= 0.3.0, < 3)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.0)
@@ -418,7 +416,6 @@ DEPENDENCIES
   sqlite3 (~> 1.6.0)
   turbo-rails (~> 1.4)
   tzinfo-data
-  uglifier (~> 4.2.0)
   web-console (~> 4.2.0)
 
 BUNDLED WITH

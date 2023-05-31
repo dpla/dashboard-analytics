@@ -13,8 +13,6 @@ gem 'sqlite3', '~> 1.6.0'
 gem 'puma', '~> 6.1', '>= 6.1.1'
 # Use SCSS for stylesheets
 gem 'sassc-rails', '~> 2.1', '>= 2.1.2'
-# Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '~> 4.2.0'
 gem 'turbo-rails', '~> 1.4'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.11', '>= 2.9.1'
