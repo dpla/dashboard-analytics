@@ -3,7 +3,8 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   layout :layout_by_resource
 
-  rescue_from Google::Apis::Error, StandardError, with: :handle_service_error
+  rescue_from Google::Apis::Error, Signet::AuthorizationError, Faraday::Error,
+              Timeout::Error, with: :handle_service_error
 
   private
 
@@ -16,7 +17,7 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_service_error(exception)
-    Rails.logger.error("#{exception.class}: #{exception.message}")
+    Rails.logger.error(exception.full_message)
     render "errors/service_unavailable", status: :service_unavailable, layout: "application"
   end
 end

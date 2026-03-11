@@ -348,7 +348,7 @@ form.comparison legend {
 footer {
   display: block;
   clear: both;
-  margin-top: 40px;
+  margin-top: 0;
 }
 
 .tooltip {
@@ -464,11 +464,42 @@ header div a:visited {
   flex-shrink: 0;
 }
 
-/* Footer columns section */
-footer {
-  margin-top: 0;
+/* Error view */
+.error-body {
+  padding: 40px;
 }
 
+.error-message {
+  font-size: 1.1em;
+  margin-bottom: 16px;
+}
+
+.error-note {
+  color: #666;
+}
+
+/* button_to logout: render like a nav link */
+nav li form {
+  display: inline;
+}
+
+nav li form button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #b6bfc3;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-family: inherit;
+}
+
+nav li form button:hover {
+  text-decoration: underline;
+}
+
+/* Footer columns section */
 .footer-columns {
   background-color: #273443;
   padding: 40px;
