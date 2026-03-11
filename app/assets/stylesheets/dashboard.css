@@ -348,20 +348,7 @@ form.comparison legend {
 footer {
   display: block;
   clear: both;
-  background-color: #273443;
-  color: #dadfe0;
-  padding: 20px 40px;
-  overflow: auto;
   margin-top: 40px;
-  box-shadow: 0 50vh 0 50vh #273443;
-}
-
-footer a, footer a:hover, footer a:visited {
-  color: #dadfe0;
-}
-
-footer a:hover {
-  text-decoration: underline;
 }
 
 .tooltip {
@@ -406,5 +393,183 @@ footer a:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+/* Header logo link */
+header div a {
+  color: #fff;
+  text-decoration: none;
+}
+
+header div a:hover,
+header div a:visited {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Pro site navigation bar */
+.pro-nav {
+  background-color: #0a2a37;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.pro-nav ul {
+  display: inline-flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.pro-nav ul li {
+  margin-right: 12px;
+}
+
+.pro-nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 0;
+}
+
+.pro-nav ul li a:hover,
+.pro-nav ul li a:visited {
+  color: #fff;
+}
+
+.pro-nav ul li a:hover {
+  text-decoration: underline;
+}
+
+.pro-nav-secondary {
+  opacity: 0.85;
+}
+
+.pro-nav-tertiary {
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+.pro-nav-divider {
+  display: inline-block;
+  height: 20px;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.6);
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* Footer columns section */
+footer {
+  margin-top: 0;
+}
+
+.footer-columns {
+  background-color: #273443;
+  padding: 40px;
+  box-shadow: 0 50vh 0 50vh #232f3c;
+}
+
+.footer-columns-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.footer-column {
+  flex: 1;
+  min-width: 140px;
+}
+
+.footer-column h2 {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.footer-column ul li a,
+.footer-column ul li a:visited {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.footer-column ul li a:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+.footer-donate {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+.footer-donate-btn {
+  display: inline-block;
+  background-color: #c0561f;
+  color: #fff !important;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 32px;
+  text-decoration: none !important;
+  border-radius: 2px;
+}
+
+.footer-donate-btn:hover {
+  background-color: #a8481a;
+  text-decoration: none !important;
+}
+
+/* Footer bottom bar (logo + social icons) */
+.footer-bottom {
+  background-color: #232f3c;
+  padding: 20px 40px;
+}
+
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-logo-link {
+  display: block;
+  text-decoration: none;
+}
+
+.footer-logo-svg {
+  width: 280px;
+  height: 56px;
+}
+
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.footer-social a:hover {
+  opacity: 1;
 }
 

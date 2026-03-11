@@ -1,67 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>The page you were looking for doesn't exist (404)</title>
+  <title>Page Not Found — DPLA Analytics Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-  .rails-default-error-page {
-    background-color: #EFEFEF;
-    color: #2E2F30;
-    text-align: center;
-    font-family: arial, sans-serif;
-    margin: 0;
-  }
-
-  .rails-default-error-page div.dialog {
-    width: 95%;
-    max-width: 33em;
-    margin: 4em auto 0;
-  }
-
-  .rails-default-error-page div.dialog > div {
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #BBB;
-    border-top: #B00100 solid 4px;
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
-    background-color: white;
-    padding: 7px 12% 0;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
-
-  .rails-default-error-page h1 {
-    font-size: 100%;
-    color: #730E15;
-    line-height: 1.5em;
-  }
-
-  .rails-default-error-page div.dialog > p {
-    margin: 0 0 1em;
-    padding: 1em;
-    background-color: #F7F7F7;
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #999;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-color: #DADADA;
-    color: #666;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Helvetica, sans-serif;
+      color: #515354;
+      line-height: 1.25;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 0 40px;
+      background-color: #000;
+      color: #fff;
+      border-bottom: 3px solid #2c7da0;
+    }
+    header div { display: inline-block; margin: 16px 0; font-size: 16px; }
+    main { flex: 1; }
+    .heading {
+      width: 100%;
+      background-color: #f9f6f0;
+      height: 80px;
+      border-bottom: 1px solid #e9dec8;
+      padding: 10px 40px;
+    }
+    h1 { margin: 10px 0; color: #000; font-size: 1.75em; line-height: 60px; }
+    .body { padding: 40px; }
+    .body p { margin-bottom: 16px; font-size: 1.1em; }
+    .body a { color: #ad5c1d; text-decoration: none; }
+    .body a:hover { text-decoration: underline; }
+    footer {
+      background-color: #273443;
+      color: #dadfe0;
+      padding: 20px 40px;
+      margin-top: auto;
+    }
+    footer a, footer a:visited { color: #dadfe0; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
-
-<body class="rails-default-error-page">
-  <!-- This file lives in public/404.html -->
-  <div class="dialog">
-    <div>
-      <h1>The page you were looking for doesn't exist.</h1>
-      <p>You may have mistyped the address or the page may have moved.</p>
+<body>
+  <header>
+    <div><span>DPLA Analytics Dashboard</span></div>
+  </header>
+  <main>
+    <div class="heading"><h1>Page Not Found</h1></div>
+    <div class="body">
+      <p>The page you were looking for doesn&rsquo;t exist.</p>
+      <p style="color: #666;">You may have mistyped the address or the page may have moved. Contact <a href="mailto:analytics-dashboard@dp.la">analytics-dashboard@dp.la</a> if you need help.</p>
     </div>
-    <p>If you are the application owner check the logs for more information.</p>
-  </div>
+  </main>
+  <footer>
+    <div>Your feedback is welcome at <a href="mailto:analytics-dashboard@dp.la">analytics-dashboard@dp.la</a></div>
+  </footer>
 </body>
 </html>
