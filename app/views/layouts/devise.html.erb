@@ -16,16 +16,22 @@
     <%= yield :head_script %>
   </head>
 
-  <header>
-    <%= render partial: "shared/header" %>
-  </header>
-
   <body>
+    <%= render partial: "shared/pro_navigation" %>
+    <header>
+      <%= render partial: "shared/header" %>
+    </header>
+
     <main>
       <p class="notice"><%= notice %></p>
       <p class="alert"><%= alert %></p>
-      
+
       <%= yield %>
     </main>
+
+    <footer>
+      <%= render partial: "shared/footer" %>
+    </footer>
   </body>
+  <%= content_for :render_async %>
 </html>

@@ -4,7 +4,7 @@ Rails 7.0.4 / Ruby 3.1.2 app deployed on AWS ECS Fargate (blue/green via CodeDep
 
 ## Before every commit
 
-Run the `simplify` skill on all changed files before committing. Fix any issues it identifies, then commit.
+Run the `simplify` skill on all changed files before committing. Review its suggestions with judgment — apply fixes that make sense, but don't follow them blindly. Then commit.
 
 ## Deployment
 
