@@ -65,12 +65,6 @@ module TooltipsHelper
     "Metadata from one of your items was included in a DPLA API response."
   end
 
-  def api_users_tooltip
-    "A third-party user or application that accessed metadata for at least one of your items.
-    Note: even if a third-party application has many end-users,
-    only the app itself is counted as a single user."
-  end
-
   # BWS
 
   def bws_use_tooltip

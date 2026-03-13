@@ -32,3 +32,6 @@
 /coverage
 
 /public/assets/*
+
+# Docker
+docker-compose.yml

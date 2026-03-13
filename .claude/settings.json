@@ -1,0 +1,15 @@
+{
+  "allowedTools": [
+    "Bash(gh pr view*)",
+    "Bash(gh pr merge*)",
+    "Bash(gh pr create*)",
+    "Bash(gh run watch*)",
+    "Bash(gh run view*)",
+    "Bash(gh workflow run*)",
+    "Bash(gh workflow list*)",
+    "Bash(aws codepipeline *)",
+    "Bash(aws ecs *)",
+    "Bash(aws ecr *)",
+    "Bash(curl -o /dev/null -s -w*)"
+  ]
+}

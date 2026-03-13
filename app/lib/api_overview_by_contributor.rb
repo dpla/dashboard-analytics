@@ -36,15 +36,16 @@ class ApiOverviewByContributor
 
   def parse_data
     # Create Hash of data
-    # e.g. { "The Library" => { "Views" => 4, "Users" => 2 } }
+    # e.g. { "The Library" => { "Views" => 4 } }
     columns = response.column_headers.map { |c| c.name }
     data = {}
 
-    response.rows.map do |r|
-      contributor = r[columns.index("ga:eventAction")]
-      views = r[columns.index("ga:totalEvents")]
-      users = r[columns.index("ga:users")]
-      data[contributor] = { 'Views' => views, 'Users' => users }
+    if (response.total_results > 0)
+      response.rows.map do |r|
+        contributor = r[columns.index("ga:eventAction")]
+        views = r[columns.index("ga:totalEvents")]
+        data[contributor] = { 'Views' => views }
+      end
     end
 
     data
@@ -75,7 +76,7 @@ class ApiOverviewByContributor
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
       builder.segment = segment
-      builder.metrics = %w(ga:totalEvents ga:users)
+      builder.metrics = %w(ga:totalEvents)
       builder.dimensions = %w(ga:eventAction)
       builder.filters = %W(ga:eventCategory=@#{@hub})
     end

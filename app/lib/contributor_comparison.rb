@@ -84,7 +84,7 @@ class ContributorComparison
   # Get all contributors and their associated key metrics.
   # @return [Hash]
   # e.g. { "The Library" => { "Website" => { "Users" => 4 },
-  #                           "Api" => { "Users" => 6 } } }
+  #                           "Api" => { "Views" => 60 } } }
   def totals
     data = {}
 
@@ -146,7 +146,6 @@ class ContributorComparison
                    "BWS Item Views",
                    "BWS Click Throughs",
                    "API Views",
-                   "API Users",
                    "Item Count" ]
 
     WikimediaPreparationsPresenter.fields.each do |field|
@@ -185,7 +184,6 @@ class ContributorComparison
                 bws["Views"],
                 bws["Click Throughs"],
                 api["Views"],
-                api["Users"],
                 count ]
 
         WikimediaPreparationsPresenter.fields.each do |field|

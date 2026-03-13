@@ -12,7 +12,7 @@
     });
   });
 
-  document.addEventListener("turbolinks:load", function(){
+  document.addEventListener("turbo:load", function(){
     console.log("hello");
     $("#users").tablesorter({
       cssHeader: 'header',

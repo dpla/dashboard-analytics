@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: CHANGEME
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/dashboard-analytics
+    depends_on: 
+      - db
+    environment:
+      # config/settings.yml
+      API_PROFILE_ID: CHANGE ME
+      API_SEGMENT: CHANGE ME
+      BWS_PROFILE_ID: CHANGE ME
+      DPLA_API_KEY: CHANGE ME
+      FRONTEND_PROFILE_ID: CHANGE ME      
+      S3_BUCKET: CHANGE ME
+      TRACKING_ID: CHANGE ME
+      
+      # config/database.yml
+      DB_HOST: CHANGE ME
+      DB_USERNAME: CHANGE ME
+      DB_PASSWORD: CHANGE ME
+
+      # config/google-analytics-key.json
+      GOOGLE_ANALYTICS_KEY: CHANGE ME
+      
+      SECRET_BASE_KEY: CHANGE ME
+
+      
+

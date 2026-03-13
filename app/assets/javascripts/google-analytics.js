@@ -1,6 +1,6 @@
 (function(){
-  // This is the turbolinks equivalent to a page load.
-  document.addEventListener("turbolinks:load", function(){
+  // This is the turbo equivalent to a page load.
+  document.addEventListener("turbo:load", function(){
 
     // Load google analytics api
 

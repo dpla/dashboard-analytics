@@ -14,17 +14,6 @@
         <%= number_with_delimiter(@api_overview.events, :delimiter => ',') %>
       </td>
     </tr>
-    <tr>
-      <td>
-        <div class="tooltip">
-          Registered users/apps
-          <span class="tooltiptext"><%= api_users_tooltip %></span>
-        </div>
-      </td>
-      <td>
-        <%= number_with_delimiter(@api_overview.users, :delimiter => ',') %>
-      </td>
-    </tr>
   </table>
 
 <% else %>
