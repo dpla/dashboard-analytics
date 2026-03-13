@@ -1,5 +1,30 @@
 <%# Local variables: @wp_data[Hash] @target[Hub|Contributor] %>
 
+<% if @wa_data.present? %>
+
+  <table>
+    <% WikimediaAnalyticsPresenter.fields.each do |key| %>
+      <% value = @wa_data[key] %>
+      <% if value.present? %>
+        <tr>
+          <td>
+            <div class="tooltip">
+              <span><%= key.titleize %></span>
+              <span class="tooltiptext"><%= find_tooltip(key) %></span>
+            </div>
+          </td>
+          <td>
+            <%= number_with_delimiter(value, :delimiter => ',') %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+
+<% else %>
+  <div class="no-data">Wikimedia upload and page view data not available</div>
+<% end %>
+
 <% key = 'wikimediaReady' %>
 
 <% if @wp_data.present? && @wp_data.key?(key) %>
@@ -22,9 +47,12 @@
   </table>
 
 <% else %>
-  <div class="no-data">Data not available</div>
+  <div class="no-data">Wikimedia readiness data not available</div>
 <% end %>
+
+<% keys = WikimediaAnalyticsPresenter.fields %>
 
 <br/>
 
 <p>More data about <%= render_wikimedia_readiness_link(@target) %></p>
+

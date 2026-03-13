@@ -201,6 +201,10 @@ th, td {
   margin-right: 50px;
 }
 
+.metrics table {
+  width: 100%;
+}
+
 .metrics table, .metrics th, .metrics td {
   border: none;
 }

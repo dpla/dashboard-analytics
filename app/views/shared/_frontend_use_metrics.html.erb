@@ -9,7 +9,9 @@
           <span class="tooltiptext"><%= view_item_tooltip %></span>
         </div>
     </td>
-    <td><%= @website_event_totals.view_events %></td>
+    <td>
+      <%= number_with_delimiter(@website_event_totals.view_events, :delimiter => ',') %>
+    </td>
   </tr>
   <tr class="subitem">
     <td>
@@ -18,7 +20,9 @@
         <span class="tooltiptext"><%= view_metadata_record_tooltip %></span>
       </div>
     </td>
-    <td><%= @website_event_totals.item_events %></td>
+    <td>
+      <%= number_with_delimiter(@website_event_totals.item_events, :delimiter => ',') %>
+    </td>
   </tr>
   <tr class="subitem">
     <td>
@@ -27,7 +31,9 @@
         <span class="tooltiptext"><%= view_exhibition_tooltip %></span>
       </div>
     </td>
-    <td><%= @website_event_totals.exhibit_events %></td>
+    <td>
+      <%= number_with_delimiter(@website_event_totals.exhibit_events, :delimiter => ',') %>
+    </td>
   </tr>
   <tr class="subitem">
     <td>
@@ -36,7 +42,9 @@
         <span class="tooltiptext"><%= view_primary_source_set_tooltip %></span>
       </div>
     </td>
-    <td><%= @website_event_totals.pss_events %></td>
+    <td>
+      <%= number_with_delimiter(@website_event_totals.pss_events, :delimiter => ',') %>
+    </td>
   </tr>
   <tr>
     <td>
@@ -45,7 +53,9 @@
         <span class="tooltiptext"><%= click_through_tooltip %></span>
       </div>
     </td>
-    <td><%= @website_event_totals.click_throughs %></td>
+    <td>
+      <%= number_with_delimiter(@website_event_totals.click_throughs, :delimiter => ',') %>
+    </td>
   </tr>
   <tr>
     <td>
@@ -54,7 +64,9 @@
         <span class="tooltiptext"><%= users_tooltip %></span>
       </div>
     </td>
-    <td><%= @website_overview.users %></td>
+    <td>
+      <%= number_with_delimiter(@website_overview.users, :delimiter => ',') %>
+    </td>
   </tr>
   <tr>
     <td>
@@ -63,6 +75,8 @@
         <span class="tooltiptext"><%= sessions_tooltip %></span>
       </div>
     </td>
-    <td><%= @website_overview.sessions %></td>
+    <td>
+      <%= number_with_delimiter(@website_overview.sessions, :delimiter => ',') %>
+    </td>
   </tr>
 </table>
