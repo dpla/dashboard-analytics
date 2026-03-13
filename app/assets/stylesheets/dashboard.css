@@ -564,7 +564,8 @@ nav li form button:hover {
 
 .footer-logo-svg {
   width: 18rem;
-  height: 3rem;
+  max-width: 100%;
+  height: auto;
 }
 
 .footer-social {
