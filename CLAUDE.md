@@ -12,7 +12,7 @@ See the `deploy-analytics-dashboard` skill for the full 4-step deployment proces
 
 **Short version:**
 1. Run the "Build ECR" GitHub Action on the branch (`gh workflow run 40080852 --ref <branch> --repo dpla/dashboard-analytics`)
-2. Merge the PR, then start CodePipeline (`aws codepipeline start-pipeline-execution --name analytics-dashboard-pipeline`)
+2. Squash merge the PR and delete the branch (`gh pr merge <number> --squash --delete-branch --repo dpla/dashboard-analytics`), then start CodePipeline (`aws codepipeline start-pipeline-execution --name analytics-dashboard-pipeline`)
 3. Monitor until green traffic reaches 100%
 4. Verify with `curl -o /dev/null -s -w "%{http_code}" https://analytics-dashboard.dp.la`
 
