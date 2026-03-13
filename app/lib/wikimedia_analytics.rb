@@ -1,5 +1,4 @@
 class WikimediaAnalytics
-  include ActionView::Helpers::NumberHelper
 
   ##
   # @return [WikimediaAnalytics]
@@ -37,8 +36,10 @@ class WikimediaAnalytics
   end
 
   def wiki_csv
-    response = sThree_response("dpla_stats.csv")
-    csv_data(response)
+    @wiki_csv ||= begin
+      response = sThree_response("dpla_stats.csv")
+      response ? csv_data(response).to_a : []
+    end
   end
 
   def file_date
@@ -56,7 +57,7 @@ class WikimediaAnalytics
     date = @end_date
     response = nil
 
-    while response == nil
+    while response.nil?
       break if date < min_date
 
       # File path in format wikimedia/YYYY/MM/filename.csv
@@ -67,7 +68,7 @@ class WikimediaAnalytics
         csv_files = SThreeResponseBuilder.list(prefix).contents
           .select{ |c| c.key.ends_with?(".csv") }
         key = csv_files.first.key unless csv_files.empty?
-      rescue Exception => e
+      rescue StandardError => e
         Rails.logger.debug(e)
         break
       end
@@ -78,18 +79,19 @@ class WikimediaAnalytics
         rescue Aws::S3::Errors::NoSuchKey => e
           Rails.logger.debug("#{key} does not exist.")
           # Loop continues
-        rescue Exception => e
+        rescue StandardError => e
           Rails.logger.debug(e)
           break
         end
       end
 
-      date = date.last_month
+      # Only advance to previous month if no file was found for current date
+      date = date.last_month unless response
     end
 
     # set @file_date to the date for which a file was found in AWS
-    @file_date = date
-    return response
+    @file_date = response ? date : nil
+    response
   end
 
   ##

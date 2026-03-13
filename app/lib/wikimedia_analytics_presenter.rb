@@ -19,7 +19,7 @@ class WikimediaAnalyticsPresenter
       .find_all { |row| row["Hub"] == hub && row["Institution"] != hub }
   rescue => e
     Rails.logger.error(e)
-    Array.new
+    []
   end
 
   ##
@@ -29,10 +29,10 @@ class WikimediaAnalyticsPresenter
   def contributor(hub, contributor)
     @wikimedia_analytics.wiki_csv
       .find { |row| row["Hub"] == hub && row["Institution"] == contributor }
-      .to_hash
+      &.to_hash || {}
   rescue => e
     Rails.logger.error(e)
-    Hash.new
+    {}
   end
 
   ##
@@ -41,10 +41,10 @@ class WikimediaAnalyticsPresenter
   def hub(hub)
     @wikimedia_analytics.wiki_csv
       .find { |row| row["Hub"] == hub && row["Institution"] == hub }
-      .to_hash
+      &.to_hash || {}
   rescue => e
     Rails.logger.error(e)
-    Hash.new
+    {}
   end
 
   ##

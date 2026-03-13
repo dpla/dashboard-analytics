@@ -182,7 +182,6 @@ class ContributorsController < ApplicationController
 
     wikimedia_analytics = WikimediaAnalytics.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:contributor_id]
       builder.end_date = @end_date
     end
 
