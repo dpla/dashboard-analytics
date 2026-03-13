@@ -450,7 +450,7 @@ header div a:visited {
   opacity: 0.85;
 }
 
-.pro-nav-tertiary {
+.pro-nav ul.pro-nav-tertiary {
   margin-left: auto;
   opacity: 0.7;
 }
@@ -502,14 +502,14 @@ nav li form button:hover {
 /* Footer columns section */
 .footer-columns {
   background-color: #273443;
-  padding: 40px;
+  padding: 60px 60px;
   box-shadow: 0 50vh 0 50vh #232f3c;
 }
 
 .footer-columns-inner {
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
+  gap: 48px;
 }
 
 .footer-column {
@@ -519,9 +519,9 @@ nav li form button:hover {
 
 .footer-column h2 {
   color: #fff;
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 1rem;
 }
 
 .footer-column ul {
@@ -535,7 +535,7 @@ nav li form button:hover {
 .footer-column ul li a:visited {
   color: #fff;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
 }
 
 .footer-column ul li a:hover {
@@ -569,7 +569,8 @@ nav li form button:hover {
 /* Footer bottom bar (logo + social icons) */
 .footer-bottom {
   background-color: #232f3c;
-  padding: 20px 40px;
+  padding: 32px 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-bottom-inner {
@@ -584,8 +585,8 @@ nav li form button:hover {
 }
 
 .footer-logo-svg {
-  width: 280px;
-  height: 56px;
+  width: 18rem;
+  height: 3rem;
 }
 
 .footer-social {
