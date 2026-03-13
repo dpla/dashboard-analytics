@@ -502,7 +502,7 @@ nav li form button:hover {
 /* Footer columns section */
 .footer-columns {
   background-color: #273443;
-  padding: 60px 60px;
+  padding: 60px;
   box-shadow: 0 50vh 0 50vh #232f3c;
 }
 
@@ -543,28 +543,6 @@ nav li form button:hover {
   color: #fff;
 }
 
-.footer-donate {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  flex: 0 0 auto;
-}
-
-.footer-donate-btn {
-  display: inline-block;
-  background-color: #c0561f;
-  color: #fff !important;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 12px 32px;
-  text-decoration: none !important;
-  border-radius: 2px;
-}
-
-.footer-donate-btn:hover {
-  background-color: #a8481a;
-  text-decoration: none !important;
-}
 
 /* Footer bottom bar (logo + social icons) */
 .footer-bottom {
