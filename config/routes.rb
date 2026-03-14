@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "/health", to: proc { [200, {}, ["ok"]] }
+
   devise_for :users, skip: [:registrations]
   as :user do
     get 'users/edit' => 'devise/registrations#edit', as: 'edit_user_registration'
