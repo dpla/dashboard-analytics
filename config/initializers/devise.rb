@@ -259,13 +259,14 @@ Devise.setup do |config|
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
 
   # ==> Warden configuration
-  # If you want to use other strategies, that are not supported by Devise, or
-  # change the failure app, you can configure them inside the config.warden block.
-  #
-  # config.warden do |manager|
-  #   manager.intercept_401 = false
-  #   manager.default_strategies(scope: :user).unshift :some_external_strategy
-  # end
+  # Warden 1.2.9 raises "Invalid strategy trackable" because Devise 4.9.0
+  # includes :trackable in the scope's strategy list even though no
+  # Warden::Strategies.add(:trackable, ...) registration exists.
+  # Explicitly override the :user scope's strategy list to exclude :trackable.
+  # Remove once Devise is upgraded to 5.x.
+  config.warden do |manager|
+    manager.scope_defaults :user, strategies: [:database_authenticatable, :rememberable]
+  end
 
   # ==> Mountable engine configurations
   # When using Devise inside an engine, let's call it `MyEngine`, and this engine
