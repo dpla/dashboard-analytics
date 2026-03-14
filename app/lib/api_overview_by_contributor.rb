@@ -35,6 +35,7 @@ class ApiOverviewByContributor
   end
 
   def parse_data
+    return Hash.new unless response.present?
     # Create Hash of data
     # e.g. { "The Library" => { "Views" => 4 } }
     columns = response.column_headers.map { |c| c.name }
