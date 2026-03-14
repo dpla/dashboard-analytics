@@ -5,6 +5,7 @@ ENV RAILS_SERVE_STATIC_FILES true
 ENV RAILS_LOG_TO_STDOUT true
 
 RUN apt-get update && apt-get install nodejs -y
+RUN gem install bundler -v 2.6.9 --no-document
 RUN bundle config --global frozen 1
 WORKDIR /opt/dashboard-analytics
 COPY Gemfile Gemfile.lock ./
