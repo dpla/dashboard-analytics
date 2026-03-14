@@ -1,3 +1,5 @@
+require 'csv'
+
 class WebsiteEventsPresenter  < GaResponsePresenter
 
   def label
