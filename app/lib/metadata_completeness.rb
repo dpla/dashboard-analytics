@@ -1,3 +1,5 @@
+require 'csv'
+
 class MetadataCompleteness
   include ActionView::Helpers::NumberHelper
 

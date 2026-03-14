@@ -1,3 +1,5 @@
+require 'csv'
+
 class ContributorComparison
 
   def self.build
