@@ -6,7 +6,7 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7.0.4'
+gem 'rails', '~> 7.1.0'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.6.0'
 # Use Puma as the app server
@@ -33,7 +33,6 @@ gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
 gem 'nokogiri', '>= 1.18.9', '< 1.19'  # 1.19+ requires Ruby >= 3.2; app runs 3.1.2
-gem 'railties', '>= 5.2.7.1'
 gem 'loofah', '>= 2.19.1'
 gem 'rack', '>= 2.2.22'
 gem 'globalid', '>= 1.0.1'
