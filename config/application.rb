@@ -29,7 +29,10 @@ Bundler.require(*Rails.groups)
 module DashboardAnalytics
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    # Keep 7.0 defaults: upgrading to 7.1 defaults breaks Devise 4.9.0 (trackable
+    # strategy error). CVE-2025-55193 is fixed by Rails 7.1.6 itself regardless of
+    # which defaults version is set. Revisit when upgrading to Devise 5.x.
+    config.load_defaults 7.0
     config.autoload_paths << "#{config.root}/lib"
     config.eager_load_paths << "#{config.root}/lib"
 
