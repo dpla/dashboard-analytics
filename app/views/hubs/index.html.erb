@@ -8,9 +8,7 @@
     <ul>
     <% @hubs.each do |hub| %>
       <li>
-        <%= link_to hub, controller: :hubs, action: :show, id: hub,
-                         start_date: current_start_date,
-                         end_date: current_end_date %>
+        <%= link_to hub, hub_path(hub) %>
       </li>
     <% end %>
     </ul>
