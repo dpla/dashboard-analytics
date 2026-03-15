@@ -40,6 +40,8 @@ gem 'rexml', '>= 3.3.9'
 gem 'webrick', '>= 1.8.2'
 gem 'net-imap', '>= 0.3.9'
 gem 'faraday', '>= 2.14.1'
+gem 'sentry-ruby', '~> 5.22'
+gem 'sentry-rails', '~> 5.22'
 
 group :production do
   gem 'pg', '~> 1.4.5'
