@@ -126,12 +126,10 @@
 </form>
 
 <div class='download'>
-  <%= link_to 'Download CSV', controller: :contributors,
-                              action: params[:action],
-                              hub_id: params[:hub_id],
-                              start_date: current_start_date,
-                              end_date: current_end_date,
-                              format: :csv %>
+  <%= link_to 'Download CSV', { controller: :contributors,
+                                action: params[:action],
+                                hub_id: params[:hub_id],
+                                format: :csv }.merge(date_opts) %>
 </div>
 
 <div class="comparison-table-wrapper">
@@ -172,10 +170,8 @@
     <% @contributor_comparison.totals.each do |contributor, totals| %>
       <tr>
         <td>
-          <%= link_to contributor, controller: :contributors, action: :show,
-                                   hub_id: params[:hub_id], id: contributor,
-                                   start_date: current_start_date,
-                                   end_date: current_end_date %>
+          <%= link_to contributor, { controller: :contributors, action: :show,
+                                     hub_id: params[:hub_id], id: contributor }.merge(date_opts) %>
         </td>
         <td class="website-view">
           <%= totals["Website"]["Views"] || 0 %>
