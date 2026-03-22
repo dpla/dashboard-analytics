@@ -334,6 +334,9 @@ table#comparison td:first-child {
   left: 0;
   background-color: #fff;
   z-index: 1;
+  max-width: 220px;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 table#comparison th {
