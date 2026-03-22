@@ -1,4 +1,6 @@
 class WikimediaCache < ApplicationRecord
+  self.table_name = "wikimedia_cache"
+
   # Aggregated stats for a hub or contributor over a date range.
   # contributor is "" for hub-level rows.
   #
