@@ -12,10 +12,11 @@ class WikimediaCacheBuilder
   CIM_SNAPSHOT_URL  = "#{CIM_BASE_URL}/category-metrics-snapshot/%s/20231101/99991231"
   CIM_PAGEVIEWS_URL = "#{CIM_BASE_URL}/pageviews-per-category-monthly/%s/deep/all-wikis/00000101/99991231"
   THREAD_POOL_SIZE  = 20
-  # Authenticated bots may query up to 500 IDs per request; anonymous is 50.
-  # Set WIKIMEDIA_BOT_USER / WIKIMEDIA_BOT_PASSWORD in the ECS task environment
-  # (the ingest-wikimedia repo's PYWIKIBOT_PASSWORD secret has the password).
-  WIKIDATA_BATCH_SIZE = ENV["WIKIMEDIA_BOT_USER"].present? ? 500 : 50
+  # DPLA bot has bot flag on commons.wikimedia.org (→ 500 IDs/batch) but not
+  # on www.wikidata.org (→ 50 IDs/batch regardless of authentication).
+  # Set WIKIMEDIA_BOT_USER / WIKIMEDIA_BOT_PASSWORD in the ECS task environment.
+  WIKIDATA_PHASE1_BATCH_SIZE = 50
+  WIKIDATA_PHASE2_BATCH_SIZE = ENV["WIKIMEDIA_BOT_USER"].present? ? 500 : 50
 
   def self.rebuild
     new.rebuild
@@ -80,8 +81,9 @@ class WikimediaCacheBuilder
     commons_cookies  = login_to_wiki(COMMONS_API_URL)
 
     # Phase 1: Wikidata — resolve each ID to a MediaInfo entity ID via P8464 claim
+    # DPLA bot has no bot flag on wikidata.org, so batch size is capped at 50.
     wikidata_to_m_id = batch_fetch_entities(
-      WIKIDATA_API_URL, wikidata_ids, "claims", wikidata_cookies
+      WIKIDATA_API_URL, wikidata_ids, "claims", wikidata_cookies, WIKIDATA_PHASE1_BATCH_SIZE
     ) do |entity|
       (entity.dig("claims", "P8464") || [])
         .first&.dig("mainsnak", "datavalue", "value", "id")
@@ -90,9 +92,10 @@ class WikimediaCacheBuilder
     Rails.logger.info "[WikimediaCacheBuilder] #{wikidata_to_m_id.size} Wikidata IDs resolved to P8464 MediaInfo entities"
 
     # Phase 2: Commons — resolve each MediaInfo entity ID to a category name
+    # DPLA bot has bot flag on commons.wikimedia.org, so 500 IDs/batch is allowed.
     unique_m_ids     = wikidata_to_m_id.values.uniq
     m_id_to_category = batch_fetch_entities(
-      COMMONS_API_URL, unique_m_ids, "sitelinks", commons_cookies
+      COMMONS_API_URL, unique_m_ids, "sitelinks", commons_cookies, WIKIDATA_PHASE2_BATCH_SIZE
     ) do |entity|
       title = entity.dig("sitelinks", "commonswiki", "title")
       title&.sub(/\ACategory:/i, "")&.gsub(" ", "_")
@@ -108,13 +111,13 @@ class WikimediaCacheBuilder
   # Fetches entities from a MediaWiki API in batches, reusing a single TCP
   # connection per invocation. Yields each entity hash; stores the return value
   # if non-nil. Returns { entity_id => value }.
-  def batch_fetch_entities(api_url, ids, props, cookies, &extractor)
+  def batch_fetch_entities(api_url, ids, props, cookies, batch_size, &extractor)
     uri    = URI(api_url)
     result = {}
     failed = 0
 
     Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 30) do |http|
-      ids.each_slice(WIKIDATA_BATCH_SIZE) do |batch|
+      ids.each_slice(batch_size) do |batch|
         params  = { action: "wbgetentities", ids: batch.join("|"),
                     format: "json", props: props }
         headers = { "User-Agent" => "DPLA Analytics Dashboard/1.0" }
@@ -129,6 +132,12 @@ class WikimediaCacheBuilder
         end
         response.value
         data = JSON.parse(response.body)
+
+        if data["error"]
+          Rails.logger.warn "[WikimediaCacheBuilder] #{uri.host} API error: #{data['error']['code']}: #{data['error']['info']}"
+          failed += 1
+          next
+        end
 
         (data["entities"] || {}).each do |id, entity|
           next if entity["missing"]
