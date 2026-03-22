@@ -59,11 +59,11 @@ class WikimediaCacheBuilder
   def build_work_items(institutions)
     items = []
     institutions.each do |hub_name, hub_data|
-      hub_wikidata = hub_data["Wikidata"]
+      hub_wikidata = hub_data["Wikidata"]&.strip
       items << { hub: hub_name, contributor: "", wikidata_id: hub_wikidata } if hub_wikidata.present?
 
       (hub_data["institutions"] || {}).each do |contributor_name, contributor_data|
-        contrib_wikidata = contributor_data["Wikidata"]
+        contrib_wikidata = contributor_data["Wikidata"]&.strip
         items << { hub: hub_name, contributor: contributor_name, wikidata_id: contrib_wikidata } if contrib_wikidata.present?
       end
     end
