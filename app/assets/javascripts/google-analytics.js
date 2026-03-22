@@ -13,6 +13,10 @@
 
     gapi.analytics.ready(function() {
 
+      // These data elements are only present on timeline/map pages.
+      // Bail out on pages that don't have them (e.g. hub overview).
+      if (!document.getElementById("access-token")) return;
+
       // Read data from HTML
 
       var accessToken = document.getElementById("access-token").dataset.accessToken;
