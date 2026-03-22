@@ -626,8 +626,14 @@ ul.hub-grid {
   padding: 20px 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 340px) {
+  ul.hub-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .hub-card {
