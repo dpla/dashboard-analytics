@@ -100,17 +100,22 @@ class GaResponseBuilder
   end
 
   def build_request(offset)
-    Google::Apis::AnalyticsdataV1beta::RunReportRequest.new(
-      metrics:              ga4_metric_names.map { |m| Google::Apis::AnalyticsdataV1beta::Metric.new(name: m) },
-      dimensions:           ga4_dimension_names.map { |d| Google::Apis::AnalyticsdataV1beta::Dimension.new(name: d) },
-      date_ranges:          [Google::Apis::AnalyticsdataV1beta::DateRange.new(start_date: @start_date, end_date: @end_date)],
-      dimension_filter:     build_filter_expression,
-      order_bys:            build_order_bys,
-      metric_aggregations:  ['TOTAL'],
-      keep_empty_rows:      false,
-      limit:                10_000,
-      offset:               offset
-    )
+    params = {
+      metrics:             ga4_metric_names.map { |m| Google::Apis::AnalyticsdataV1beta::Metric.new(name: m) },
+      dimensions:          ga4_dimension_names.map { |d| Google::Apis::AnalyticsdataV1beta::Dimension.new(name: d) },
+      date_ranges:         [Google::Apis::AnalyticsdataV1beta::DateRange.new(start_date: @start_date, end_date: @end_date)],
+      metric_aggregations: ['TOTAL'],
+      keep_empty_rows:     false,
+      limit:               10_000,
+      offset:              offset
+    }
+    # Only include optional collection fields when non-nil; passing nil for a
+    # collection field causes the representable serializer to crash.
+    filter    = build_filter_expression
+    order_bys = build_order_bys
+    params[:dimension_filter] = filter    if filter
+    params[:order_bys]        = order_bys if order_bys
+    Google::Apis::AnalyticsdataV1beta::RunReportRequest.new(**params)
   end
 
   def build_filter_expression
