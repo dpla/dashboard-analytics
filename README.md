@@ -74,8 +74,8 @@ Website analytics are pulled live from the GA4 Reporting API (v1 beta) using a G
 
 **What is NOT tracked in GA4:**
 
-- **API usage** — The DPLA API does not report to GA4. The API usage sections on every page show no data and are currently stubs.
-- **BWS usage** — The Black Women's Suffrage site has not yet been instrumented with GA4. BWS usage sections are stubs returning zero values.
+- **API usage** — The DPLA API does not report to GA4. API usage sections on every page are present in the UI but show no data.
+- **BWS usage** — The Black Women's Suffrage site is not instrumented with GA4 (it ran Universal Analytics, which stopped collecting data in July 2023). BWS usage sections are present in the UI but show zero values.
 
 The GA4 integration lives in `app/lib/ga_response_builder.rb`. Each metric section has a dedicated builder class (e.g., `WebsiteOverview`, `WebsiteEvents`, `WebsiteSearchTerms`) that constructs and executes the appropriate GA4 `RunReportRequest`.
 
@@ -489,15 +489,15 @@ All user management is done through the admin UI at `/admin/users` (requires `ad
 
 ### Missing Data — API Usage
 
-API usage metrics (sections labeled "API" across all hub and contributor pages) return no data. The DPLA API does not report usage to Google Analytics, and no alternative source is currently integrated. These sections are intentional stubs left in the UI for future implementation.
+API usage metrics (sections labeled "API" across all hub and contributor pages) return no data. The DPLA API does not report usage to Google Analytics, and no alternative source has been integrated. The sections are present in the UI but display nothing.
 
 ### Missing Data — Black Women's Suffrage
 
-The Black Women's Suffrage (BWS) digital exhibit at [blackwomenssuffrage.dp.la](https://blackwomenssuffrage.dp.la) has not yet been instrumented with GA4. All BWS analytics sections show zero values. The site is still running Universal Analytics (which stopped collecting data in July 2023). BWS analytics cannot be enabled until the site is migrated to GA4 and a property is configured in the dashboard settings.
+The Black Women's Suffrage (BWS) digital exhibit at [blackwomenssuffrage.dp.la](https://blackwomenssuffrage.dp.la) ran Universal Analytics, which stopped collecting data in July 2023. The site has not been migrated to GA4, so all BWS analytics sections show zero values. BWS analytics will require a GA4 property to be set up for the BWS site and its ID configured in dashboard settings.
 
 ### Missing Data — Primary Source Sets
 
-Primary Source Set (PSS) page view data is not yet flowing through GA4. The PSS pages on dp.la fire analytics events, but the dashboard does not currently have a query or section for PSS-specific metrics. This is a known gap in the post-GA4-migration work.
+Primary Source Set (PSS) page view data is not tracked in the dashboard. The PSS pages on dp.la fire GA4 analytics events, but no PSS-specific query or metric section exists in the dashboard. This is a gap in the GA4 migration work.
 
 ### Wikimedia Cache — No Automatic Rebuild
 
