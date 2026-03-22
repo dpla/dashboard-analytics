@@ -2,65 +2,67 @@ class WikimediaAnalyticsPresenter
 
   # Fields to be shown in the user interface.
   def self.fields
-    [ 'Upload count', 'Page views' ]
+    [ 'Upload count', 'Page views', 'Files Used', 'Pages Enhanced' ]
   end
 
   ##
-  # @param [WikimediaAnalytics]
-  def initialize(wikimedia_analytics)
-    @wikimedia_analytics = wikimedia_analytics
-  end
-
-  ##
-  # @param [String]
-  # @return [Array<CSV::Row>]
-  def all_contributors(hub)
-    @wikimedia_analytics.wiki_csv
-      .find_all { |row| row["Hub"] == hub && row["Institution"] != hub }
-  rescue => e
-    Rails.logger.error(e)
-    []
+  # @param start_month [String] "YYYY-MM"
+  # @param end_month   [String] "YYYY-MM"
+  def initialize(start_month:, end_month:)
+    @start_month = start_month
+    @end_month   = end_month
   end
 
   ##
   # @param hub [String]
+  # @return [Hash]
+  def hub(hub)
+    WikimediaCache.totals_for(hub: hub, contributor: "", start_month: @start_month, end_month: @end_month)
+  rescue => e
+    Rails.logger.error(e)
+    {}
+  end
+
+  ##
+  # @param hub         [String]
   # @param contributor [String]
   # @return [Hash]
   def contributor(hub, contributor)
-    @wikimedia_analytics.wiki_csv
-      .find { |row| row["Hub"] == hub && row["Institution"] == contributor }
-      &.to_hash || {}
+    WikimediaCache.totals_for(hub: hub, contributor: contributor, start_month: @start_month, end_month: @end_month)
   rescue => e
     Rails.logger.error(e)
     {}
   end
 
   ##
-  # @param [String]
-  # @return [Hash]
-  def hub(hub)
-    csv          = @wikimedia_analytics.wiki_csv
-    hub_row      = csv.find   { |r| r["Hub"] == hub && r["Institution"] == hub }
-    contributors = csv.select { |r| r["Hub"] == hub && r["Institution"] != hub }
-
-    return {} if hub_row.nil? && contributors.empty?
-
-    # Hub-level rows sometimes have 0 for fields that contributors show as
-    # non-zero (a data quality issue in the CSV). Take the max of the hub row
-    # value and the contributor sum per field so neither source is silently lost.
-    self.class.fields.each_with_object({}) do |field, hash|
-      hub_val    = hub_row ? hub_row[field].to_i : 0
-      contrib_sum = contributors.sum { |r| r[field].to_i }
-      hash[field] = [hub_val, contrib_sum].max.to_s
-    end
+  # Returns a list of hashes, one per contributor, each containing the
+  # contributor's name under 'Institution' plus their aggregated field values.
+  # This preserves compatibility with ContributorComparison which does
+  # row['Institution'] and row[field] lookups on these objects.
+  #
+  # @param hub [String]
+  # @return [Array<Hash>]
+  def all_contributors(hub)
+    WikimediaCache
+      .where(hub: hub, month: @start_month..@end_month)
+      .where.not(contributor: "")
+      .group(:contributor)
+      .select(:contributor,
+              Arel.sql("SUM(page_views) AS page_views"),
+              Arel.sql("MAX(upload_count) AS upload_count"),
+              Arel.sql("MAX(files_used) AS files_used"),
+              Arel.sql("MAX(pages_enhanced) AS pages_enhanced"))
+      .map do |row|
+        {
+          "Institution"    => row.contributor,
+          "Page views"     => row.page_views&.to_i     || 0,
+          "Upload count"   => row.upload_count&.to_i   || 0,
+          "Files Used"     => row.files_used&.to_i     || 0,
+          "Pages Enhanced" => row.pages_enhanced&.to_i || 0
+        }
+      end
   rescue => e
     Rails.logger.error(e)
-    {}
-  end
-
-  ##
-  # @return Date|nil
-  def file_date
-    @wikimedia_analytics.file_date
+    []
   end
 end
