@@ -39,13 +39,17 @@ class MetadataCompleteness
   end
 
   def hub_csv
-    response = sThree_response("provider.csv")
-    csv_data(response)
+    @hub_csv ||= begin
+      response = sThree_response("provider.csv")
+      response ? csv_data(response).to_a : []
+    end
   end
 
   def contributor_csv
-    response = sThree_response("contributor.csv")
-    csv_data(response)
+    @contributor_csv ||= begin
+      response = sThree_response("contributor.csv")
+      response ? csv_data(response).to_a : []
+    end
   end
 
   def file_date

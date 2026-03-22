@@ -317,9 +317,37 @@ table input[type="submit"] {
   padding-right: 14px;
 }
 
-table#comparison {
+.comparison-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
   clear: both;
+}
+
+table#comparison {
   font-size: 0.9em;
+  white-space: nowrap;
+}
+
+table#comparison th:first-child,
+table#comparison td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: #fff;
+  z-index: 1;
+}
+
+table#comparison th {
+  cursor: pointer;
+}
+
+table#comparison th.headerSortUp::after {
+  content: " ▲";
+  font-size: 0.75em;
+}
+
+table#comparison th.headerSortDown::after {
+  content: " ▼";
+  font-size: 0.75em;
 }
 
 form.comparison fieldset {

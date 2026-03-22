@@ -93,9 +93,12 @@ class ContributorComparison
     @contributors_item_count.map do |c|
       contributor = c["term"]
       count = c["count"]
-      f_use = frontend_use_by_contributor[contributor] || {}
-      f_events = frontend_events_by_contributor[contributor] || {}
-      b_count = { "ItemCount" => @bws_item_count[contributor] || nil }
+      # GA4 truncates event names (contributor names) at ingestion — look up
+      # using the same prefix length so keys match the GA4 response rows.
+      ga_key = contributor[0, GaResponseBuilder::GA4_EVENT_NAME_MAX_LENGTH]
+      f_use = frontend_use_by_contributor[ga_key] || {}
+      f_events = frontend_events_by_contributor[ga_key] || {}
+      b_count = { "ItemCount" => @bws_item_count[contributor] }
       b_use = bws_use_by_contributor[contributor] || {}
       b_events = bws_events_by_contributor[contributor] || {}
       # TODO: only call API if date range applies
@@ -208,11 +211,11 @@ class ContributorComparison
   private
 
   def frontend_use_by_contributor
-    @website_overview.parse_data
+    @frontend_use_by_contributor ||= @website_overview.parse_data
   end
 
   def frontend_events_by_contributor
-    @website_events.parse_data
+    @frontend_events_by_contributor ||= @website_events.parse_data
   end
 
   def bws_use_by_contributor
