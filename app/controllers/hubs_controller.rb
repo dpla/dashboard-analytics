@@ -11,7 +11,7 @@ class HubsController < ApplicationController
 
   def index
     assign_start_and_end_dates
-    @hubs = Hub.all
+    @hubs = Hub.all_with_counts
     redirect_to hub_path(current_user.hub) unless current_user.hub == "All"
   end
 

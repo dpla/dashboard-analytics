@@ -3,17 +3,18 @@
 </div>
 
 <main>
-  <div class="clear"/>
-    <% if @hubs.present? %>
-    <ul>
-    <% @hubs.each do |hub| %>
-      <li>
-        <%= link_to hub, hub_path(hub) %>
-      </li>
-    <% end %>
+  <% if @hubs.present? %>
+    <ul class="hub-grid">
+      <% @hubs.each do |hub| %>
+        <li class="hub-card">
+          <%= link_to hub_path(hub['term']), class: "hub-card-link" do %>
+            <span class="hub-card-name"><%= hub['term'] %></span>
+            <span class="hub-card-count"><%= number_with_delimiter(hub['count']) %> items</span>
+          <% end %>
+        </li>
+      <% end %>
     </ul>
-    <% else %>
-      There was a problem retriving hubs from the DPLA API.
-    <% end %>
-  </div>
+  <% else %>
+    <p class="no-data">There was a problem retrieving hubs from the DPLA API.</p>
+  <% end %>
 </main>

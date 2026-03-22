@@ -8,13 +8,20 @@ class DplaApiResponseBuilder
   # @return [Array<String>]
   #
   def hubs
+    hubs_with_counts.map { |h| h['term'] }
+  end
+
+  ##
+  # @return [Array<Hash>] each hash has 'term' (hub name) and 'count' (item count)
+  #
+  def hubs_with_counts
     options = { query: { api_key: api_key,
                          facets: 'provider.name',
                          page_size: 0 } }
 
     begin
       json_response('/items', options)['facets']['provider.name']['terms']
-        .map{ |f| f['term'] }
+        .sort_by { |f| f['term'] }
     rescue Exception => e
       Rails.logger.debug(e)
       Array.new

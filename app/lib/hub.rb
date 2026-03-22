@@ -9,6 +9,14 @@ class Hub
   end
 
   ##
+  # Get all hubs with their DPLA item counts (single API call, already sorted)
+  # @return [Array<Hash>] each hash has 'term' (hub name) and 'count' (item count)
+  #
+  def self.all_with_counts
+    dpla_api.hubs_with_counts
+  end
+
+  ##
   # Initialize a single hub
   # 
   # @param name [String]
