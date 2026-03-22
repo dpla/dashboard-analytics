@@ -215,6 +215,8 @@ class GaResponseBuilder
       return {} unless @response&.totals&.any?
 
       totals_row = @response.totals.first
+      return {} if totals_row.nil?
+
       @metric_names.each_with_index.each_with_object({}) do |(name, i), hash|
         hash[name] = totals_row.metric_values[i]&.value
       end
