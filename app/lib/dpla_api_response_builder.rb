@@ -134,6 +134,33 @@ class DplaApiResponseBuilder
     end
   end
 
+  ##
+  # Fetch dataProvider (contributing institution) names for a list of DPLA
+  # item IDs. Returns a hash of { item_id => data_provider_name }.
+  # IDs not found or missing dataProvider are omitted.
+  #
+  # @param ids [Array<String>] DPLA item hex IDs
+  # @return [Hash<String, String>]
+  #
+  def data_providers_for_items(ids)
+    return {} if ids.empty?
+
+    result = {}
+    ids.uniq.compact.each_slice(50) do |batch|
+      begin
+        docs = json_response("/items/#{batch.join(',')}", query: { api_key: api_key })['docs'] || []
+        docs.each do |doc|
+          item_hash = doc['id']&.split('/')&.last
+          name = doc.dig('dataProvider', 'name')
+          result[item_hash] = name if item_hash && name
+        end
+      rescue => e
+        Rails.logger.debug(e)
+      end
+    end
+    result
+  end
+
   private
 
   def api_key

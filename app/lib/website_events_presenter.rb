@@ -19,7 +19,7 @@ class WebsiteEventsPresenter  < GaResponsePresenter
   end
 
   def contributor(row)
-    row[columns.index("ga:eventAction")]
+    item_contributor_lookup[id(row)] || row[columns.index("ga:eventAction")]
   end
 
   def id(row)
@@ -36,6 +36,7 @@ class WebsiteEventsPresenter  < GaResponsePresenter
 
   ##
   # Generate CSV of all events
+  # @return [CSV]
   def to_csv
     attributes = ["Item", "Item ID", "Contributor", label]
 
@@ -47,6 +48,18 @@ class WebsiteEventsPresenter  < GaResponsePresenter
           csv << [title(row), id(row), contributor(row), count(row)]
         end
       end
+    end
+  end
+
+  private
+
+  # Batch-fetches full dataProvider names from the DPLA item API for all
+  # items on the current page, keyed by item ID. Falls back to the GA4
+  # event name (truncated to 40 chars) when an item is not found.
+  def item_contributor_lookup
+    @item_contributor_lookup ||= begin
+      item_ids = rows.filter_map { |row| id(row) }
+      DplaApiResponseBuilder.new.data_providers_for_items(item_ids)
     end
   end
 end
