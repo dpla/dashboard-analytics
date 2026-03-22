@@ -24,12 +24,27 @@ class WikimediaCacheBuilder
 
     # Resolve each unique Wikidata ID to a Commons category once, avoiding
     # redundant API calls when multiple contributors share the same Wikidata ID.
-    unique_ids         = work_items.map { |i| i[:wikidata_id] }.uniq
-    wikidata_to_cat    = {}
-    unique_ids.each do |wikidata_id|
-      cat = resolve_commons_category(wikidata_id)
-      wikidata_to_cat[wikidata_id] = cat if cat
+    # Run resolutions in parallel — there are hundreds of IDs and each makes 2
+    # sequential HTTP calls, so a thread pool gives a large speedup here.
+    unique_ids      = work_items.map { |i| i[:wikidata_id] }.uniq
+    wikidata_to_cat = {}
+    cat_mutex       = Mutex.new
+
+    id_queue = Queue.new
+    unique_ids.each { |id| id_queue << id }
+    THREAD_POOL_SIZE.times { id_queue << :stop }
+
+    id_threads = THREAD_POOL_SIZE.times.map do
+      Thread.new do
+        loop do
+          id = id_queue.pop
+          break if id == :stop
+          cat = resolve_commons_category(id)
+          cat_mutex.synchronize { wikidata_to_cat[id] = cat } if cat
+        end
+      end
     end
+    id_threads.each(&:join)
 
     processable = work_items.select { |i| wikidata_to_cat.key?(i[:wikidata_id]) }
     Rails.logger.info "[WikimediaCacheBuilder] #{processable.size} items with resolvable categories"
@@ -103,16 +118,14 @@ class WikimediaCacheBuilder
   end
 
   def fetch_and_upsert(hub, contributor, category)
-    # Fetch snapshot and pageview data concurrently — they're independent calls.
-    snapshot_thread  = Thread.new { fetch_snapshot(category) }
-    pageviews_thread = Thread.new { fetch_pageviews(category) }
-    snapshot_data    = snapshot_thread.value
-    pageviews_data   = pageviews_thread.value
+    # The 20-thread outer pool already provides sufficient I/O parallelism;
+    # spawning additional threads here would cause unbounded thread proliferation.
+    snapshot_data  = fetch_snapshot(category)
+    pageviews_data = fetch_pageviews(category)
 
     all_months = (snapshot_data.keys + pageviews_data.keys).uniq
     return if all_months.empty?
 
-    now  = Time.current
     rows = all_months.map do |month|
       snap = snapshot_data[month] || {}
       # Snapshot fields use hyphenated names matching the API response keys.
@@ -124,15 +137,14 @@ class WikimediaCacheBuilder
         upload_count:   snap["media-file-count-deep"],
         files_used:     snap["used-media-file-count-deep"],
         pages_enhanced: snap["leveraging-page-count-deep"],
-        page_views:     pageviews_data[month],
-        updated_at:     now
+        page_views:     pageviews_data[month]
       }
     end
 
     WikimediaCache.upsert_all(
       rows,
       unique_by: [:hub, :contributor, :month],
-      update_only: [:upload_count, :files_used, :pages_enhanced, :page_views, :updated_at]
+      update_only: [:upload_count, :files_used, :pages_enhanced, :page_views]
     )
 
     Rails.logger.debug "[WikimediaCacheBuilder] Upserted #{rows.size} rows for #{hub} / #{contributor.presence || 'hub'}"
