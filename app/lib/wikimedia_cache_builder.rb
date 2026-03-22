@@ -28,7 +28,8 @@ class WikimediaCacheBuilder
     # silent failures when too many threads hit the API simultaneously.
     unique_ids      = work_items.map { |i| i[:wikidata_id] }.uniq
     wikidata_to_cat = {}
-    unique_ids.each do |wikidata_id|
+    unique_ids.each_with_index do |wikidata_id, idx|
+      sleep(0.1) if idx > 0  # ~10 req/s — stays well under Wikidata rate limits
       cat = resolve_commons_category(wikidata_id)
       wikidata_to_cat[wikidata_id] = cat if cat
     end
@@ -202,9 +203,16 @@ class WikimediaCacheBuilder
   # Reuse an already-open Net::HTTP connection.
   # Raises Net::HTTPError for non-2xx responses so callers' rescue blocks log
   # the failure instead of silently parsing an error response body as JSON.
+  # Retries once on 429 after honoring the Retry-After header (default 10s).
   def fetch_json_via(http, url)
     uri      = URI(url)
     response = http.get(uri.request_uri, "User-Agent" => "DPLA Analytics Dashboard/1.0")
+    if response.is_a?(Net::HTTPTooManyRequests)
+      wait = response["Retry-After"]&.to_i || 10
+      Rails.logger.info "[WikimediaCacheBuilder] 429 from #{uri.host}, retrying in #{wait}s"
+      sleep(wait)
+      response = http.get(uri.request_uri, "User-Agent" => "DPLA Analytics Dashboard/1.0")
+    end
     response.value
     JSON.parse(response.body)
   end
