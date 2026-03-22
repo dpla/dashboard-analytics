@@ -138,10 +138,8 @@ class ContributorsController < ApplicationController
 
   def contributor_comparison
     assign_start_and_end_dates
-    
-    contributors_item_count = DplaApiResponseBuilder.new
-      .contributors_item_count(params[:hub_id])
 
+    # Build objects first — no network calls yet.
     website_overview = WebsiteOverviewByContributor.build do |builder|
       builder.hub = params[:hub_id]
       builder.start_date = @start_date
@@ -153,9 +151,6 @@ class ContributorsController < ApplicationController
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
-
-    bws_item_count = DplaApiResponseBuilder.new
-      .contributors_bws_item_count(params[:hub_id])
 
     bws_overview = BwsOverviewByContributor.build do |builder|
       builder.hub = params[:hub_id]
@@ -184,6 +179,22 @@ class ContributorsController < ApplicationController
       builder.hub = params[:hub_id]
       builder.end_date = @end_date
     end
+
+    # Fire all six independent network calls concurrently. DPLA API results
+    # are returned directly; GA4/S3 calls warm each object's memoized cache
+    # so ContributorComparison#totals reads from memory instead of the network.
+    hub_id = params[:hub_id]
+    results = [
+      Thread.new { DplaApiResponseBuilder.new.contributors_item_count(hub_id) },
+      Thread.new { DplaApiResponseBuilder.new.contributors_bws_item_count(hub_id) },
+      Thread.new { website_overview.response },
+      Thread.new { website_events.response },
+      Thread.new { metadata_completeness.contributor_csv },
+      Thread.new { wikimedia_analytics.wiki_csv },
+    ].map(&:value)
+
+    contributors_item_count = results[0]
+    bws_item_count          = results[1]
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
