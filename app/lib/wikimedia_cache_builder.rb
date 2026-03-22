@@ -24,27 +24,14 @@ class WikimediaCacheBuilder
 
     # Resolve each unique Wikidata ID to a Commons category once, avoiding
     # redundant API calls when multiple contributors share the same Wikidata ID.
-    # Run resolutions in parallel — there are hundreds of IDs and each makes 2
-    # sequential HTTP calls, so a thread pool gives a large speedup here.
+    # Done sequentially — Wikidata rate-limits concurrent connections, causing
+    # silent failures when too many threads hit the API simultaneously.
     unique_ids      = work_items.map { |i| i[:wikidata_id] }.uniq
     wikidata_to_cat = {}
-    cat_mutex       = Mutex.new
-
-    id_queue = Queue.new
-    unique_ids.each { |id| id_queue << id }
-    THREAD_POOL_SIZE.times { id_queue << :stop }
-
-    id_threads = THREAD_POOL_SIZE.times.map do
-      Thread.new do
-        loop do
-          id = id_queue.pop
-          break if id == :stop
-          cat = resolve_commons_category(id)
-          cat_mutex.synchronize { wikidata_to_cat[id] = cat } if cat
-        end
-      end
+    unique_ids.each do |wikidata_id|
+      cat = resolve_commons_category(wikidata_id)
+      wikidata_to_cat[wikidata_id] = cat if cat
     end
-    id_threads.each(&:join)
 
     processable = work_items.select { |i| wikidata_to_cat.key?(i[:wikidata_id]) }
     Rails.logger.info "[WikimediaCacheBuilder] #{processable.size} items with resolvable categories"
