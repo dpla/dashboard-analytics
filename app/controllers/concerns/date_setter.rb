@@ -6,15 +6,15 @@ module DateSetter
   end
 
   def max_date
-    Date.today
+    Date.current
   end
 
   def default_start_date
-      Date.today.beginning_of_month
+    Date.current.beginning_of_month
   end
 
   def default_end_date
-    Date.today
+    Date.current
   end
 
   ##

@@ -42,15 +42,10 @@ class WikimediaCacheBuilder
 
     threads = THREAD_POOL_SIZE.times.map do
       Thread.new do
-        # Explicitly check out a connection per thread so upsert_all results
-        # are committed and visible to all connections (not just the thread's
-        # own implicit connection, which Rails doesn't auto-release on join).
-        ActiveRecord::Base.connection_pool.with_connection do
-          loop do
-            item = queue.pop
-            break if item == :stop
-            process_item(item, wikidata_to_cat[item[:wikidata_id]])
-          end
+        loop do
+          item = queue.pop
+          break if item == :stop
+          process_item(item, wikidata_to_cat[item[:wikidata_id]])
         end
       end
     end
@@ -132,22 +127,14 @@ class WikimediaCacheBuilder
           pages_enhanced: snap["leveraging-page-count-deep"]
         }
       end
-      WikimediaCache.upsert_all(
-        snap_rows,
-        unique_by: [:hub, :contributor, :month],
-        update_only: [:upload_count, :files_used, :pages_enhanced]
-      )
+      upsert_cache_rows(snap_rows, [:upload_count, :files_used, :pages_enhanced])
     end
 
     if pageviews_data.any?
       pv_rows = pageviews_data.map do |month, views|
         { hub: hub, contributor: contributor, month: month, page_views: views }
       end
-      WikimediaCache.upsert_all(
-        pv_rows,
-        unique_by: [:hub, :contributor, :month],
-        update_only: [:page_views]
-      )
+      upsert_cache_rows(pv_rows, [:page_views])
     end
 
     Rails.logger.debug "[WikimediaCacheBuilder] Upserted for #{hub} / #{contributor.presence || 'hub'}: #{snapshot_data.size} snap months, #{pageviews_data.size} pv months"
@@ -200,10 +187,25 @@ class WikimediaCacheBuilder
     end
   end
 
+  # Upserts rows into wikimedia_cache, borrowing a DB connection only for the
+  # duration of the write so the pool isn't exhausted by idle worker threads.
+  def upsert_cache_rows(rows, update_only_cols)
+    ActiveRecord::Base.connection_pool.with_connection do
+      WikimediaCache.upsert_all(
+        rows,
+        unique_by: [:hub, :contributor, :month],
+        update_only: update_only_cols
+      )
+    end
+  end
+
   # Reuse an already-open Net::HTTP connection.
+  # Raises Net::HTTPError for non-2xx responses so callers' rescue blocks log
+  # the failure instead of silently parsing an error response body as JSON.
   def fetch_json_via(http, url)
     uri      = URI(url)
     response = http.get(uri.request_uri, "User-Agent" => "DPLA Analytics Dashboard/1.0")
+    response.value
     JSON.parse(response.body)
   end
 end
