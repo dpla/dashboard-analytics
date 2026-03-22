@@ -39,9 +39,17 @@ class WikimediaAnalyticsPresenter
   # @param [String]
   # @return [Hash]
   def hub(hub)
-    @wikimedia_analytics.wiki_csv
-      .find { |row| row["Hub"] == hub && row["Institution"] == hub }
-      &.to_hash || {}
+    csv = @wikimedia_analytics.wiki_csv
+    row = csv.find { |r| r["Hub"] == hub && r["Institution"] == hub }
+    return row.to_hash if row
+
+    # No hub-level aggregate row in the CSV — sum contributor rows instead.
+    contributors = csv.select { |r| r["Hub"] == hub && r["Institution"] != hub }
+    return {} if contributors.empty?
+
+    self.class.fields.each_with_object({}) do |field, hash|
+      hash[field] = contributors.sum { |r| r[field].to_i }.to_s
+    end
   rescue => e
     Rails.logger.error(e)
     {}
