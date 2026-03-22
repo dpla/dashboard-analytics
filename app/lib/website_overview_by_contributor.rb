@@ -45,8 +45,8 @@ class WebsiteOverviewByContributor
       contributor = r[columns.index("ga:eventAction")]
       sessions = r[columns.index("ga:sessions")]
       users = r[columns.index("ga:users")]
-      data[contributor] = { 'Sessions' => sessions,
-                            'Users' => users }
+      data[contributor] = { 'Sessions' => sessions.to_i,
+                            'Users' => users.to_i }
     end
 
     data

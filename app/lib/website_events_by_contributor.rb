@@ -45,8 +45,8 @@ class WebsiteEventsByContributor
       contributor = r[1]
       count = r[2].to_i rescue 0
 
-      data[contributor] ||= { "Views" => 0 }
-      data[contributor]["Click Throughs"] = count if event == "Click Through"
+      data[contributor] ||= { "Views" => 0, "Click Throughs" => 0 }
+      data[contributor]["Click Throughs"] += count if event == "Click Through"
       data[contributor]["Views"] += count if event.start_with?("View")
     end
 
