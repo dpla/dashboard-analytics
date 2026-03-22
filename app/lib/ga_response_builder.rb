@@ -139,13 +139,13 @@ class GaResponseBuilder
   end
 
   def parse_filter(filter_str)
-    if (m = filter_str.match(/\A(.+?)==(.+)\z/))
+    if (m = filter_str.match(/\A([^=!]+)==(.+)\z/))
       field = GA4_DIMENSIONS[m[1]] || m[1]
       value = field == 'eventName' ? m[2][0, GA4_EVENT_NAME_MAX_LENGTH] : m[2]
       make_string_filter(field, value, 'EXACT')
-    elsif (m = filter_str.match(/\A(.+?)=@(.+)\z/))
+    elsif (m = filter_str.match(/\A([^=!]+)=@(.+)\z/))
       make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'CONTAINS')
-    elsif (m = filter_str.match(/\A(.+?)!@(.+)\z/))
+    elsif (m = filter_str.match(/\A([^=!]+)!@(.+)\z/))
       Google::Apis::AnalyticsdataV1beta::FilterExpression.new(
         not_expression: make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'CONTAINS')
       )
