@@ -26,9 +26,7 @@
         <% if api_data_for_date_range? %>
           <%= render_async api_events_path({ hub_id: params[:hub_id],
                                              contributor_id: params[:contributor_id],
-                                             event_id: params[:id],
-                                             start_date: current_start_date,
-                                             end_date: current_end_date }),
+                                             event_id: params[:id] }.merge(date_opts)),
                 'data-turbolinks-track': 'reload' do %>
             <div>Loading...</div>
           <% end %>
@@ -39,9 +37,7 @@
       <% else %>
         <%= render_async website_events_path({ hub_id: params[:hub_id],
                                                contributor_id: params[:contributor_id],
-                                               event_id: params[:id],
-                                               start_date: current_start_date,
-                                               end_date: current_end_date }),
+                                               event_id: params[:id] }.merge(date_opts)),
               'data-turbolinks-track': 'reload' do %>
           <div>Loading...</div>
         <% end %>

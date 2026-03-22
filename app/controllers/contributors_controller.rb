@@ -119,13 +119,10 @@ class ContributorsController < ApplicationController
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
     @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
 
-    wikimedia_analytics = WikimediaAnalytics.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.contributor = params[:contributor_id]
-      builder.end_date = @end_date
-    end
-
-    wa_presenter = WikimediaAnalyticsPresenter.new(wikimedia_analytics)
+    wa_presenter = WikimediaAnalyticsPresenter.new(
+      start_month: @start_date.strftime("%Y-%m"),
+      end_month:   @end_date.strftime("%Y-%m")
+    )
     @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
     @target = Contributor.new(params[:contributor_id],
@@ -175,12 +172,7 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    wikimedia_analytics = WikimediaAnalytics.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.end_date = @end_date
-    end
-
-    # Fire all six independent network calls concurrently. DPLA API results
+    # Fire all five independent network calls concurrently. DPLA API results
     # are returned directly; GA4/S3 calls warm each object's memoized cache
     # so ContributorComparison#totals reads from memory instead of the network.
     hub_id = params[:hub_id]
@@ -190,7 +182,6 @@ class ContributorsController < ApplicationController
       Thread.new { website_overview.response },
       Thread.new { website_events.response },
       Thread.new { metadata_completeness.contributor_csv },
-      Thread.new { wikimedia_analytics.wiki_csv },
     ].map(&:value)
 
     contributors_item_count = results[0]
@@ -198,7 +189,10 @@ class ContributorsController < ApplicationController
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
-    wa_presenter = WikimediaAnalyticsPresenter.new(wikimedia_analytics)
+    wa_presenter = WikimediaAnalyticsPresenter.new(
+      start_month: @start_date.strftime("%Y-%m"),
+      end_month:   @end_date.strftime("%Y-%m")
+    )
 
     @contributor_comparison = ContributorComparison.build do |builder|
       builder.hub = params[:hub_id]

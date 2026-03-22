@@ -12,8 +12,7 @@
                 action: params[:action],
                 hub_id: params[:hub_id],
                 contributor_id: params[:contributor_id],
-                start_date: current_start_date,
-                end_date: current_end_date,
+                **date_opts,
                 format: :csv %>
   </div>
 

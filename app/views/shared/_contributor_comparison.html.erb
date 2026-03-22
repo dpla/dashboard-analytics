@@ -126,12 +126,10 @@
 </form>
 
 <div class='download'>
-  <%= link_to 'Download CSV', controller: :contributors,
-                              action: params[:action],
-                              hub_id: params[:hub_id],
-                              start_date: current_start_date,
-                              end_date: current_end_date,
-                              format: :csv %>
+  <%= link_to 'Download CSV', { controller: :contributors,
+                                action: params[:action],
+                                hub_id: params[:hub_id],
+                                format: :csv }.merge(date_opts) %>
 </div>
 
 <div class="comparison-table-wrapper">
@@ -172,47 +170,45 @@
     <% @contributor_comparison.totals.each do |contributor, totals| %>
       <tr>
         <td>
-          <%= link_to contributor, controller: :contributors, action: :show,
-                                   hub_id: params[:hub_id], id: contributor,
-                                   start_date: current_start_date,
-                                   end_date: current_end_date %>
+          <%= link_to contributor, { controller: :contributors, action: :show,
+                                     hub_id: params[:hub_id], id: contributor }.merge(date_opts) %>
         </td>
         <td class="website-view">
-          <%= totals["Website"]["Views"] %>
+          <%= totals["Website"]["Views"] || 0 %>
         </td>
         <td class="click-through">
-          <%= totals["Website"]["Click Throughs"] %>
+          <%= totals["Website"]["Click Throughs"] || 0 %>
         </td>
         <td class="website-session">
-          <%= totals["Website"]["Sessions"] %>
+          <%= totals["Website"]["Sessions"] || 0 %>
         </td>
         <td class="website-user">
-          <%= totals["Website"]["Users"] %>
+          <%= totals["Website"]["Users"] || 0 %>
         </td>
         <% if bws_data_for_date_range? %>
           <td class="bws-item-count">
-            <%= totals["BWS"]["ItemCount"] %>
+            <%= totals["BWS"]["ItemCount"] || 0 %>
           </td>
           <td class="bws-view">
-            <%= totals["BWS"]["Views"] %>
+            <%= totals["BWS"]["Views"] || 0 %>
           </td>
           <td class="bws-click-through">
-            <%= totals["BWS"]["Click Throughs"] %>
+            <%= totals["BWS"]["Click Throughs"] || 0 %>
           </td>
           <td class="bws-session">
-            <%= totals["BWS"]["Sessions"] %>
+            <%= totals["BWS"]["Sessions"] || 0 %>
           </td>
           <td class="bws-user">
-            <%= totals["BWS"]["Users"] %>
+            <%= totals["BWS"]["Users"] || 0 %>
           </td>
         <% end %>
         <% if api_data_for_date_range? %>
           <td class="api-view">
-            <%= totals["Api"]["Views"] %>
+            <%= totals["Api"]["Views"] || 0 %>
           </td>
         <% end %>
         <td class="item-count">
-          <%= totals["ItemCount"] %>
+          <%= totals["ItemCount"] || 0 %>
         </td>
         <% WikimediaPreparationsPresenter.fields.each do |field| %>
           <% value = totals["WikimediaPreparations"][field] %>
@@ -223,7 +219,7 @@
         <% WikimediaAnalyticsPresenter.fields.each do |field| %>
           <% value = totals["WikimediaAnalytics"][field] %>
           <td class="<%= field.parameterize %>">
-            <%= number_with_delimiter(value) %>
+            <%= number_with_delimiter(value || 0) %>
           </td>
         <% end %>
         <% MetadataCompletenessPresenter.fields.each do |field| %>

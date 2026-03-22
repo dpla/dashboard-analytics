@@ -56,19 +56,19 @@ class WebsiteOverview
   ##
   # Total website events for the given hub/contributor and time period.
   def events
-    response.present? ? response.totals_for_all_results['ga:totalEvents'] : 0
+    response&.totals_for_all_results&.[]('ga:totalEvents').to_i
   end
 
   ##
   # Total website sessions for the given hub/contributor and time period.
   def sessions
-    response.present? ? response.totals_for_all_results['ga:sessions'] : 0
+    response&.totals_for_all_results&.[]('ga:sessions').to_i
   end
 
   ##
   # Total website users for the given hub/contributor and time period.
   def users
-   response.present? ? response.totals_for_all_results['ga:users'] : 0
+    response&.totals_for_all_results&.[]('ga:users').to_i
   end
 
   private

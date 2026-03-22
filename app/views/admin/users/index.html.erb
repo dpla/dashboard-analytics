@@ -7,6 +7,18 @@
     <div class="notice"><%= flash[:notice] %></div>
   <% end %>
 
+  <div style="margin-bottom: 1.5em; padding: 1em; border: 1px solid #e9dec8; border-radius: 3px; background: #fdf8f0;">
+    <strong>Wikimedia Cache</strong>
+    <%= button_to "Rebuild Wikimedia Cache",
+          admin_wikimedia_cache_rebuild_path,
+          method: :post,
+          data: { turbo_confirm: "This will rebuild the Wikimedia cache from the CIM API. It runs in the background and may take several minutes. Continue?" },
+          style: "margin-left: 1em;" %>
+    <span style="margin-left: 0.5em; font-size: 0.85em; color: #777;">
+      Monthly automatic rebuild planned for the 8th of each month.
+    </span>
+  </div>
+
   <p>
     <%= button_to "Sign up a new user", new_admin_user_path, method: :get %>
   </p>
@@ -36,7 +48,7 @@
           <% end %>
           
           <%= button_to "Delete", admin_user_path(user), method: :delete, 
-            data: { confirm: "Are you sure you want to delete #{user.email}?" } %>
+            data: { turbo_confirm: "Are you sure you want to delete #{user.email}?" } %>
         </td>
       </tr>
       <% end %>

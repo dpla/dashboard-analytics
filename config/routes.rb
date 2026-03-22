@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :users
+    post "wikimedia_cache/rebuild", to: "wikimedia_cache#rebuild"
   end
 
   resources :hubs, id: /.*/, only: [:index, :show] do
