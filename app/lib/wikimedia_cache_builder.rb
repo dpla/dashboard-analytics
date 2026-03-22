@@ -115,31 +115,42 @@ class WikimediaCacheBuilder
     snapshot_data  = fetch_snapshot(category)
     pageviews_data = fetch_pageviews(category)
 
-    all_months = (snapshot_data.keys + pageviews_data.keys).uniq
-    return if all_months.empty?
+    return if snapshot_data.empty? && pageviews_data.empty?
 
-    rows = all_months.map do |month|
-      snap = snapshot_data[month] || {}
+    # Upsert snapshot and pageview data separately so that a failed API call
+    # (returning {}) never overwrites previously cached values with nil.
+    if snapshot_data.any?
       # Snapshot fields use hyphenated names matching the API response keys.
       # -deep variants include subcategories (category-scope=deep).
-      {
-        hub:            hub,
-        contributor:    contributor,
-        month:          month,
-        upload_count:   snap["media-file-count-deep"],
-        files_used:     snap["used-media-file-count-deep"],
-        pages_enhanced: snap["leveraging-page-count-deep"],
-        page_views:     pageviews_data[month]
-      }
+      snap_rows = snapshot_data.map do |month, snap|
+        {
+          hub:            hub,
+          contributor:    contributor,
+          month:          month,
+          upload_count:   snap["media-file-count-deep"],
+          files_used:     snap["used-media-file-count-deep"],
+          pages_enhanced: snap["leveraging-page-count-deep"]
+        }
+      end
+      WikimediaCache.upsert_all(
+        snap_rows,
+        unique_by: [:hub, :contributor, :month],
+        update_only: [:upload_count, :files_used, :pages_enhanced]
+      )
     end
 
-    WikimediaCache.upsert_all(
-      rows,
-      unique_by: [:hub, :contributor, :month],
-      update_only: [:upload_count, :files_used, :pages_enhanced, :page_views]
-    )
+    if pageviews_data.any?
+      pv_rows = pageviews_data.map do |month, views|
+        { hub: hub, contributor: contributor, month: month, page_views: views }
+      end
+      WikimediaCache.upsert_all(
+        pv_rows,
+        unique_by: [:hub, :contributor, :month],
+        update_only: [:page_views]
+      )
+    end
 
-    Rails.logger.debug "[WikimediaCacheBuilder] Upserted #{rows.size} rows for #{hub} / #{contributor.presence || 'hub'}"
+    Rails.logger.debug "[WikimediaCacheBuilder] Upserted for #{hub} / #{contributor.presence || 'hub'}: #{snapshot_data.size} snap months, #{pageviews_data.size} pv months"
   end
 
   # Returns { "YYYY-MM" => { "media-file-count-deep" => N, ... } }
