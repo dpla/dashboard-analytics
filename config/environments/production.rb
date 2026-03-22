@@ -53,7 +53,7 @@ Rails.application.configure do
   logger = ActiveSupport::Logger.new(STDOUT)
   logger.formatter = config.log_formatter
   config.logger = ActiveSupport::TaggedLogging.new(logger)
-  config.log_level = :error
+  config.log_level = ENV.fetch("LOG_LEVEL", "error").to_sym
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
