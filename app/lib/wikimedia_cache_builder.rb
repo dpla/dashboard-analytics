@@ -42,10 +42,15 @@ class WikimediaCacheBuilder
 
     threads = THREAD_POOL_SIZE.times.map do
       Thread.new do
-        loop do
-          item = queue.pop
-          break if item == :stop
-          process_item(item, wikidata_to_cat[item[:wikidata_id]])
+        # Explicitly check out a connection per thread so upsert_all results
+        # are committed and visible to all connections (not just the thread's
+        # own implicit connection, which Rails doesn't auto-release on join).
+        ActiveRecord::Base.connection_pool.with_connection do
+          loop do
+            item = queue.pop
+            break if item == :stop
+            process_item(item, wikidata_to_cat[item[:wikidata_id]])
+          end
         end
       end
     end
