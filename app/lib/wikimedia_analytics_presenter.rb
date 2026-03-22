@@ -39,16 +39,19 @@ class WikimediaAnalyticsPresenter
   # @param [String]
   # @return [Hash]
   def hub(hub)
-    csv = @wikimedia_analytics.wiki_csv
-    row = csv.find { |r| r["Hub"] == hub && r["Institution"] == hub }
-    return row.to_hash if row
-
-    # No hub-level aggregate row in the CSV — sum contributor rows instead.
+    csv          = @wikimedia_analytics.wiki_csv
+    hub_row      = csv.find   { |r| r["Hub"] == hub && r["Institution"] == hub }
     contributors = csv.select { |r| r["Hub"] == hub && r["Institution"] != hub }
-    return {} if contributors.empty?
 
+    return {} if hub_row.nil? && contributors.empty?
+
+    # Hub-level rows sometimes have 0 for fields that contributors show as
+    # non-zero (a data quality issue in the CSV). Take the max of the hub row
+    # value and the contributor sum per field so neither source is silently lost.
     self.class.fields.each_with_object({}) do |field, hash|
-      hash[field] = contributors.sum { |r| r[field].to_i }.to_s
+      hub_val    = hub_row ? hub_row[field].to_i : 0
+      contrib_sum = contributors.sum { |r| r[field].to_i }
+      hash[field] = [hub_val, contrib_sum].max.to_s
     end
   rescue => e
     Rails.logger.error(e)
