@@ -34,60 +34,12 @@ class ApiOverviewByContributor
     @end_date = end_date
   end
 
+  # API usage data is not tracked in GA4 — no data available.
   def parse_data
-    return Hash.new unless response.present?
-    # Create Hash of data
-    # e.g. { "The Library" => { "Views" => 4 } }
-    columns = response.column_headers.map { |c| c.name }
-    data = {}
-
-    if (response.total_results > 0)
-      response.rows.map do |r|
-        contributor = r[columns.index("ga:eventAction")]
-        views = r[columns.index("ga:totalEvents")]
-        data[contributor] = { 'Views' => views }
-      end
-    end
-
-    data
+    Hash.new
   end
 
-  ##
-  # Lazy load single-page response.
-  # Return nil if response fails.
-  #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
-  #
   def response
-    @reponse ||= overview_by_contributor_builder.response
-  rescue => e
-    Rails.logger.error(e)
     nil
-  end
-
-  private
-
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
-  def overview_by_contributor_builder
-    GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date.iso8601
-      builder.end_date = @end_date.iso8601
-      builder.segment = segment
-      builder.metrics = %w(ga:totalEvents)
-      builder.dimensions = %w(ga:eventAction)
-      builder.filters = %W(ga:eventCategory=@#{@hub})
-    end
-  end
-
-  def segment
-    Settings.google_analytics.api_segment
-  end
-
-  def profile_id
-    Settings.google_analytics.api_profile_id
   end
 end

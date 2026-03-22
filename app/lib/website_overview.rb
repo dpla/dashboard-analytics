@@ -47,7 +47,7 @@ class WebsiteOverview
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @reponse ||= website_overview_builder.response
+    @response ||= website_overview_builder.response
   rescue => e
     Rails.logger.error(e)
     nil

@@ -1,13 +1,10 @@
 ##
-# The service account must have read permissions for the views.
-# Segments must be shared.
+# The service account must have Viewer access to the GA4 property.
 google_analytics:
   # File path to the service account JSON key.
   service_account_json_key: <%= File.join Rails.root, 'google-analytics-key.json' %>
-  frontend_profile_id: <%= ENV["FRONTEND_PROFILE_ID"] %>
-  bws_profile_id: <%= ENV["BWS_PROFILE_ID"] %>
-  api_profile_id: <%= ENV["API_PROFILE_ID"] %>
-  api_segment: <%= ENV["API_SEGMENT"] %>
+  # GA4 property ID (numeric, without the "properties/" prefix)
+  property_id: <%= ENV["GA4_PROPERTY_ID"] %>
   tracking_id: <%= ENV["TRACKING_ID"] %>
 
 dpla_api:

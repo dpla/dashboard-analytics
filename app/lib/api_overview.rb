@@ -46,42 +46,12 @@ class ApiOverview
   #
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
+  # API usage data is not tracked in GA4 — no data available.
   def response
-    @reponse ||= api_overview_builder.response
-  rescue => e
-    Rails.logger.error(e)
     nil
   end
 
   def events
-    response.present? ? response.totals_for_all_results['ga:totalEvents'] : nil
-  end
-
-  private
-
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
-  def api_overview_builder
-    filters = %W(ga:eventCategory=@#{@hub})
-    filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
-
-    GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date.iso8601
-      builder.end_date = @end_date.iso8601
-      builder.segment = segment
-      builder.metrics = %w(ga:totalEvents)
-      builder.filters = filters
-    end
-  end
-
-  def segment
-    Settings.google_analytics.api_segment
-  end
-
-  def profile_id
-    Settings.google_analytics.api_profile_id
+    nil
   end
 end

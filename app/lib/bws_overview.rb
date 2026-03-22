@@ -40,57 +40,12 @@ class BwsOverview
     @end_date = end_date
   end
 
-  ##
-  # Lazy load single-page response.
-  # Return nil if response fails.
-  #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
-  #
+  # BWS usage data is not tracked in GA4 — no data available.
   def response
-    @reponse ||= bws_overview_builder.response
-  rescue => e
-    Rails.logger.error(e)
     nil
   end
 
-  ##
-  # Total bws events for the given hub/contributor and time period.
-  def events
-    response.present? ? response.totals_for_all_results['ga:totalEvents'] : 0
-  end
-
-  ##
-  # Total bws sessions for the given hub/contributor and time period.
-  def sessions
-    response.present? ? response.totals_for_all_results['ga:sessions'] : 0
-  end
-
-  ##
-  # Total bws users for the given hub/contributor and time period.
-  def users
-   response.present? ? response.totals_for_all_results['ga:users'] : 0
-  end
-
-  private
-
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
-  def bws_overview_builder
-    filters = %W(ga:eventCategory=@#{@hub})
-    filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
-
-    GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date.iso8601
-      builder.end_date = @end_date.iso8601
-      builder.metrics = %w(ga:totalEvents ga:sessions ga:users)
-      builder.filters = filters
-    end
-  end
-
-  def profile_id
-    Settings.google_analytics.bws_profile_id
-  end
+  def events;   0; end
+  def sessions; 0; end
+  def users;    0; end
 end

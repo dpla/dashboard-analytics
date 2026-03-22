@@ -67,7 +67,7 @@ class WebsiteEventTotals
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @reponse ||= event_overview_builder.response
+    @response ||= event_overview_builder.response
   rescue => e
     Rails.logger.error(e)
     nil

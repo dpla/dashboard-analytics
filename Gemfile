@@ -17,7 +17,7 @@ gem 'turbo-rails', '~> 1.4'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.11', '>= 2.9.1'
 gem 'config', '~> 4.1.0'
-gem 'google-apis-analytics_v3', '~> 0.13.0'
+gem 'google-apis-analyticsdata_v1beta', '~> 0.32'
 gem 'googleauth', '~> 1.3.0'
 gem 'devise', '~> 5.0'
 gem 'httparty', '>= 0.24.0'

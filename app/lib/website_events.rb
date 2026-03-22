@@ -70,7 +70,7 @@ class WebsiteEvents
   # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
   #
   def multi_page_response
-    @multi_page_reponse ||= events_builder.multi_page_response
+    @multi_page_response ||= events_builder.multi_page_response
   rescue => e
     Rails.logger.error(e)
     Array.new

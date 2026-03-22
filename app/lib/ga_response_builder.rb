@@ -1,20 +1,26 @@
-require 'google/apis/analytics_v3'
+require 'google/apis/analyticsdata_v1beta'
 
 class GaResponseBuilder
 
-  ##
-  # Get an authorized GaResponseBuider
-  #
-  # @return [GaResponseBuilder]
-  #
-  # @example
-  #   GaResponseBuilder.build do |builder|
-  #     builder.profile_id = 'ga:123'
-  #     builder.start_date = '2018-01=01'
-  #     builder.end_date = '2018-01-31'
-  #     builder.metrics = ['ga:users']
-  #   end
-  #
+  GA4_METRICS = {
+    'ga:totalEvents'   => 'eventCount',
+    'ga:sessions'      => 'sessions',
+    'ga:users'         => 'totalUsers',
+    'ga:searchUniques' => 'eventCount',
+  }.freeze
+
+  GA4_DIMENSIONS = {
+    'ga:eventCategory' => 'customEvent:event_category',
+    'ga:eventAction'   => 'eventName',
+    'ga:eventLabel'    => 'customEvent:event_label',
+    'ga:searchKeyword' => 'searchTerm',
+  }.freeze
+
+  # When these UA metrics are requested, add an implicit event name filter
+  IMPLICIT_EVENT_FILTERS = {
+    'ga:searchUniques' => 'view_search_results',
+  }.freeze
+
   def self.build
     builder = new
     yield(builder)
@@ -23,124 +29,213 @@ class GaResponseBuilder
   end
 
   def initialize
-    @analytics = Google::Apis::AnalyticsV3::AnalyticsService.new
-    @profile_id = nil
-    @start_date = nil
-    @end_date = nil
-    @metrics = []
+    @analytics = Google::Apis::AnalyticsdataV1beta::AnalyticsDataService.new
+    @metrics    = []
     @dimensions = []
-    @filters = []
-    @start_index = 1
-    @sort = nil
-    @segment = nil
+    @filters    = []
+    @sort       = nil
+    @start_date = nil
+    @end_date   = nil
+    @offset     = 0
   end
 
-  # @param [String]
-  # Required
-  def profile_id=(profile_id)
-    @profile_id = profile_id
-  end
+  # profile_id and segment are UA concepts — accepted for interface compatibility but ignored
+  def profile_id=(profile_id); end
+  def segment=(segment); end
 
-  # @param [String] in format YYYT-MM-DD (iso8601)
-  # Required
-  def start_date=(start_date)
-    @start_date = start_date
-  end
+  def start_index=(idx); @offset = [idx.to_i - 1, 0].max; end
+  def start_date=(v); @start_date = v; end
+  def end_date=(v); @end_date = v; end
+  def metrics=(v); @metrics = Array(v); end
+  def dimensions=(v); @dimensions = Array(v); end
+  def filters=(v); @filters = Array(v); end
+  def sort=(v); @sort = Array(v); end
 
-  # @param [String] in format YYYT-MM-DD (iso8601)
-  # Required
-  def end_date=(end_date)
-    @end_date = end_date
-  end
-
-  # @param [Array<String>]
-  # Required
-  def metrics=(metrics)
-    @metrics = metrics.join(',') #comma = "or"
-  end
-
-  # @param [Array<String>]
-  def dimensions=(dimensions)
-    @dimensions = dimensions.join(',') #comma = "or"
-  end
-
-  # @param [Array<String>]
-  def filters=(filters)
-    @filters = filters.map { |f| f.gsub('\\') { '\\\\' }.gsub(',', '\,') }.join(';') #semicolon = "and"
-  end
-
-  # @param [String | Int] ???
-  def start_index=(start_index)
-    @start_index = start_index
-  end
-
-  # @param [String]
-  def sort=(sort)
-    @sort = sort
-  end
-
-  # @param [String]
-  def segment=(segment)
-    @segment = segment
-  end
-
-  ##
-  # Authorize the AnalyticsService.
-  # If the AnalyticsService is not authorized, any request for data will return
-  # an error.
   def authorize
-    @analytics.authorization = GaAuthorizer.token
+    @analytics.authorization = GaAuthorizer.credentials
   end
 
-  ##
-  # @return [Google::Apis::AnalyticsV3::GaData]
-  #
-  # @raise [Google::Apis::ServerError]
-  # An error occurred on the server and the request can be retried.
-  #
-  # @raise [Google::Apis::ClientError]
-  # The request is invalid and should not be retried without modification.
-  #
-  # @raise [Google::Apis::AuthorizationError]
-  # Authorization is required.
-  #
   def response
-    tries ||= 0
+    return nil if @metrics.empty?
 
-    @analytics.get_ga_data(@profile_id,
-                           @start_date,
-                           @end_date,
-                           @metrics,
-                           dimensions: @dimensions,
-                           filters: @filters,
-                           sort: @sort,
-                           start_index: @start_index,
-                           segment: @segment)
-
+    result = @analytics.run_property_report(property_id, build_request(@offset))
+    Ga4Response.new(result, @dimensions, @metrics)
   rescue Google::Apis::AuthorizationError
-    # Reauthorize in case token has expired or been invalidated.
-    authorize and retry unless(tries += 1) == 2
-  rescue Google::Apis::ServerError
-    # Use exponential backoff to delay next request attempt.
-    sleep(2**tries + rand) and retry unless(tries += 1) == 3
+    authorize
+    retry
+  rescue => e
+    Rails.logger.error(e)
+    nil
   end
 
-  ##
-  # @return [Array<Google::Apis::AnalyticsV3::GaData>]
   def multi_page_response
-    results = [response]
-    more = results.last.next_link.present?
+    results = []
+    offset  = 0
+    limit   = 10_000
 
-    while more == true
-      next_uri = URI(results.last.next_link)
-      next_start_index = Rack::Utils.parse_query(next_uri.query)["start-index"]
-      # sanity check to protect against infinite loop
-      break unless (next_start_index && next_start_index != @start_index)
-      @start_index = next_start_index
-      results.push response
-      more = results.last.next_link.present?
+    loop do
+      @offset = offset
+      resp = response
+      break unless resp&.rows&.any?
+      results << resp
+      break unless resp.row_count > offset + limit
+      offset += limit
     end
 
     results
+  end
+
+  private
+
+  def property_id
+    "properties/#{Settings.google_analytics.property_id}"
+  end
+
+  def ga4_metric_names
+    @metrics.map { |m| GA4_METRICS[m] || m }
+  end
+
+  def ga4_dimension_names
+    @dimensions.map { |d| GA4_DIMENSIONS[d] || d }
+  end
+
+  def build_request(offset)
+    Google::Apis::AnalyticsdataV1beta::RunReportRequest.new(
+      metrics:              ga4_metric_names.map { |m| Google::Apis::AnalyticsdataV1beta::Metric.new(name: m) },
+      dimensions:           ga4_dimension_names.map { |d| Google::Apis::AnalyticsdataV1beta::Dimension.new(name: d) },
+      date_ranges:          [Google::Apis::AnalyticsdataV1beta::DateRange.new(start_date: @start_date, end_date: @end_date)],
+      dimension_filter:     build_filter_expression,
+      order_bys:            build_order_bys,
+      metric_aggregations:  ['TOTAL'],
+      keep_empty_rows:      false,
+      limit:                10_000,
+      offset:               offset
+    )
+  end
+
+  def build_filter_expression
+    exprs = @filters.map { |f| parse_filter(f) }.compact
+
+    @metrics.each do |m|
+      next unless IMPLICIT_EVENT_FILTERS[m]
+      exprs << make_string_filter('eventName', IMPLICIT_EVENT_FILTERS[m], 'EXACT')
+    end
+
+    return nil  if exprs.empty?
+    return exprs.first if exprs.length == 1
+
+    Google::Apis::AnalyticsdataV1beta::FilterExpression.new(
+      and_group: Google::Apis::AnalyticsdataV1beta::FilterExpressionList.new(expressions: exprs)
+    )
+  end
+
+  def parse_filter(filter_str)
+    if (m = filter_str.match(/\A(.+?)==(.+)\z/))
+      make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'EXACT')
+    elsif (m = filter_str.match(/\A(.+?)=@(.+)\z/))
+      make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'CONTAINS')
+    elsif (m = filter_str.match(/\A(.+?)!@(.+)\z/))
+      Google::Apis::AnalyticsdataV1beta::FilterExpression.new(
+        not_expression: make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'CONTAINS')
+      )
+    end
+  end
+
+  def make_string_filter(field, value, match_type)
+    Google::Apis::AnalyticsdataV1beta::FilterExpression.new(
+      filter: Google::Apis::AnalyticsdataV1beta::Filter.new(
+        field_name:    field,
+        string_filter: Google::Apis::AnalyticsdataV1beta::StringFilter.new(
+          match_type:     match_type,
+          value:          value,
+          case_sensitive: false
+        )
+      )
+    )
+  end
+
+  def build_order_bys
+    return nil unless @sort&.any?
+
+    @sort.map do |s|
+      desc = s.start_with?('-')
+      name = desc ? s[1..] : s
+
+      if GA4_METRICS.key?(name)
+        Google::Apis::AnalyticsdataV1beta::OrderBy.new(
+          metric: Google::Apis::AnalyticsdataV1beta::MetricOrderBy.new(metric_name: GA4_METRICS[name]),
+          desc:   desc
+        )
+      else
+        Google::Apis::AnalyticsdataV1beta::OrderBy.new(
+          dimension: Google::Apis::AnalyticsdataV1beta::DimensionOrderBy.new(dimension_name: GA4_DIMENSIONS[name] || name),
+          desc:      desc
+        )
+      end
+    end
+  end
+
+  ##
+  # Wraps a GA4 RunReportResponse to present the same interface as the old
+  # UA GaData response, minimising changes to callers.
+  class Ga4Response
+    ColumnHeader = Struct.new(:name)
+    QueryStub    = Struct.new(:start_index)
+    def initialize(ga4_response, dimension_names, metric_names)
+      @response        = ga4_response
+      @dimension_names = dimension_names
+      @metric_names    = metric_names
+    end
+
+    # Returns rows as arrays of plain strings, dimensions first then metrics —
+    # same shape as the old UA GaData rows.
+    def rows
+      return nil unless @response&.rows
+
+      @response.rows.map do |row|
+        (row.dimension_values || []).map(&:value) +
+          (row.metric_values || []).map(&:value)
+      end
+    end
+
+    # Keyed by the original UA metric names (e.g. 'ga:totalEvents') so existing
+    # callers need no changes.
+    def totals_for_all_results
+      return {} unless @response&.totals&.any?
+
+      totals_row = @response.totals.first
+      @metric_names.each_with_index.each_with_object({}) do |(name, i), hash|
+        hash[name] = totals_row.metric_values[i]&.value
+      end
+    end
+
+    # Column headers use the original UA names so callers can do
+    # columns.index("ga:eventAction") etc. without changes.
+    def column_headers
+      (@dimension_names + @metric_names).map { |n| ColumnHeader.new(n) }
+    end
+
+    def total_results
+      @response&.row_count || 0
+    end
+
+    # GA4 returns all rows at once; expose total as items_per_page so
+    # the "Showing X-Y of Z" pagination UI shows the full count.
+    def items_per_page
+      total_results
+    end
+
+    # Provides response.query.start_index = 1 for the pagination UI.
+    def query
+      QueryStub.new(1)
+    end
+
+    def row_count
+      total_results
+    end
+
+    def present?
+      @response.present?
+    end
   end
 end

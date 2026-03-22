@@ -59,7 +59,7 @@ class WebsiteOverviewByContributor
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @reponse ||= overview_by_contributor_builder.response
+    @response ||= overview_by_contributor_builder.response
   rescue => e
     Rails.logger.error(e)
     nil
