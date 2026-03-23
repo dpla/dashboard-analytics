@@ -18,6 +18,14 @@ module ApplicationHelper
     @end_date.strftime("%Y-%m") rescue nil
   end
 
+  ##
+  # Returns true when the user has explicitly chosen a date range via URL params.
+  # Partials use this to show "not time-bound" notes in date-invariant sections.
+  #
+  def date_range_active?
+    params[:start_date].present? || params[:end_date].present?
+  end
+
   def date_opts
     # The default view (no params) always shows the current month. Omit params
     # from links when the selected range matches the default so URLs stay clean.

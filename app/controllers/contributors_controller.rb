@@ -31,20 +31,20 @@ class ContributorsController < ApplicationController
   end
 
   def contributor_website_overview
-    assign_start_and_end_dates
+    assign_all_time_dates
 
     @website_overview = WebsiteOverview.build do |builder|
-      builder.hub = params[:hub_id]
+      builder.hub         = params[:hub_id]
       builder.contributor = params[:contributor_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
+      builder.start_date  = @start_date
+      builder.end_date    = @end_date
     end
 
     @website_event_totals = WebsiteEventTotals.build do |builder|
-      builder.hub = params[:hub_id]
+      builder.hub         = params[:hub_id]
       builder.contributor = params[:contributor_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
+      builder.start_date  = @start_date
+      builder.end_date    = @end_date
     end
 
     render partial: "shared/frontend_use_metrics"
@@ -93,6 +93,43 @@ class ContributorsController < ApplicationController
     render partial: "shared/item_count"
   end
 
+  def contributor_totals
+    api = DplaApiResponseBuilder.new
+    results = [
+      Thread.new { api.item_count(params[:hub_id], params[:contributor_id]) rescue nil },
+      Thread.new {
+        begin
+          WebsiteOverview.build do |b|
+            b.hub         = params[:hub_id]
+            b.contributor = params[:contributor_id]
+            b.start_date  = min_date
+            b.end_date    = max_date
+          end.events
+        rescue => e
+          Rails.logger.error(e)
+          nil
+        end
+      },
+      Thread.new {
+        begin
+          WikimediaAnalyticsPresenter.new(
+            start_month: min_date.strftime("%Y-%m"),
+            end_month:   max_date.strftime("%Y-%m")
+          ).contributor(params[:hub_id], params[:contributor_id])["Page views"]
+        rescue => e
+          Rails.logger.error(e)
+          nil
+        end
+      }
+    ].map(&:value)
+
+    @item_count      = results[0]
+    @website_views   = results[1]
+    @wikimedia_views = results[2]
+
+    render partial: "shared/totals"
+  end
+
   def contributor_metadata_completeness
     assign_start_and_end_dates
 
@@ -108,12 +145,20 @@ class ContributorsController < ApplicationController
   end
 
   def contributor_wikimedia_overview
-    assign_start_and_end_dates
+    assign_all_time_dates
+
+    # Fetch item_count concurrently while building Wikimedia data.
+    item_count_thread = Thread.new do
+      DplaApiResponseBuilder.new.item_count(params[:hub_id], params[:contributor_id])
+    rescue => e
+      Rails.logger.error(e)
+      nil
+    end
 
     metadata_completeness = MetadataCompleteness.build do |builder|
-      builder.hub = params[:hub_id]
+      builder.hub         = params[:hub_id]
       builder.contributor = params[:contributor_id]
-      builder.end_date = @end_date
+      builder.end_date    = @end_date
     end
 
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
@@ -125,10 +170,11 @@ class ContributorsController < ApplicationController
     )
     @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
-    @target = Contributor.new(params[:contributor_id],
-                              params[:hub_id],
-                              @start_date,
-                              @end_date)
+    @item_count = item_count_thread.value
+    @target     = Contributor.new(params[:contributor_id],
+                                  params[:hub_id],
+                                  @start_date,
+                                  @end_date)
 
     render partial: "shared/wikimedia_overview"
   end

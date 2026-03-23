@@ -1,82 +1,99 @@
-<%# Local variables: @website_overiew [WebsiteOverview],
+<%# Local variables: @website_overview [WebsiteOverview],
                      @website_event_totals [WebsiteEventTotals] %>
 
 <table>
-  <tr>
-    <td>
+  <% if @website_event_totals.view_events > 0 %>
+    <tr>
+      <td>
         <div class="tooltip">
           Item views
           <span class="tooltiptext"><%= view_item_tooltip %></span>
         </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_event_totals.view_events, :delimiter => ',') %>
-    </td>
-  </tr>
-  <tr class="subitem">
-    <td>
-      <div class="tooltip">
-        Digital library catalog
-        <span class="tooltiptext"><%= view_metadata_record_tooltip %></span>
-      </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_event_totals.item_events, :delimiter => ',') %>
-    </td>
-  </tr>
-  <tr class="subitem">
-    <td>
-      <div class="tooltip">
-        Exhibition
-        <span class="tooltiptext"><%= view_exhibition_tooltip %></span>
-      </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_event_totals.exhibit_events, :delimiter => ',') %>
-    </td>
-  </tr>
-  <tr class="subitem">
-    <td>
-      <div class="tooltip">
-        Primary source set
-        <span class="tooltiptext"><%= view_primary_source_set_tooltip %></span>
-      </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_event_totals.pss_events, :delimiter => ',') %>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <div class="tooltip">
-        Click throughs
-        <span class="tooltiptext"><%= click_through_tooltip %></span>
-      </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_event_totals.click_throughs, :delimiter => ',') %>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <div class="tooltip">
-        Users
-        <span class="tooltiptext"><%= users_tooltip %></span>
-      </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_overview.users, :delimiter => ',') %>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <div class="tooltip">
-        Sessions
-        <span class="tooltiptext"><%= sessions_tooltip %></span>
-      </div>
-    </td>
-    <td>
-      <%= number_with_delimiter(@website_overview.sessions, :delimiter => ',') %>
-    </td>
-  </tr>
+      </td>
+      <td>
+        <%= number_with_delimiter(@website_event_totals.view_events, delimiter: ',') %>
+      </td>
+    </tr>
+    <% if @website_event_totals.item_events > 0 %>
+      <tr class="subitem">
+        <td>
+          <div class="tooltip">
+            Digital library catalog
+            <span class="tooltiptext"><%= view_metadata_record_tooltip %></span>
+          </div>
+        </td>
+        <td>
+          <%= number_with_delimiter(@website_event_totals.item_events, delimiter: ',') %>
+        </td>
+      </tr>
+    <% end %>
+    <% if @website_event_totals.exhibit_events > 0 %>
+      <tr class="subitem">
+        <td>
+          <div class="tooltip">
+            Exhibition
+            <span class="tooltiptext"><%= view_exhibition_tooltip %></span>
+          </div>
+        </td>
+        <td>
+          <%= number_with_delimiter(@website_event_totals.exhibit_events, delimiter: ',') %>
+        </td>
+      </tr>
+    <% end %>
+    <% if @website_event_totals.pss_events > 0 %>
+      <tr class="subitem">
+        <td>
+          <div class="tooltip">
+            Primary source set
+            <span class="tooltiptext"><%= view_primary_source_set_tooltip %></span>
+          </div>
+        </td>
+        <td>
+          <%= number_with_delimiter(@website_event_totals.pss_events, delimiter: ',') %>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+
+  <% if @website_event_totals.click_throughs.to_i > 0 %>
+    <tr>
+      <td>
+        <div class="tooltip">
+          Click throughs
+          <span class="tooltiptext"><%= click_through_tooltip %></span>
+        </div>
+      </td>
+      <td>
+        <%= number_with_delimiter(@website_event_totals.click_throughs, delimiter: ',') %>
+      </td>
+    </tr>
+  <% end %>
+
+  <% if @website_overview.users.to_i > 0 %>
+    <tr>
+      <td>
+        <div class="tooltip">
+          Users
+          <span class="tooltiptext"><%= users_tooltip %></span>
+        </div>
+      </td>
+      <td>
+        <%= number_with_delimiter(@website_overview.users, delimiter: ',') %>
+      </td>
+    </tr>
+  <% end %>
+
+  <% if @website_overview.sessions.to_i > 0 %>
+    <tr>
+      <td>
+        <div class="tooltip">
+          Sessions
+          <span class="tooltiptext"><%= sessions_tooltip %></span>
+        </div>
+      </td>
+      <td>
+        <%= number_with_delimiter(@website_overview.sessions, delimiter: ',') %>
+      </td>
+    </tr>
+  <% end %>
 </table>

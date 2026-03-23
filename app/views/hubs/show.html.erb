@@ -20,6 +20,20 @@
 
     <div class="data-section">
 
+      <%# === Column 1: Totals (prominent summary card) === %>
+      <div class="metrics">
+
+        <div class="tooltip">
+          <h2>Totals</h2>
+        </div>
+
+        <%= render_async_section hub_totals_path(@hub.name) do %>
+          <div>Loading...</div>
+        <% end %>
+
+      </div>
+
+      <%# === Column 2: DPLA Website (all-time) === %>
       <div class="metrics">
 
         <div class="tooltip">
@@ -27,58 +41,34 @@
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
-        <%= render_async_section hub_website_overview_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_website_overview_path(@hub.name) do %>
           <div>Loading...</div>
         <% end %>
 
-        <br/>
-
-        <div class="tooltip">
-          <h2>Black Women's Suffrage</h2>
-          <span class="tooltiptext"><%= bws_use_tooltip %></span>
-        </div>
-
-        <%= render_async_section hub_bws_overview_path(@hub.name, date_opts) do %>
-          <div>Loading...</div>
-        <% end %>
+        <%# TODO: Re-enable when BWS GA4 property ID is available %>
+        <%# <br/> %>
+        <%# <div class="tooltip"> %>
+        <%#   <h2>Black Women's Suffrage</h2> %>
+        <%#   <span class="tooltiptext"><%= bws_use_tooltip %></span> %>
+        <%# </div> %>
+        <%# <%= render_async_section hub_bws_overview_path(@hub.name, date_opts) do %> %>
+        <%#   <div>Loading...</div> %>
+        <%# <% end %> %>
 
       </div>
 
+      <%# === Column 3: Wikimedia Integration + Metadata Completeness === %>
       <div class="metrics">
-
-        <div class="tooltip">
-          <h2>DPLA API</h2>
-          <span class="tooltiptext"><%= api_use_tooltip %></span>
-        </div>
-
-        <%= render_async_section hub_api_overview_path(@hub.name, date_opts) do %>
-          <div>Loading...</div>
-        <% end %>
-
-        <br/>
-
-        <div class="tooltip">
-          <h2>Item Count</h2>
-          <span class="tooltiptext"><%= item_count_tooltip %></span>
-        </div>
-
-        <%= render_async_section hub_item_count_path(@hub.name, date_opts) do %>
-          <div>Loading...</div>
-        <% end %>
-
-        <br/>
 
         <div class="tooltip">
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async_section hub_wikimedia_overview_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_wikimedia_overview_path(@hub.name) do %>
           <div>Loading...</div>
         <% end %>
 
-      </div>
-
-      <div class="metrics">
+        <br/>
 
         <div class="tooltip">
           <h2>Metadata Completeness</h2>
@@ -90,6 +80,18 @@
         <% end %>
 
       </div>
+
+      <%# TODO: Re-enable DPLA API section when data source is confirmed %>
+      <%# <div class="metrics"> %>
+      <%#   <div class="tooltip"> %>
+      <%#     <h2>DPLA API</h2> %>
+      <%#     <span class="tooltiptext"><%= api_use_tooltip %></span> %>
+      <%#   </div> %>
+      <%#   <%= render_async_section hub_api_overview_path(@hub.name, date_opts) do %> %>
+      <%#     <div>Loading...</div> %>
+      <%#   <% end %> %>
+      <%# </div> %>
+
     </div>
   </div>
 </main>

@@ -1,23 +1,22 @@
-<%# Local variables: @wp_data[Hash] @target[Hub|Contributor] %>
+<%# Local variables: @wa_data[Hash], @wp_data[Hash], @item_count[Int|Nil], @target[Hub|Contributor] %>
 
-<% if @wa_data.present? %>
+<% if @wa_data.present? && @wa_data.any? { |_, v| v.to_i > 0 } %>
 
   <table>
     <% WikimediaAnalyticsPresenter.fields.each do |key| %>
       <% value = @wa_data[key] %>
-      <% if value.present? %>
-        <tr>
-          <td>
-            <div class="tooltip">
-              <span><%= key.titleize %></span>
-              <span class="tooltiptext"><%= find_tooltip(key) %></span>
-            </div>
-          </td>
-          <td>
-            <%= number_with_delimiter(value, :delimiter => ',') %>
-          </td>
-        </tr>
-      <% end %>
+      <% next unless value.to_i > 0 %>
+      <tr>
+        <td>
+          <div class="tooltip">
+            <span><%= key.titleize %></span>
+            <span class="tooltiptext"><%= find_tooltip(key) %></span>
+          </div>
+        </td>
+        <td>
+          <%= number_with_delimiter(value, delimiter: ',') %>
+        </td>
+      </tr>
     <% end %>
   </table>
 
@@ -29,6 +28,7 @@
 
 <% if @wp_data.present? && @wp_data.key?(key) %>
   <% value = @wp_data[key] %>
+  <% ready_count = @item_count ? (@item_count.to_f * value.to_f).round : nil %>
 
   <table>
     <% if WikimediaPreparationsPresenter.fields.include?(key) %>
@@ -36,7 +36,12 @@
         <td>
           <div class="tooltip">
             <span><%= key.titleize %></span>
-            <span class="tooltiptext"><%= wikimedia_readiness_tooltip %></span>
+            <span class="tooltiptext">
+              <%= wikimedia_readiness_tooltip %>
+              <% if ready_count %>
+                That's approximately <%= number_with_delimiter(ready_count, delimiter: ',') %> items.
+              <% end %>
+            </span>
           </div>
         </td>
         <td class="bar <%= percentage_class(value) %>">
@@ -50,9 +55,6 @@
   <div class="no-data">Wikimedia readiness data not available</div>
 <% end %>
 
-<% keys = WikimediaAnalyticsPresenter.fields %>
-
 <br/>
 
 <p>More data about <%= render_wikimedia_readiness_link(@target) %></p>
-

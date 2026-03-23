@@ -8,4 +8,13 @@
 
     <%= submit_tag 'Refresh', name: nil %>
   <% end %>
+
+  <% if date_range_active? %>
+    <p class="date-range-note">
+      Showing <%= @start_date.strftime("%b %Y") %> &ndash; <%= @end_date.strftime("%b %Y") %>.
+      <%= link_to "View all-time data", request.path %>
+    </p>
+  <% else %>
+    <p class="date-range-note">View counts are displayed for all time, or search a specific date range.</p>
+  <% end %>
 </div>

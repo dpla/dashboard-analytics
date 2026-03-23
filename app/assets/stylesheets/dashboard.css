@@ -680,3 +680,33 @@ ul.hub-grid {
   color: #777;
 }
 
+
+/* Totals card — prominent summary section at top-left of hub/contributor pages */
+.totals-section {
+  background-color: #f0e8d5;
+  border: 1px solid #d5c4a0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+}
+
+.totals-section table td:last-child {
+  font-weight: 600;
+  font-size: 1.05em;
+}
+
+/* Informational note below the date range picker */
+.date-range-note {
+  font-size: 0.8em;
+  color: #666;
+  margin: 4px 0 0 0;
+  text-align: right;
+}
+
+/* Note shown in time-invariant sections when a date range is active */
+.not-time-bound-note {
+  font-size: 0.8em;
+  color: #888;
+  font-style: italic;
+  margin: 0 0 10px 0;
+}
