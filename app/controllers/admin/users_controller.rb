@@ -60,7 +60,9 @@ module Admin
 
     def destroy
       @user = User.find(params[:id])
+      email = @user.email
       @user.destroy
+      flash[:notice] = "User #{email} was successfully deleted."
       redirect_to admin_users_path
     end
 
