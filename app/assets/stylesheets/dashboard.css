@@ -288,7 +288,7 @@ table input[type="submit"] {
   margin: 1.5em 0 1em;
 }
 
-.admin-primary-button button {
+.admin-primary-button {
   background-color: #2c7da0;
   color: #fff;
   border: none;
@@ -302,11 +302,11 @@ table input[type="submit"] {
   transition: background-color 0.15s ease, box-shadow 0.1s ease, transform 0.1s ease;
 }
 
-.admin-primary-button button:hover {
+.admin-primary-button:hover {
   background-color: #1f5f7a;
 }
 
-.admin-primary-button button:active {
+.admin-primary-button:active {
   background-color: #1a4f63;
   box-shadow: 0 1px 0 #1a4f63;
   transform: translateY(2px);
