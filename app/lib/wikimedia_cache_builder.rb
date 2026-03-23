@@ -12,11 +12,7 @@ class WikimediaCacheBuilder
   CIM_SNAPSHOT_URL  = "#{CIM_BASE_URL}/category-metrics-snapshot/%s/20231101/99991231"
   CIM_PAGEVIEWS_URL = "#{CIM_BASE_URL}/pageviews-per-category-monthly/%s/deep/all-wikis/00000101/99991231"
   THREAD_POOL_SIZE  = 20
-  # DPLA bot has bot flag on commons.wikimedia.org (→ 500 IDs/batch) but not
-  # on www.wikidata.org (→ 50 IDs/batch regardless of authentication).
-  # Set WIKIMEDIA_BOT_USER / WIKIMEDIA_BOT_PASSWORD in the ECS task environment.
-  WIKIDATA_PHASE1_BATCH_SIZE = 50
-  WIKIDATA_PHASE2_BATCH_SIZE = ENV["WIKIMEDIA_BOT_USER"].present? ? 500 : 50
+  BATCH_SIZE        = 50  # MediaWiki anonymous API limit
 
   def self.rebuild
     new.rebuild
@@ -28,8 +24,8 @@ class WikimediaCacheBuilder
 
     Rails.logger.info "[WikimediaCacheBuilder] #{work_items.size} work items to process"
 
-    # Resolve each unique Wikidata ID to a Commons category in batches via the
-    # MediaWiki API (50 IDs/request anonymous; 500 with bot credentials).
+    # Resolve each unique Wikidata ID to a Commons category in batches of 50
+    # via the anonymous MediaWiki API (~55 requests for Phase 1, ~8 for Phase 2).
     unique_ids      = work_items.map { |i| i[:wikidata_id] }.uniq
     wikidata_to_cat = batch_resolve_commons_categories(unique_ids)
 
@@ -71,20 +67,13 @@ class WikimediaCacheBuilder
   end
 
   # Resolves an array of Wikidata IDs to Commons category names in two batched
-  # phases via the MediaWiki API:
+  # phases via the anonymous MediaWiki API (50 IDs per request):
   #   Phase 1 — wikidata.org: fetch P8464 claims to get MediaInfo entity IDs
   #   Phase 2 — commons.wikimedia.org: fetch sitelinks to get category titles
   # Returns { wikidata_id => category_name } for all successfully resolved IDs.
   def batch_resolve_commons_categories(wikidata_ids)
-    # Authenticate per-wiki (WMF uses unified login but sessions are wiki-scoped)
-    wikidata_cookies = login_to_wiki(WIKIDATA_API_URL)
-    commons_cookies  = login_to_wiki(COMMONS_API_URL)
-
     # Phase 1: Wikidata — resolve each ID to a MediaInfo entity ID via P8464 claim
-    # DPLA bot has no bot flag on wikidata.org, so batch size is capped at 50.
-    wikidata_to_m_id = batch_fetch_entities(
-      WIKIDATA_API_URL, wikidata_ids, "claims", wikidata_cookies, WIKIDATA_PHASE1_BATCH_SIZE
-    ) do |entity|
+    wikidata_to_m_id = batch_fetch_entities(WIKIDATA_API_URL, wikidata_ids, "claims") do |entity|
       (entity.dig("claims", "P8464") || [])
         .first&.dig("mainsnak", "datavalue", "value", "id")
     end
@@ -92,11 +81,8 @@ class WikimediaCacheBuilder
     Rails.logger.info "[WikimediaCacheBuilder] #{wikidata_to_m_id.size} Wikidata IDs resolved to P8464 MediaInfo entities"
 
     # Phase 2: Commons — resolve each MediaInfo entity ID to a category name
-    # DPLA bot has bot flag on commons.wikimedia.org, so 500 IDs/batch is allowed.
     unique_m_ids     = wikidata_to_m_id.values.uniq
-    m_id_to_category = batch_fetch_entities(
-      COMMONS_API_URL, unique_m_ids, "sitelinks", commons_cookies, WIKIDATA_PHASE2_BATCH_SIZE
-    ) do |entity|
+    m_id_to_category = batch_fetch_entities(COMMONS_API_URL, unique_m_ids, "sitelinks") do |entity|
       title = entity.dig("sitelinks", "commonswiki", "title")
       title&.sub(/\ACategory:/i, "")&.gsub(" ", "_")
     end
@@ -108,21 +94,19 @@ class WikimediaCacheBuilder
     end
   end
 
-  # Fetches entities from a MediaWiki API in batches, reusing a single TCP
-  # connection per invocation. Yields each entity hash; stores the return value
-  # if non-nil. Returns { entity_id => value }.
-  def batch_fetch_entities(api_url, ids, props, cookies, batch_size, &extractor)
+  # Fetches entities from a MediaWiki API in batches of 50, reusing a single
+  # TCP connection per invocation. Yields each entity hash; stores the return
+  # value if non-nil. Returns { entity_id => value }.
+  def batch_fetch_entities(api_url, ids, props, &extractor)
     uri    = URI(api_url)
     result = {}
     failed = 0
 
     Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 30) do |http|
-      ids.each_slice(batch_size) do |batch|
-        params  = { action: "wbgetentities", ids: batch.join("|"),
-                    format: "json", props: props }
-        headers = { "User-Agent" => "DPLA Analytics Dashboard/1.0" }
-        headers["Cookie"] = cookies if cookies.present?
-
+      ids.each_slice(BATCH_SIZE) do |batch|
+        params   = { action: "wbgetentities", ids: batch.join("|"),
+                     format: "json", props: props }
+        headers  = { "User-Agent" => "DPLA Analytics Dashboard/1.0" }
         response = http.get("#{uri.path}?#{URI.encode_www_form(params)}", headers)
         if response.is_a?(Net::HTTPTooManyRequests)
           wait = response["Retry-After"]&.to_i || 10
@@ -152,79 +136,6 @@ class WikimediaCacheBuilder
 
     Rails.logger.info "[WikimediaCacheBuilder] #{uri.host}: #{result.size} resolved, #{failed} batches failed" if failed > 0
     result
-  end
-
-  # Logs in to a MediaWiki wiki using bot credentials and returns the session
-  # cookie string for use in subsequent requests, or nil if no credentials are
-  # configured. Credentials (WIKIMEDIA_BOT_USER / WIKIMEDIA_BOT_PASSWORD) should
-  # be set in the ECS task environment. The bot password from the ingest-wikimedia
-  # repo's PYWIKIBOT_PASSWORD secret is compatible.
-  def login_to_wiki(api_url)
-    user = ENV["WIKIMEDIA_BOT_USER"]
-    pass = ENV["WIKIMEDIA_BOT_PASSWORD"]
-    return nil unless user.present? && pass.present?
-
-    uri = URI(api_url)
-    Net::HTTP.start(uri.host, uri.port, use_ssl: true, read_timeout: 30) do |http|
-      # Step 1: fetch a login token (also sets initial session cookie)
-      token_resp = http.get(
-        "#{uri.path}?#{URI.encode_www_form(action: 'query', meta: 'tokens', type: 'login', format: 'json')}",
-        "User-Agent" => "DPLA Analytics Dashboard/1.0"
-      )
-      token_resp.value
-      login_token = JSON.parse(token_resp.body).dig("query", "tokens", "logintoken")
-      return nil unless login_token
-
-      session_cookie = parse_cookies(token_resp)
-
-      # Step 2: log in with bot credentials
-      body = URI.encode_www_form(
-        action: "login", lgname: user, lgpassword: pass,
-        lgtoken: login_token, format: "json"
-      )
-      login_resp = http.post(
-        uri.path, body,
-        "Content-Type" => "application/x-www-form-urlencoded",
-        "User-Agent"   => "DPLA Analytics Dashboard/1.0",
-        "Cookie"       => session_cookie
-      )
-      login_resp.value
-      result = JSON.parse(login_resp.body)
-
-      unless result.dig("login", "result") == "Success"
-        Rails.logger.warn "[WikimediaCacheBuilder] Bot login failed for #{uri.host}: #{result.dig('login', 'reason')}"
-        return nil
-      end
-
-      Rails.logger.info "[WikimediaCacheBuilder] Logged in to #{uri.host} as #{result.dig('login', 'lgusername')}"
-      merge_cookies(session_cookie, parse_cookies(login_resp))
-    end
-  rescue StandardError => e
-    Rails.logger.warn "[WikimediaCacheBuilder] Bot login error for #{URI(api_url).host}: #{e.message} — proceeding anonymously"
-    nil
-  end
-
-  # Extracts Set-Cookie values from a response into a single Cookie header string.
-  def parse_cookies(response)
-    Array(response.get_fields("Set-Cookie"))
-      .map { |c| c.split(";").first }
-      .join("; ")
-  end
-
-  # Merges two cookie strings, with newer values overriding older ones.
-  def merge_cookies(existing, incoming)
-    return incoming if existing.blank?
-    return existing if incoming.blank?
-
-    cookie_hash = existing.split("; ").each_with_object({}) do |pair, h|
-      k, v = pair.split("=", 2)
-      h[k] = v
-    end
-    incoming.split("; ").each do |pair|
-      k, v = pair.split("=", 2)
-      cookie_hash[k] = v
-    end
-    cookie_hash.map { |k, v| "#{k}=#{v}" }.join("; ")
   end
 
   # category is pre-resolved by the caller to avoid redundant API calls.
