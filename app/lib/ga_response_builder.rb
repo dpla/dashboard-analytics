@@ -32,8 +32,13 @@ class GaResponseBuilder
     builder
   end
 
+  # GA4 API read timeout. Chosen to be well under the ALB's 60s idle timeout so
+  # that slow queries fail fast and return a graceful error rather than a 504.
+  GA4_READ_TIMEOUT_SEC = 25
+
   def initialize
     @analytics = Google::Apis::AnalyticsdataV1beta::AnalyticsDataService.new
+    @analytics.request_options.timeout_sec = GA4_READ_TIMEOUT_SEC
     @metrics    = []
     @dimensions = []
     @filters    = []
