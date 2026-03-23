@@ -1,10 +1,17 @@
 Rails.application.routes.draw do
   get "/health", to: proc { [200, {}, ["ok"]] }
 
-  devise_for :users, skip: [:registrations]
+  devise_for :users, skip: [:registrations, :passwords]
   as :user do
-    get 'users/edit' => 'devise/registrations#edit', as: 'edit_user_registration'
-    put 'users' => 'devise/registrations#update', as: 'user_registration'
+    get 'users/edit', to: 'devise/registrations#edit', as: :edit_user_registration
+    put 'users', to: 'devise/registrations#update', as: :user_registration
+    # Password routes are defined explicitly here because devise_for does not
+    # generate them automatically in this app's configuration.
+    get  'users/password/new',  to: 'devise/passwords#new',    as: :new_user_password
+    get  'users/password/edit', to: 'devise/passwords#edit',   as: :edit_user_password
+    post 'users/password',      to: 'devise/passwords#create', as: :user_password
+    put  'users/password',      to: 'devise/passwords#update'
+    patch 'users/password',     to: 'devise/passwords#update'
   end
 
   namespace :admin do
