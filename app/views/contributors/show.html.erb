@@ -2,8 +2,7 @@
   locals: { hub: @contributor.hub } %>
 
 <% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics', 
-    'data-turbo-track': 'reload', defer: 'defer' %>
+  <%= javascript_include_tag 'google-analytics', defer: 'defer' %>
 <% end %>
 
 <div class="heading">
@@ -29,9 +28,8 @@
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributor_website_overview_path(
-              @contributor.hub.name, @contributor.name, date_opts),
-              do %>
+        <%= render_async_section hub_contributor_contributor_website_overview_path(
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -42,9 +40,8 @@
           <span class="tooltiptext"><%= bws_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributor_bws_overview_path(
-          @contributor.hub.name, @contributor.name, date_opts),
-              do %>
+        <%= render_async_section hub_contributor_contributor_bws_overview_path(
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -57,9 +54,8 @@
           <span class="tooltiptext"><%= api_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributor_api_overview_path(
-              @contributor.hub.name, @contributor.name, date_opts),
-              do %>
+        <%= render_async_section hub_contributor_contributor_api_overview_path(
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -70,9 +66,8 @@
           <span class="tooltiptext"><%= item_count_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributor_item_count_path(
-              @contributor.hub.name, @contributor.name, date_opts),
-              do %>
+        <%= render_async_section hub_contributor_contributor_item_count_path(
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -82,9 +77,8 @@
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async hub_contributor_contributor_wikimedia_overview_path(
-          @contributor.hub.name, @contributor.name, date_opts),
-              do %>
+        <%= render_async_section hub_contributor_contributor_wikimedia_overview_path(
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
       </div>
@@ -96,9 +90,8 @@
           <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
         </div>
 
-        <%= render_async hub_contributor_contributor_metadata_completeness_path(
-              @contributor.hub.name, @contributor.name, date_opts),
-              do %>
+        <%= render_async_section hub_contributor_contributor_metadata_completeness_path(
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 

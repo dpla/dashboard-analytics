@@ -1,5 +1,15 @@
 module ApplicationHelper
 
+  ##
+  # Wrapper around render_async that adds a default error message shown when
+  # the async request fails instead of silently replacing the container with
+  # an empty string.
+  #
+  def render_async_section(path, options = {}, &block)
+    default_error = '<div class="error-message">Data unavailable. Please try refreshing.</div>'
+    render_async(path, { error_message: default_error }.merge(options), &block)
+  end
+
   def current_start_date
     @start_date.strftime("%Y-%m") rescue nil
   end

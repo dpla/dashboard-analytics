@@ -1,8 +1,7 @@
 <%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
 
 <% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics',
-    'data-turbo-track': 'reload', defer: 'defer' %>
+  <%= javascript_include_tag 'google-analytics', defer: 'defer' %>
 <% end %>
 
 <div class="heading">
@@ -24,9 +23,9 @@
       <% if params[:id] == "view_api" %>
 
         <% if api_data_for_date_range? %>
-          <%= render_async api_events_path({ hub_id: params[:hub_id],
-                                             contributor_id: params[:contributor_id],
-                                             event_id: params[:id] }.merge(date_opts)) do %>
+          <%= render_async_section api_events_path({ hub_id: params[:hub_id],
+                                                    contributor_id: params[:contributor_id],
+                                                    event_id: params[:id] }.merge(date_opts)) do %>
             <div>Loading...</div>
           <% end %>
         <% else %>
@@ -34,9 +33,9 @@
         <% end %>
 
       <% else %>
-        <%= render_async website_events_path({ hub_id: params[:hub_id],
-                                               contributor_id: params[:contributor_id],
-                                               event_id: params[:id] }.merge(date_opts)) do %>
+        <%= render_async_section website_events_path({ hub_id: params[:hub_id],
+                                                      contributor_id: params[:contributor_id],
+                                                      event_id: params[:id] }.merge(date_opts)) do %>
           <div>Loading...</div>
         <% end %>
       <% end %>

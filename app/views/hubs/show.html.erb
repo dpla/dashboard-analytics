@@ -1,8 +1,7 @@
 <%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
 
 <% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics', 
-    'data-turbo-track': 'reload', defer: 'defer' %>
+  <%= javascript_include_tag 'google-analytics', defer: 'defer' %>
 <% end %>
 
   <div class="heading">
@@ -28,7 +27,7 @@
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_website_overview_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_website_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -39,7 +38,7 @@
           <span class="tooltiptext"><%= bws_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_bws_overview_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_bws_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -52,7 +51,7 @@
           <span class="tooltiptext"><%= api_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_api_overview_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_api_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -63,7 +62,7 @@
           <span class="tooltiptext"><%= item_count_tooltip %></span>
         </div>
 
-        <%= render_async hub_item_count_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_item_count_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -73,7 +72,7 @@
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async hub_wikimedia_overview_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_wikimedia_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -86,7 +85,7 @@
           <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
         </div>
 
-        <%= render_async hub_metadata_completeness_path(@hub.name, date_opts) do %>
+        <%= render_async_section hub_metadata_completeness_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
