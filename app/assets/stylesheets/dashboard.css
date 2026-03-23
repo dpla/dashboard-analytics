@@ -276,6 +276,26 @@ table input[type="submit"] {
   margin: 0;
 }
 
+/* Admin user management */
+.admin-actions {
+  margin: 1.5em 0 1em;
+}
+
+.admin-primary-button button {
+  background-color: #2c7da0;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 0.95em;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-primary-button button:hover {
+  background-color: #1f5f7a;
+}
+
 #us-map, #world-map {
   display: inline-block;
   width: 500px;

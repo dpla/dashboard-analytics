@@ -8,7 +8,11 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
-    resources :users
+    resources :users do
+      member do
+        post :send_password_reset
+      end
+    end
     post "wikimedia_cache/rebuild", to: "wikimedia_cache#rebuild"
   end
 

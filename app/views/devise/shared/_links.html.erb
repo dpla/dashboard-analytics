@@ -2,12 +2,12 @@
   <%= link_to "Log in", new_session_path(resource_name) %><br />
 <% end -%>
 
-<%- if devise_mapping.registerable? && controller_name != 'registrations' %>
-  <%= link_to "Sign up", new_registration_path(resource_name) %><br />
-<% end -%>
-
 <%- if controller_name == 'sessions' %>
-  <p>For password resets or login issues, contact <a href="mailto:network@dp.la">network@dp.la</a>.</p>
+  <%= link_to "Forgot your password?", new_password_path(resource_name) %><br />
+  <p>
+    Accounts are created by DPLA administrators. To request an account or get
+    help logging in, contact <a href="mailto:network@dp.la">network@dp.la</a>.
+  </p>
 <% end -%>
 
 <%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
