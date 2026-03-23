@@ -320,7 +320,7 @@ table input[type="submit"] {
 
 .data-section {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: repeat(3, 1fr);
   column-gap: 50px;
   align-items: start;
   margin-top: 20px;

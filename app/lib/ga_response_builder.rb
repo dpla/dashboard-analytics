@@ -38,7 +38,7 @@ class GaResponseBuilder
 
   def initialize
     @analytics = Google::Apis::AnalyticsdataV1beta::AnalyticsDataService.new
-    @analytics.request_options.timeout_sec = GA4_READ_TIMEOUT_SEC
+    @analytics.client_options.read_timeout_sec = GA4_READ_TIMEOUT_SEC
     @metrics    = []
     @dimensions = []
     @filters    = []
@@ -74,7 +74,7 @@ class GaResponseBuilder
     retry
   rescue => e
     Rails.logger.error(e)
-    nil
+    raise
   end
 
   def multi_page_response

@@ -32,6 +32,21 @@ Confirm the PR is open. If it's already merged or closed, stop and tell the user
 
 Print: `📋 PR #<N>: "<title>" on branch <branch>`
 
+**Pre-flight: verify the branch contains all of main's commits.**
+
+The PR branch may have been created via cherry-pick rather than branching from current main, meaning it could be missing commits already merged to main. Check:
+
+```bash
+git fetch origin && git log --oneline origin/main ^origin/<branch> | head -10
+```
+
+If this prints any commits, the branch is **missing** those commits from main. Stop and warn:
+> "⚠️ Branch `<branch>` is missing N commits that are already on main (e.g. `<title>`). If deployed as-is, those changes will be absent from the image. Rebase the branch onto main before proceeding."
+
+Only proceed once the branch contains all of main's commits (i.e. the above command prints nothing, or the only difference is the PR's own new commits).
+
+Print: `✅ Branch is up to date with main`
+
 ---
 
 ## Step 2: Trigger the Build ECR GitHub Action

@@ -1,6 +1,10 @@
 <%# Local variables: @website_overview [WebsiteOverview],
                      @website_event_totals [WebsiteEventTotals] %>
 
+<% if @website_overview.error? || @website_event_totals.error? %>
+  <p class="error-note">Data unavailable — GA4 query failed. Try refreshing the page.</p>
+<% else %>
+
 <table>
   <% if @website_event_totals.view_events.to_i > 0 %>
     <tr>
@@ -96,4 +100,15 @@
       </td>
     </tr>
   <% end %>
+
+  <% if @website_event_totals.view_events.to_i == 0 &&
+        @website_event_totals.click_throughs.to_i == 0 &&
+        @website_overview.users.to_i == 0 &&
+        @website_overview.sessions.to_i == 0 %>
+    <tr>
+      <td colspan="2" class="no-data">No activity recorded for this period.</td>
+    </tr>
+  <% end %>
 </table>
+
+<% end %>
