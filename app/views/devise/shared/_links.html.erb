@@ -3,9 +3,10 @@
 <% end -%>
 
 <%- if controller_name == 'sessions' %>
+  <p><%= link_to "Forgot your password?", new_user_password_path %></p>
   <p>
-    Accounts are created by DPLA administrators. To request an account,
-    reset your password, or get help logging in, contact
+    Accounts are created by DPLA administrators. To request an account
+    or get help logging in, contact
     <a href="mailto:network@dp.la">network@dp.la</a>.
   </p>
 <% end -%>
