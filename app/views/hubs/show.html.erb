@@ -27,7 +27,7 @@
           <h2>Totals</h2>
         </div>
 
-        <%= render_async_section hub_totals_path(@hub.name) do %>
+        <%= render_async_section hub_totals_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 

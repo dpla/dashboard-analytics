@@ -29,7 +29,7 @@
         </div>
 
         <%= render_async_section hub_contributor_contributor_totals_path(
-              @contributor.hub.name, @contributor.name) do %>
+              @contributor.hub.name, @contributor.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
