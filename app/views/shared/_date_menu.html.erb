@@ -6,6 +6,6 @@
     <%= label_tag(:end_date, 'End:') %>
     <%= select_tag(:end_date, options_for_select(end_date_form_options, current_end_date)) %>
 
-    <%= submit_tag 'Refresh' %>
+    <%= submit_tag 'Refresh', name: nil %>
   <% end %>
 </div>

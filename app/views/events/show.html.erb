@@ -1,7 +1,7 @@
 <%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
 
 <% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics', 
+  <%= javascript_include_tag 'google-analytics',
     'data-turbo-track': 'reload', defer: 'defer' %>
 <% end %>
 
@@ -26,19 +26,17 @@
         <% if api_data_for_date_range? %>
           <%= render_async api_events_path({ hub_id: params[:hub_id],
                                              contributor_id: params[:contributor_id],
-                                             event_id: params[:id] }.merge(date_opts)),
-                'data-turbolinks-track': 'reload' do %>
+                                             event_id: params[:id] }.merge(date_opts)) do %>
             <div>Loading...</div>
           <% end %>
         <% else %>
           Data is not available for this date range.
         <% end %>
-        
+
       <% else %>
         <%= render_async website_events_path({ hub_id: params[:hub_id],
                                                contributor_id: params[:contributor_id],
-                                               event_id: params[:id] }.merge(date_opts)),
-              'data-turbolinks-track': 'reload' do %>
+                                               event_id: params[:id] }.merge(date_opts)) do %>
           <div>Loading...</div>
         <% end %>
       <% end %>

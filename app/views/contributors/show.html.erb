@@ -31,7 +31,7 @@
 
         <%= render_async hub_contributor_contributor_website_overview_path(
               @contributor.hub.name, @contributor.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+              do %>
           <div>Loading...</div>
         <% end %>
 
@@ -44,7 +44,7 @@
 
         <%= render_async hub_contributor_contributor_bws_overview_path(
           @contributor.hub.name, @contributor.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+              do %>
           <div>Loading...</div>
         <% end %>
 
@@ -59,7 +59,7 @@
 
         <%= render_async hub_contributor_contributor_api_overview_path(
               @contributor.hub.name, @contributor.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+              do %>
           <div>Loading...</div>
         <% end %>
 
@@ -72,7 +72,7 @@
 
         <%= render_async hub_contributor_contributor_item_count_path(
               @contributor.hub.name, @contributor.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+              do %>
           <div>Loading...</div>
         <% end %>
 
@@ -82,9 +82,9 @@
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async  hub_contributor_contributor_wikimedia_overview_path(
+        <%= render_async hub_contributor_contributor_wikimedia_overview_path(
           @contributor.hub.name, @contributor.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+              do %>
           <div>Loading...</div>
         <% end %>
       </div>
@@ -98,7 +98,7 @@
 
         <%= render_async hub_contributor_contributor_metadata_completeness_path(
               @contributor.hub.name, @contributor.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+              do %>
           <div>Loading...</div>
         <% end %>
 

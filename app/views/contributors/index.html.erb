@@ -31,7 +31,6 @@
   <h2>Contributors</h2>
 
   <%= render_async contributor_comparison_path({ hub_id: params[:hub_id] }.merge(date_opts)),
-        'data-turbolinks-track': 'reload',
         event_name: 'contributor-comparison-loaded' do %>
     <div>Loading...</div>
   <% end %>

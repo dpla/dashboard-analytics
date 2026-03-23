@@ -28,8 +28,7 @@
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_website_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async hub_website_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -40,8 +39,7 @@
           <span class="tooltiptext"><%= bws_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_bws_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async hub_bws_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -54,11 +52,10 @@
           <span class="tooltiptext"><%= api_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_api_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async hub_api_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
-        
+
         <br/>
 
         <div class="tooltip">
@@ -66,8 +63,7 @@
           <span class="tooltiptext"><%= item_count_tooltip %></span>
         </div>
 
-        <%= render_async hub_item_count_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async hub_item_count_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -77,8 +73,7 @@
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async  hub_wikimedia_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async hub_wikimedia_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
@@ -91,8 +86,7 @@
           <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
         </div>
 
-        <%= render_async hub_metadata_completeness_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async hub_metadata_completeness_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
