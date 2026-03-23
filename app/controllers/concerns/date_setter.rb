@@ -18,6 +18,15 @@ module DateSetter
   end
 
   ##
+  # Set @start_date and @end_date to span all available history (min_date → today).
+  # Use this for sections that always display all-time totals regardless of URL params.
+  #
+  def assign_all_time_dates
+    @start_date = min_date
+    @end_date   = max_date
+  end
+
+  ##
   # This assigns values to @start_date and @end_date using params[:start_date]
   # and params[:end_date], both of which are expected to be in the format
   # "YYYY-MM"

@@ -1,8 +1,7 @@
 <%= render partial: "shared/sub_navigation", locals: { hub: @hub } %>
 
 <% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics', 
-    'data-turbo-track': 'reload', defer: 'defer' %>
+  <%= javascript_include_tag 'google-analytics', defer: 'defer' %>
 <% end %>
 
   <div class="heading">
@@ -21,6 +20,20 @@
 
     <div class="data-section">
 
+      <%# === Column 1: Totals (prominent summary card) === %>
+      <div class="metrics">
+
+        <div class="tooltip">
+          <h2>Totals</h2>
+        </div>
+
+        <%= render_async_section hub_totals_path(@hub.name, date_opts) do %>
+          <div>Loading...</div>
+        <% end %>
+
+      </div>
+
+      <%# === Column 2: DPLA Website (all-time) === %>
       <div class="metrics">
 
         <div class="tooltip">
@@ -28,75 +41,42 @@
           <span class="tooltiptext"><%= website_use_tooltip %></span>
         </div>
 
-        <%= render_async hub_website_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async_section hub_website_overview_path(@hub.name) do %>
           <div>Loading...</div>
         <% end %>
 
-        <br/>
-
-        <div class="tooltip">
-          <h2>Black Women's Suffrage</h2>
-          <span class="tooltiptext"><%= bws_use_tooltip %></span>
-        </div>
-
-        <%= render_async hub_bws_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
-          <div>Loading...</div>
-        <% end %>
+        <%# TODO: Re-enable BWS section when GA4 property ID is available.
+             hub_bws_overview_path / bws_use_tooltip / BwsOverview %>
 
       </div>
 
+      <%# === Column 3: Wikimedia Integration + Metadata Completeness === %>
       <div class="metrics">
-
-        <div class="tooltip">
-          <h2>DPLA API</h2>
-          <span class="tooltiptext"><%= api_use_tooltip %></span>
-        </div>
-
-        <%= render_async hub_api_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
-          <div>Loading...</div>
-        <% end %>
-        
-        <br/>
-
-        <div class="tooltip">
-          <h2>Item Count</h2>
-          <span class="tooltiptext"><%= item_count_tooltip %></span>
-        </div>
-
-        <%= render_async hub_item_count_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
-          <div>Loading...</div>
-        <% end %>
-
-        <br/>
 
         <div class="tooltip">
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async  hub_wikimedia_overview_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async_section hub_wikimedia_overview_path(@hub.name) do %>
           <div>Loading...</div>
         <% end %>
 
-      </div>
-
-      <div class="metrics">
+        <br/>
 
         <div class="tooltip">
           <h2>Metadata Completeness</h2>
           <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
         </div>
 
-        <%= render_async hub_metadata_completeness_path(@hub.name, date_opts),
-              'data-turbolinks-track': 'reload' do %>
+        <%= render_async_section hub_metadata_completeness_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 
       </div>
+
+      <%# TODO: Re-enable DPLA API section when data source is confirmed.
+           hub_api_overview_path / api_use_tooltip / ApiOverview %>
+
     </div>
   </div>
 </main>

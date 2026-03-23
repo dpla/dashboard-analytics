@@ -26,14 +26,12 @@
 
         <% if params[:id] == "website" %>
 
-          <%= render_async website_search_terms_path(date_opts),
-                'data-turbolinks-track': 'reload' do %>
+          <%= render_async_section website_search_terms_path(date_opts) do %>
             <div>Loading...</div>
           <% end %>
 
         <% elsif params[:id] == "api" %>
-           <%= render_async api_search_terms_path(date_opts),
-                'data-turbolinks-track': 'reload' do %>
+           <%= render_async_section api_search_terms_path(date_opts) do %>
             <div>Loading...</div>
           <% end %>
 

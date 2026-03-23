@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     get :api_overview
     get :bws_overview
     get :item_count
+    get :totals
     get :metadata_completeness
     get :wikimedia_overview
 
@@ -25,6 +26,7 @@ Rails.application.routes.draw do
       get :contributor_api_overview
       get :contributor_bws_overview
       get :contributor_item_count
+      get :contributor_totals
       get :contributor_metadata_completeness
       get :contributor_wikimedia_overview
       resources :events, only: [:show]

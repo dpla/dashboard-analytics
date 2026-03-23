@@ -1,0 +1,71 @@
+<%# Local variables:
+  @item_count        [Int|Nil]  — items indexed in DPLA
+  @contributor_count [Int|Nil]  — contributing institutions (hub pages only, nil for contributor pages)
+  @website_views     [Int|Nil]  — all-time item views on dp.la
+  @wikimedia_views   [Int|Nil]  — all-time Wikimedia page views
+%>
+
+<div class="totals-section">
+
+  <% if date_range_active? %>
+    <p class="not-time-bound-note">These totals reflect current data and are not affected by the selected date range.</p>
+  <% end %>
+
+  <% any_data = @item_count.to_i > 0 || @contributor_count.to_i > 0 ||
+                @website_views.to_i > 0 || @wikimedia_views.to_i > 0 %>
+
+  <% if any_data %>
+    <table>
+      <% if @contributor_count.to_i > 0 %>
+        <tr>
+          <td>
+            <div class="tooltip">
+              Contributors
+              <span class="tooltiptext"><%= contributor_count_tooltip %></span>
+            </div>
+          </td>
+          <td><%= number_with_delimiter(@contributor_count, delimiter: ',') %></td>
+        </tr>
+      <% end %>
+
+      <% if @item_count.to_i > 0 %>
+        <tr>
+          <td>
+            <div class="tooltip">
+              Items
+              <span class="tooltiptext"><%= item_count_tooltip %></span>
+            </div>
+          </td>
+          <td><%= number_with_delimiter(@item_count, delimiter: ',') %></td>
+        </tr>
+      <% end %>
+
+      <% if @website_views.to_i > 0 %>
+        <tr>
+          <td>
+            <div class="tooltip">
+              Views on dp.la
+              <span class="tooltiptext"><%= website_views_total_tooltip %></span>
+            </div>
+          </td>
+          <td><%= number_with_delimiter(@website_views, delimiter: ',') %></td>
+        </tr>
+      <% end %>
+
+      <% if @wikimedia_views.to_i > 0 %>
+        <tr>
+          <td>
+            <div class="tooltip">
+              Views on Wikimedia
+              <span class="tooltiptext"><%= wikimedia_views_total_tooltip %></span>
+            </div>
+          </td>
+          <td><%= number_with_delimiter(@wikimedia_views, delimiter: ',') %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <div class="no-data">Data not available</div>
+  <% end %>
+
+</div>

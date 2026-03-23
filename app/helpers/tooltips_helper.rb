@@ -107,11 +107,32 @@ module TooltipsHelper
   end
 
   def wikimedia_uploads_tooltip
-    "The number of items that have been uploaded into Wikimedia."
+    "The number of files that have been uploaded into Wikimedia."
+  end
+
+  def wikimedia_files_used_tooltip
+    "The number of your files that are currently in use on Wikimedia pages."
+  end
+
+  def wikimedia_pages_enhanced_tooltip
+    "The number of Wikimedia pages that include at least one of your files."
   end
 
   def wikimedia_views_tooltip
-    "The number of item page views in Wikimedia."
+    "The all-time total page views of Wikimedia pages featuring your uploaded files."
+  end
+
+  def contributor_count_tooltip
+    "The total number of contributing institutions currently indexed in DPLA for this hub."
+  end
+
+  def website_views_total_tooltip
+    "All-time total views of your items on the DPLA website (dp.la), including the " \
+    "digital library catalog, exhibitions, and primary source sets."
+  end
+
+  def wikimedia_views_total_tooltip
+    "All-time total page views of Wikimedia pages featuring files uploaded from your collection."
   end
 
   def find_tooltip(key)
@@ -128,6 +149,10 @@ module TooltipsHelper
       view_api_item_tooltip
     when "Upload count"
       wikimedia_uploads_tooltip
+    when "Files Used"
+      wikimedia_files_used_tooltip
+    when "Pages Enhanced"
+      wikimedia_pages_enhanced_tooltip
     when "Page views"
       wikimedia_views_tooltip
     end

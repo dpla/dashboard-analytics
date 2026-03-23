@@ -1,5 +1,9 @@
 <%# Local variables: @mc_data[Hash] %>
 
+<% if date_range_active? %>
+  <p class="not-time-bound-note">Metadata completeness reflects the current state of your records and is not affected by the selected date range.</p>
+<% end %>
+
 <% if @mc_data.present? %>
 
   <table>
