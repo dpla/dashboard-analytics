@@ -1,4 +1,5 @@
 class WebsiteEventTotals
+  include GaErrorTracking
 
   ##
   # @return [WebsiteEventTotals]
@@ -62,14 +63,15 @@ class WebsiteEventTotals
 
   ##
   # Lazy load single-page response.
-  # Return nil if response fails.
+  # Returns nil on error (see #error? and #error_message for diagnosis).
   #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
+  # @return [GaResponseBuilder::Ga4Response, nil]
   #
   def response
     @response ||= event_overview_builder.response
   rescue => e
     Rails.logger.error(e)
+    record_ga_error(e)
     nil
   end
 
