@@ -294,14 +294,23 @@ table input[type="submit"] {
   color: #fff;
   border: none;
   border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 0.95em;
+  padding: 10px 20px;
+  font-size: 1em;
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  box-shadow: 0 3px 0 #1a4f63;
+  transition: background-color 0.15s ease, box-shadow 0.1s ease, transform 0.1s ease;
 }
 
 .admin-primary-button button:hover {
   background-color: #1f5f7a;
+}
+
+.admin-primary-button button:active {
+  background-color: #1a4f63;
+  box-shadow: 0 1px 0 #1a4f63;
+  transform: translateY(2px);
 }
 
 #us-map, #world-map {
