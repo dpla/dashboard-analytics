@@ -59,10 +59,20 @@ module Admin
     end
 
     def destroy
+      unless current_user.admin
+        flash[:alert] = "You don't have permission to do that."
+        redirect_to admin_user_path(current_user) and return
+      end
+
       @user = User.find(params[:id])
       email = @user.email
-      @user.destroy
-      flash[:notice] = "User #{email} was successfully deleted."
+
+      if @user.destroy
+        flash[:notice] = "User #{email} was successfully deleted."
+      else
+        flash[:alert] = "Could not delete user #{email}."
+      end
+
       redirect_to admin_users_path
     end
 
