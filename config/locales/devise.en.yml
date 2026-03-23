@@ -1,0 +1,5 @@
+en:
+  devise:
+    mailer:
+      reset_password_instructions:
+        subject: 'Analytics Dashboard password reset instructions'
