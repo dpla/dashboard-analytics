@@ -103,6 +103,7 @@ nav .divider {
   min-height: 80px;
   border-bottom: 1px solid #e9dec8;
   padding: 10px 40px 16px;
+  display: flow-root;
 }
 
 .data-menu {
@@ -198,8 +199,6 @@ th, td {
 }
 
 .metrics-left-col {
-  float: left;
-  margin-right: 50px;
   margin-bottom: 20px;
 }
 
@@ -320,8 +319,11 @@ table input[type="submit"] {
 }
 
 .data-section {
-  clear: both;
-  margin-top: 20px 0;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 50px;
+  align-items: start;
+  margin-top: 20px;
 }
 
 .item-table table {
