@@ -106,6 +106,10 @@ module TooltipsHelper
     have both media access and open rights."
   end
 
+  def wikimedia_readiness_count_tooltip(count)
+    "Approximately #{number_with_delimiter(count, delimiter: ',')} items meet Wikimedia upload criteria."
+  end
+
   def wikimedia_uploads_tooltip
     "The number of files that have been uploaded into Wikimedia."
   end

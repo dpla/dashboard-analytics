@@ -36,16 +36,16 @@
         <td>
           <div class="tooltip">
             <span><%= key.titleize %></span>
-            <span class="tooltiptext">
-              <%= wikimedia_readiness_tooltip %>
-              <% if ready_count %>
-                That's approximately <%= number_with_delimiter(ready_count, delimiter: ',') %> items.
-              <% end %>
-            </span>
+            <span class="tooltiptext"><%= wikimedia_readiness_tooltip %></span>
           </div>
         </td>
         <td class="bar <%= percentage_class(value) %>">
-          <%= render_percentage(value) %>
+          <div class="tooltip">
+            <%= render_percentage(value) %>
+            <% if ready_count %>
+              <span class="tooltiptext"><%= wikimedia_readiness_count_tooltip(ready_count) %></span>
+            <% end %>
+          </div>
         </td>
       </tr>
     <% end %>

@@ -100,9 +100,9 @@ nav .divider {
   box-sizing: border-box;
   width: 100%;
   background-color: #f9f6f0;
-  height: 80px;
+  min-height: 80px;
   border-bottom: 1px solid #e9dec8;
-  padding: 10px 40px;
+  padding: 10px 40px 16px;
 }
 
 .data-menu {
@@ -197,9 +197,17 @@ th, td {
   float: left;
 }
 
-.metrics:first-of-type, .metrics:nth-of-type(2) {
+.metrics-left-col {
+  float: left;
   margin-right: 50px;
+  margin-bottom: 20px;
 }
+
+.metrics-left-col .metrics {
+  float: none;
+  display: block;
+}
+
 
 .metrics table {
   width: 100%;
@@ -690,6 +698,10 @@ ul.hub-grid {
   margin-bottom: 10px;
 }
 
+.totals-section > h2 {
+  margin-top: 0;
+}
+
 .totals-section table td:last-child {
   font-weight: 600;
   font-size: 1.05em;
@@ -699,7 +711,7 @@ ul.hub-grid {
 .date-range-note {
   font-size: 0.8em;
   color: #666;
-  margin: 4px 0 0 0;
+  margin: 4px 0 8px 0;
   text-align: right;
 }
 
