@@ -2,7 +2,7 @@
                      @website_event_totals [WebsiteEventTotals] %>
 
 <table>
-  <% if @website_event_totals.view_events > 0 %>
+  <% if @website_event_totals.view_events.to_i > 0 %>
     <tr>
       <td>
         <div class="tooltip">
@@ -14,7 +14,7 @@
         <%= number_with_delimiter(@website_event_totals.view_events, delimiter: ',') %>
       </td>
     </tr>
-    <% if @website_event_totals.item_events > 0 %>
+    <% if @website_event_totals.item_events.to_i > 0 %>
       <tr class="subitem">
         <td>
           <div class="tooltip">
@@ -27,7 +27,7 @@
         </td>
       </tr>
     <% end %>
-    <% if @website_event_totals.exhibit_events > 0 %>
+    <% if @website_event_totals.exhibit_events.to_i > 0 %>
       <tr class="subitem">
         <td>
           <div class="tooltip">
@@ -40,7 +40,7 @@
         </td>
       </tr>
     <% end %>
-    <% if @website_event_totals.pss_events > 0 %>
+    <% if @website_event_totals.pss_events.to_i > 0 %>
       <tr class="subitem">
         <td>
           <div class="tooltip">

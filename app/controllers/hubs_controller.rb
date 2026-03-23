@@ -83,8 +83,22 @@ class HubsController < ApplicationController
   def totals
     api = DplaApiResponseBuilder.new
     results = [
-      Thread.new { api.item_count(params[:hub_id]) rescue nil },
-      Thread.new { api.contributors(params[:hub_id]).count rescue nil },
+      Thread.new {
+        begin
+          api.item_count(params[:hub_id])
+        rescue => e
+          Rails.logger.error(e)
+          nil
+        end
+      },
+      Thread.new {
+        begin
+          api.contributors(params[:hub_id]).count
+        rescue => e
+          Rails.logger.error(e)
+          nil
+        end
+      },
       Thread.new {
         begin
           WebsiteOverview.build do |b|

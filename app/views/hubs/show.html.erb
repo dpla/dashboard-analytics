@@ -45,15 +45,8 @@
           <div>Loading...</div>
         <% end %>
 
-        <%# TODO: Re-enable when BWS GA4 property ID is available %>
-        <%# <br/> %>
-        <%# <div class="tooltip"> %>
-        <%#   <h2>Black Women's Suffrage</h2> %>
-        <%#   <span class="tooltiptext"><%= bws_use_tooltip %></span> %>
-        <%# </div> %>
-        <%# <%= render_async_section hub_bws_overview_path(@hub.name, date_opts) do %> %>
-        <%#   <div>Loading...</div> %>
-        <%# <% end %> %>
+        <%# TODO: Re-enable BWS section when GA4 property ID is available.
+             hub_bws_overview_path / bws_use_tooltip / BwsOverview %>
 
       </div>
 
@@ -81,16 +74,8 @@
 
       </div>
 
-      <%# TODO: Re-enable DPLA API section when data source is confirmed %>
-      <%# <div class="metrics"> %>
-      <%#   <div class="tooltip"> %>
-      <%#     <h2>DPLA API</h2> %>
-      <%#     <span class="tooltiptext"><%= api_use_tooltip %></span> %>
-      <%#   </div> %>
-      <%#   <%= render_async_section hub_api_overview_path(@hub.name, date_opts) do %> %>
-      <%#     <div>Loading...</div> %>
-      <%#   <% end %> %>
-      <%# </div> %>
+      <%# TODO: Re-enable DPLA API section when data source is confirmed.
+           hub_api_overview_path / api_use_tooltip / ApiOverview %>
 
     </div>
   </div>

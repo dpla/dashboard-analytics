@@ -96,7 +96,14 @@ class ContributorsController < ApplicationController
   def contributor_totals
     api = DplaApiResponseBuilder.new
     results = [
-      Thread.new { api.item_count(params[:hub_id], params[:contributor_id]) rescue nil },
+      Thread.new {
+        begin
+          api.item_count(params[:hub_id], params[:contributor_id])
+        rescue => e
+          Rails.logger.error(e)
+          nil
+        end
+      },
       Thread.new {
         begin
           WebsiteOverview.build do |b|
