@@ -21,39 +21,36 @@
 
     <div class="data-section">
 
-      <%# === Column 1: Totals (prominent summary card) === %>
-      <div class="metrics">
+      <%# === Column 1 (left): Totals card + DPLA Website stacked === %>
+      <div class="metrics-left-col">
 
-        <div class="tooltip">
-          <h2>Totals</h2>
+        <div class="metrics">
+          <%= render_async_section hub_contributor_contributor_totals_path(
+                @contributor.hub.name, @contributor.name, date_opts) do %>
+            <div>Loading...</div>
+          <% end %>
         </div>
 
-        <%= render_async_section hub_contributor_contributor_totals_path(
-              @contributor.hub.name, @contributor.name, date_opts) do %>
-          <div>Loading...</div>
-        <% end %>
+        <div class="metrics">
+
+          <div class="tooltip">
+            <h2>DPLA Website (dp.la)</h2>
+            <span class="tooltiptext"><%= website_use_tooltip %></span>
+          </div>
+
+          <%= render_async_section hub_contributor_contributor_website_overview_path(
+                @contributor.hub.name, @contributor.name) do %>
+            <div>Loading...</div>
+          <% end %>
+
+          <%# TODO: Re-enable BWS section when GA4 property ID is available.
+               hub_contributor_contributor_bws_overview_path / bws_use_tooltip / BwsOverview %>
+
+        </div>
 
       </div>
 
-      <%# === Column 2: DPLA Website (all-time) === %>
-      <div class="metrics">
-
-        <div class="tooltip">
-          <h2>DPLA Website (dp.la)</h2>
-          <span class="tooltiptext"><%= website_use_tooltip %></span>
-        </div>
-
-        <%= render_async_section hub_contributor_contributor_website_overview_path(
-              @contributor.hub.name, @contributor.name) do %>
-          <div>Loading...</div>
-        <% end %>
-
-        <%# TODO: Re-enable BWS section when GA4 property ID is available.
-             hub_contributor_contributor_bws_overview_path / bws_use_tooltip / BwsOverview %>
-
-      </div>
-
-      <%# === Column 3: Wikimedia Integration + Metadata Completeness === %>
+      <%# === Column 2 (middle): Wikimedia Integration === %>
       <div class="metrics">
 
         <div class="tooltip">
@@ -65,7 +62,10 @@
           <div>Loading...</div>
         <% end %>
 
-        <br/>
+      </div>
+
+      <%# === Column 3 (right): Metadata Completeness === %>
+      <div class="metrics">
 
         <div class="tooltip">
           <h2>Metadata Completeness</h2>
