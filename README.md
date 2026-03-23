@@ -391,6 +391,7 @@ aws ecs run-task \
 ### Prerequisites
 
 - Ruby 3.1.2 (use `rbenv` or `asdf`)
+- Rails 7.1 (`gem 'rails', '~> 7.1.0'` — note: `config.load_defaults` is intentionally kept at `7.0`; see [Known Issues](#rails-71-load_defaults-pinned-at-70))
 - Bundler 2.x
 - SQLite 3 (development database)
 - Node.js (for asset compilation if needed)
@@ -514,6 +515,10 @@ Metadata completeness CSVs are generated as part of the monthly ingestion cycle 
 ### Contributor Comparison — Potential Timeouts
 
 The contributor comparison page (`/contributor_comparison`) makes parallel GA4 API calls for every contributor in a hub. For hubs with many contributors, this can be slow and may time out under heavy load. The page includes a CSV export option for offline analysis.
+
+### Rails 7.1 — `load_defaults` Pinned at 7.0
+
+The app runs Rails 7.1 but `config/application.rb` calls `config.load_defaults 7.0`. Upgrading to `load_defaults 7.1` enables several behavior changes (notably `ActiveRecord::Base.automatically_invert_plural_associations`) that have not been reviewed or tested. The pin is intentional until a compatibility audit is done.
 
 ### Hard-Coded Configuration
 
