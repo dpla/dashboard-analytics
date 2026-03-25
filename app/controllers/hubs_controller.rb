@@ -19,13 +19,18 @@ class HubsController < ApplicationController
     assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
+    first_month = Rails.cache.fetch("wikimedia_start_month:#{params[:id]}", expires_in: 24.hours) do
+      WikimediaCache.where(hub: params[:id], contributor: "").minimum(:month)
+    end
+    @wikimedia_start_date = Date.parse("#{first_month}-01") if first_month
+
     unless current_user.hub == params[:id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)
     end
   end
 
   def website_overview
-    assign_all_time_dates
+    assign_start_and_end_dates
 
     @website_overview = WebsiteOverview.build do |builder|
       builder.hub        = params[:hub_id]
@@ -147,7 +152,7 @@ class HubsController < ApplicationController
   end
 
   def wikimedia_overview
-    assign_all_time_dates
+    assign_start_and_end_dates
 
     # Fetch item_count concurrently while building Wikimedia data.
     item_count_thread = Thread.new do

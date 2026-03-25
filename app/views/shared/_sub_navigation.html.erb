@@ -5,7 +5,7 @@
     <nav>
       <ul>
         <li>
-          <%= link_to hub.name, hub_path(hub.name, date_opts) %>
+          <%= link_to hub.name, hub_path(hub.name) %>
         </li>
         <% if hub.contributors.count > 1 %>
           <li>

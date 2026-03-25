@@ -39,6 +39,10 @@ module DateHelper
     dates
   end
 
+  def website_data_start_date
+    Date.new(Settings.min_date.year, Settings.min_date.month)
+  end
+
   def api_data_for_date_range?
     api_min_date = Date.new(Settings.api_min_date.year.to_i, 
                             Settings.api_min_date.month.to_i)

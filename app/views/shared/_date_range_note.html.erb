@@ -1,0 +1,5 @@
+<% if date_range_active? %>
+  <p class="date-range-note">Showing <%= @start_date.strftime("%b %Y") %> &ndash; <%= @end_date.strftime("%b %Y") %>.</p>
+<% elsif local_assigns[:data_start_date] %>
+  <p class="date-range-note">Data starts <%= data_start_date.strftime("%b %Y") %>.</p>
+<% end %>
