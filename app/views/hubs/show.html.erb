@@ -36,7 +36,9 @@
             <span class="tooltiptext"><%= website_use_tooltip %></span>
           </div>
 
-          <%= render_async_section hub_website_overview_path(@hub.name) do %>
+          <%= render partial: "shared/date_range_note", locals: { data_start_date: website_data_start_date } %>
+
+          <%= render_async_section hub_website_overview_path(@hub.name, date_opts) do %>
             <div>Loading...</div>
           <% end %>
 
@@ -54,7 +56,9 @@
           <h2>Wikimedia Integration</h2>
         </div>
 
-        <%= render_async_section hub_wikimedia_overview_path(@hub.name) do %>
+        <%= render partial: "shared/date_range_note", locals: { data_start_date: @wikimedia_start_date } %>
+
+        <%= render_async_section hub_wikimedia_overview_path(@hub.name, date_opts) do %>
           <div>Loading...</div>
         <% end %>
 

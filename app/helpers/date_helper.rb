@@ -27,7 +27,7 @@ module DateHelper
   ##
   # @return [Array<Date>] the first day of every available month
   def available_months
-    first_date = Date.new(Settings.min_date.year, Settings.min_date.month)
+    first_date = min_data_date
     last_date = Date.today.beginning_of_month
     dates = [first_date]
 
@@ -37,6 +37,10 @@ module DateHelper
     end
 
     dates
+  end
+
+  def website_data_start_date
+    min_data_date
   end
 
   def api_data_for_date_range?
@@ -51,7 +55,7 @@ module DateHelper
   end
 
   def bws_data_for_date_range?
-    bws_min_date = Date.new(Settings.bws_min_date.year.to_i, 
+    bws_min_date = Date.new(Settings.bws_min_date.year.to_i,
                             Settings.bws_min_date.month.to_i)
 
     if (@start_date && @start_date >= bws_min_date)
@@ -59,5 +63,11 @@ module DateHelper
     else
       false
     end
+  end
+
+  private
+
+  def min_data_date
+    Date.new(Settings.min_date.year, Settings.min_date.month)
   end
 end
