@@ -30,7 +30,7 @@ class HubsController < ApplicationController
   end
 
   def website_overview
-    assign_start_and_end_dates
+    params[:start_date].present? ? assign_start_and_end_dates : assign_all_time_dates
 
     @website_overview = WebsiteOverview.build do |builder|
       builder.hub        = params[:hub_id]
@@ -152,7 +152,7 @@ class HubsController < ApplicationController
   end
 
   def wikimedia_overview
-    assign_start_and_end_dates
+    params[:start_date].present? ? assign_start_and_end_dates : assign_all_time_dates
 
     # Fetch item_count concurrently while building Wikimedia data.
     item_count_thread = Thread.new do
