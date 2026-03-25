@@ -40,7 +40,7 @@ class WebsiteEventsPresenter  < GaResponsePresenter
   def to_csv
     attributes = ["Item", "Item ID", "Contributor", label]
 
-    CSV.generate({ headers: true }) do |csv|
+    CSV.generate(headers: true) do |csv|
       csv << attributes
 
       multi_page_response.each do |response|
