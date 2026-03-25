@@ -19,14 +19,11 @@
 
   <div class="data-content">
 
-    <div class="data-section">
+    <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
 
-      <% contributor = @target.is_a?(Contributor) ? @target.name : nil %>
-
-      <%= render partial: "shared/wikimedia_readiness",
-                 locals: { ga_token: GaAuthorizer.token,          
-                           hub: @hub.name,
-                           contributor: contributor } %>
-    </div>
+    <%= render partial: "shared/wikimedia_readiness",
+               locals: { ga_token: GaAuthorizer.token,
+                         hub: @hub.name,
+                         contributor: contributor } %>
   </div>
 </main>

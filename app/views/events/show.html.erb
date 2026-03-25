@@ -18,27 +18,25 @@
 
   <div class="data-content">
 
-    <div class="data-section">
+    <% if params[:id] == "view_api" %>
 
-      <% if params[:id] == "view_api" %>
-
-        <% if api_data_for_date_range? %>
-          <%= render_async_section api_events_path({ hub_id: params[:hub_id],
-                                                    contributor_id: params[:contributor_id],
-                                                    event_id: params[:id] }.merge(date_opts)) do %>
-            <div>Loading...</div>
-          <% end %>
-        <% else %>
-          Data is not available for this date range.
-        <% end %>
-
-      <% else %>
-        <%= render_async_section website_events_path({ hub_id: params[:hub_id],
-                                                      contributor_id: params[:contributor_id],
-                                                      event_id: params[:id] }.merge(date_opts)) do %>
+      <% if api_data_for_date_range? %>
+        <%= render_async_section api_events_path({ hub_id: params[:hub_id],
+                                                  contributor_id: params[:contributor_id],
+                                                  event_id: params[:id] }.merge(date_opts)) do %>
           <div>Loading...</div>
         <% end %>
+      <% else %>
+        Data is not available for this date range.
       <% end %>
-    </div>
+
+    <% else %>
+      <%= render_async_section website_events_path({ hub_id: params[:hub_id],
+                                                    contributor_id: params[:contributor_id],
+                                                    event_id: params[:id] }.merge(date_opts)) do %>
+        <div>Loading...</div>
+      <% end %>
+    <% end %>
+
   </div>
 </main>
