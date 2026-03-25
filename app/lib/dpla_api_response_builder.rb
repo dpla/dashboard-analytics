@@ -22,7 +22,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['provider.name']['terms']
         .sort_by { |f| f['term'] }
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.debug(e)
       Array.new
     end
@@ -42,7 +42,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |f| f['term'] }
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.debug(e)
       Array.new
     end
@@ -61,7 +61,7 @@ class DplaApiResponseBuilder
 
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.debug(e)
       Array.new
     end
@@ -88,7 +88,7 @@ class DplaApiResponseBuilder
       else
         count['value'] # ElasticSearch 7
       end
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.debug(e)
       nil
     end
@@ -116,7 +116,7 @@ class DplaApiResponseBuilder
       else
         count['value'] # ElasticSearch 7
       end
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.debug(e)
       nil
     end
@@ -137,7 +137,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |t| [t["term"], t["count"]] }.to_h
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.debug(e)
       Array.new
     end
