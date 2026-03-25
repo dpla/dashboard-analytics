@@ -90,6 +90,7 @@ class DplaApiResponseBuilder
       end
     rescue Exception => e
       Rails.logger.debug(e)
+      nil
     end
   end
 
@@ -117,6 +118,7 @@ class DplaApiResponseBuilder
       end
     rescue Exception => e
       Rails.logger.debug(e)
+      nil
     end
   end
 
