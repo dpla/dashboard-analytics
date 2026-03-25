@@ -139,7 +139,7 @@ class DplaApiResponseBuilder
         .map{ |t| [t["term"], t["count"]] }.to_h
     rescue StandardError => e
       Rails.logger.debug(e)
-      Array.new
+      {}
     end
   end
 
