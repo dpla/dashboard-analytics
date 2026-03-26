@@ -190,14 +190,21 @@ class DplaApiResponseBuilder
 
     if res.code != 200
       Rails.logger.debug("A #{res.code} error occurred when attempting to call the DPLA API")
+      raise HttpRateLimitError if res.code == 429
       raise HttpServerError if res.code.in? [500, 502, 503, 504]
     end
 
     res
-  rescue HttpServerError
-    # Use exponential backoff to delay next request attempt.
-    sleep(2**tries + rand) and retry unless(tries += 1) == 3
+  rescue HttpRateLimitError, HttpServerError => e
+    if (tries += 1) < 3
+      sleep(2**tries + rand)
+      retry
+    else
+      Rails.logger.warn("DPLA API request failed after #{tries} attempts: #{e.class}")
+      nil
+    end
   end
 end
 
 class HttpServerError < StandardError; end
+class HttpRateLimitError < StandardError; end

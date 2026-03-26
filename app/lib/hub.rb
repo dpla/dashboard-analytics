@@ -13,7 +13,9 @@ class Hub
   # @return [Array<Hash>] each hash has 'term' (hub name) and 'count' (item count)
   #
   def self.all_with_counts
-    dpla_api.hubs_with_counts
+    Rails.cache.fetch("hub:all_with_counts", expires_in: 1.hour) do
+      dpla_api.hubs_with_counts
+    end
   end
 
   ##
