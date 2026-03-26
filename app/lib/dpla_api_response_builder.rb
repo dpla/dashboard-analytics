@@ -23,6 +23,7 @@ class DplaApiResponseBuilder
       json_response('/items', options)['facets']['provider.name']['terms']
         .sort_by { |f| f['term'] }
     rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       Array.new
     end
@@ -43,6 +44,7 @@ class DplaApiResponseBuilder
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |f| f['term'] }
     rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       Array.new
     end
@@ -62,6 +64,7 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
     rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       Array.new
     end
@@ -89,8 +92,8 @@ class DplaApiResponseBuilder
         count['value'] # ElasticSearch 7
       end
     rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
-      nil
     end
   end
 
@@ -117,8 +120,8 @@ class DplaApiResponseBuilder
         count['value'] # ElasticSearch 7
       end
     rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
-      nil
     end
   end
 
@@ -138,6 +141,7 @@ class DplaApiResponseBuilder
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |t| [t["term"], t["count"]] }.to_h
     rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       {}
     end
@@ -163,7 +167,8 @@ class DplaApiResponseBuilder
           name = doc.dig('dataProvider', 'name')
           result[item_hash] = name if item_hash && name
         end
-      rescue => e
+      rescue StandardError => e
+        Sentry.capture_exception(e)
         Rails.logger.debug(e)
       end
     end
@@ -177,7 +182,9 @@ class DplaApiResponseBuilder
   end
 
   def json_response(path, options)
-    JSON.parse(response(path, options).to_json)
+    res = response(path, options)
+    return {} if res.nil?
+    JSON.parse(res.to_json)
   end
 
   ##
@@ -192,14 +199,22 @@ class DplaApiResponseBuilder
 
     if res.code != 200
       Rails.logger.debug("A #{res.code} error occurred when attempting to call the DPLA API")
+      raise HttpRateLimitError if res.code == 429
       raise HttpServerError if res.code.in? [500, 502, 503, 504]
     end
 
     res
-  rescue HttpServerError
-    # Use exponential backoff to delay next request attempt.
-    sleep(2**tries + rand) and retry unless(tries += 1) == 3
+  rescue HttpRateLimitError, HttpServerError => e
+    if (tries += 1) < 3
+      sleep(2**tries + rand)
+      retry
+    else
+      Sentry.capture_exception(e)
+      Rails.logger.warn("DPLA API request failed after #{tries} attempts: #{e.class}")
+      nil
+    end
   end
 end
 
 class HttpServerError < StandardError; end
+class HttpRateLimitError < StandardError; end
