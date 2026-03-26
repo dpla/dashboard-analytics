@@ -387,6 +387,7 @@ table#comparison td:first-child {
   max-width: 220px;
   white-space: normal;
   word-wrap: break-word;
+  box-shadow: inset -1px 0 0 #e9dec8, inset 1px 0 0 #e9dec8;
 }
 
 table#comparison th {
