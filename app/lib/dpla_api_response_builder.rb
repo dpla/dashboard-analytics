@@ -22,7 +22,8 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['provider.name']['terms']
         .sort_by { |f| f['term'] }
-    rescue Exception => e
+    rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       Array.new
     end
@@ -42,7 +43,8 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |f| f['term'] }
-    rescue Exception => e
+    rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       Array.new
     end
@@ -61,7 +63,8 @@ class DplaApiResponseBuilder
 
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
-    rescue Exception => e
+    rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
       Array.new
     end
@@ -88,7 +91,8 @@ class DplaApiResponseBuilder
       else
         count['value'] # ElasticSearch 7
       end
-    rescue Exception => e
+    rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
     end
   end
@@ -115,7 +119,8 @@ class DplaApiResponseBuilder
       else
         count['value'] # ElasticSearch 7
       end
-    rescue Exception => e
+    rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
     end
   end
@@ -135,9 +140,10 @@ class DplaApiResponseBuilder
     begin
       json_response('/items', options)['facets']['dataProvider']['terms']
         .map{ |t| [t["term"], t["count"]] }.to_h
-    rescue Exception => e
+    rescue StandardError => e
+      Sentry.capture_exception(e)
       Rails.logger.debug(e)
-      Array.new
+      {}
     end
   end
 
@@ -161,7 +167,8 @@ class DplaApiResponseBuilder
           name = doc.dig('dataProvider', 'name')
           result[item_hash] = name if item_hash && name
         end
-      rescue => e
+      rescue StandardError => e
+        Sentry.capture_exception(e)
         Rails.logger.debug(e)
       end
     end
@@ -175,7 +182,9 @@ class DplaApiResponseBuilder
   end
 
   def json_response(path, options)
-    JSON.parse(response(path, options).to_json)
+    res = response(path, options)
+    return {} if res.nil?
+    JSON.parse(res.to_json)
   end
 
   ##

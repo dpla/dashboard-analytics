@@ -14,8 +14,9 @@ class Hub
   #
   def self.all_with_counts
     Rails.cache.fetch("hub:all_with_counts", expires_in: 1.hour) do
-      dpla_api.hubs_with_counts
-    end
+      result = dpla_api.hubs_with_counts
+      result.presence
+    end || []
   end
 
   ##
