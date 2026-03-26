@@ -44,7 +44,7 @@ class GaResponseBuilder
     property = "properties/#{Settings.google_analytics.property_id}"
     requests = builders.map { |b| b.build_request(b.offset) }
     batch_req = Google::Apis::AnalyticsdataV1beta::BatchRunReportsRequest.new(requests: requests)
-    batch_resp = service.batch_run_reports(property, batch_req)
+    batch_resp = service.batch_property_run_reports(property, batch_req)
 
     batch_resp.reports.each_with_index.map do |report, i|
       b = builders[i]
