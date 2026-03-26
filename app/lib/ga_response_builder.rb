@@ -77,16 +77,27 @@ class GaResponseBuilder
     raise
   end
 
-  def multi_page_response
+  def multi_page_response(max_pages: 10)
     results = []
     offset  = 0
     limit   = 10_000
+    page    = 0
 
     loop do
       @offset = offset
       resp = response
       break unless resp&.rows&.any?
       results << resp
+      page += 1
+
+      if page >= max_pages
+        Rails.logger.warn(
+          "GaResponseBuilder: multi_page_response hit max_pages=#{max_pages} " \
+          "(#{page * limit} rows). Some data may be truncated."
+        )
+        break
+      end
+
       break unless resp.row_count > offset + limit
       offset += limit
     end
