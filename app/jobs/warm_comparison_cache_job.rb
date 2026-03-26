@@ -1,9 +1,14 @@
 class WarmComparisonCacheJob < ApplicationJob
   queue_as :default
 
-  # Pre-warms the GA4 and S3 caches for all hubs using the all-time
-  # date range (the most-visited view). Running this nightly ensures the
+  # Intended to pre-warm GA4 and S3 caches for all hubs nightly so the
   # first user of the day gets fast page loads instead of cold-cache latency.
+  #
+  # NOTE: Currently limited by the production MemoryStore cache backend.
+  # MemoryStore is process-local, so cache writes made here are not visible
+  # to web worker ECS tasks. This job will become effective once the app
+  # is configured to use a shared cache backend (e.g. Redis/ElastiCache).
+  # See: config/environments/production.rb
   #
   # Schedule via AWS EventBridge rule targeting an ECS task, e.g.:
   #   cron(0 5 * * ? *)   # 05:00 UTC daily
