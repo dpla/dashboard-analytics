@@ -61,7 +61,7 @@ class WebsiteSearchTerms
   def to_csv
     attributes = [ "Search term", "Count" ]
 
-    CSV.generate({ headers: true }) do |csv|
+    CSV.generate(headers: true) do |csv|
       csv << attributes
 
       multi_page_response.each do |response|
