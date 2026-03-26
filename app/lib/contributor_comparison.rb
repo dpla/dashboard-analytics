@@ -165,7 +165,7 @@ class ContributorComparison
       attributes.push(field.titleize + " Completeness") unless field == "count"
     end
 
-    CSV.generate({ headers: true }) do |csv|
+    CSV.generate(headers: true) do |csv|
       csv << attributes
 
       totals.each do |contributor|

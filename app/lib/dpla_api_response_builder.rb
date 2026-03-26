@@ -209,6 +209,7 @@ class DplaApiResponseBuilder
       sleep(2**tries + rand)
       retry
     else
+      Sentry.capture_exception(e)
       Rails.logger.warn("DPLA API request failed after #{tries} attempts: #{e.class}")
       nil
     end

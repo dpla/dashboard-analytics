@@ -40,7 +40,7 @@ class ApiSearchTerms
   end
 
   def to_csv
-    CSV.generate({ headers: true }) do |csv|
+    CSV.generate(headers: true) do |csv|
       csv << ["Search term", "Count"]
     end
   end
