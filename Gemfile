@@ -6,7 +6,7 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7.1.0'
+gem 'rails', '~> 7.2'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.6.0'
 # Use Puma as the app server
@@ -40,6 +40,8 @@ gem 'rexml', '>= 3.3.9'
 gem 'webrick', '>= 1.8.2'
 gem 'net-imap', '>= 0.3.9'
 gem 'faraday', '>= 2.14.1'
+gem 'json', '>= 2.19.2'
+gem 'bcrypt', '>= 3.1.22'
 gem 'sentry-ruby', '~> 5.22'
 gem 'sentry-rails', '~> 5.22'
 
