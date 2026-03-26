@@ -59,7 +59,9 @@ class WebsiteOverviewByContributor
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= overview_by_contributor_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      overview_by_contributor_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     nil
@@ -80,6 +82,10 @@ class WebsiteOverviewByContributor
       builder.dimensions = %w(ga:eventAction)
       builder.filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
     end
+  end
+
+  def cache_key
+    "ga:website_overview_by_contributor:#{@hub}:#{@start_date}:#{@end_date}"
   end
 
   def profile_id

@@ -48,7 +48,9 @@ class WebsiteOverview
   # @return [GaResponseBuilder::Ga4Response, nil]
   #
   def response
-    @response ||= website_overview_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      website_overview_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     record_ga_error(e)
@@ -94,5 +96,9 @@ class WebsiteOverview
 
   def profile_id
     Settings.google_analytics.frontend_profile_id
+  end
+
+  def cache_key
+    "ga:website_overview:#{@hub}:#{@contributor}:#{@start_date}:#{@end_date}"
   end
 end

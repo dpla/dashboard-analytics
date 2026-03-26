@@ -37,7 +37,9 @@ class WebsiteSearchTerms
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= search_terms_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      search_terms_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     nil
@@ -50,7 +52,9 @@ class WebsiteSearchTerms
   # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
   #
   def multi_page_response
-    @multi_page_response ||= search_terms_builder.multi_page_response
+    @multi_page_response ||= Rails.cache.fetch("#{cache_key}:multi", expires_in: 2.hours) do
+      search_terms_builder.multi_page_response
+    end
   rescue => e
     Rails.logger.error(e)
     Array.new
@@ -73,6 +77,10 @@ class WebsiteSearchTerms
   end
 
   private
+
+  def cache_key
+    "ga:website_search_terms:#{@start_date}:#{@end_date}"
+  end
 
   def profile_id
     Settings.google_analytics.frontend_profile_id

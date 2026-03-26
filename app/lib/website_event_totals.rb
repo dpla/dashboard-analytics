@@ -68,7 +68,9 @@ class WebsiteEventTotals
   # @return [GaResponseBuilder::Ga4Response, nil]
   #
   def response
-    @response ||= event_overview_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      event_overview_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     record_ga_error(e)
@@ -105,6 +107,10 @@ class WebsiteEventTotals
     else
       Hash.new
     end
+  end
+
+  def cache_key
+    "ga:website_event_totals:#{@hub}:#{@contributor}:#{@start_date}:#{@end_date}"
   end
 
   def profile_id

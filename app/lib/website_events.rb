@@ -57,7 +57,9 @@ class WebsiteEvents
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= events_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      events_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     nil
@@ -70,7 +72,9 @@ class WebsiteEvents
   # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
   #
   def multi_page_response
-    @multi_page_response ||= events_builder.multi_page_response
+    @multi_page_response ||= Rails.cache.fetch("#{cache_key}:multi", expires_in: 2.hours) do
+      events_builder.multi_page_response
+    end
   rescue => e
     Rails.logger.error(e)
     Array.new
@@ -96,6 +100,10 @@ class WebsiteEvents
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
     end
+  end
+
+  def cache_key
+    "ga:website_events:#{@hub}:#{@contributor}:#{@event_name}:#{@start_date}:#{@end_date}"
   end
 
   def profile_id
