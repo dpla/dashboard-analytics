@@ -132,7 +132,7 @@ class GaResponseBuilder
     results
   end
 
-  protected
+  public
 
   attr_reader :analytics, :dimensions, :metrics, :offset
 
