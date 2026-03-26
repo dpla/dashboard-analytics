@@ -39,14 +39,14 @@ class MetadataCompleteness
   end
 
   def hub_csv
-    @hub_csv ||= begin
+    @hub_csv ||= Rails.cache.fetch("mc_csv:hub:#{@end_date}", expires_in: 24.hours) do
       response = sThree_response("provider.csv")
       response ? csv_data(response).to_a : []
     end
   end
 
   def contributor_csv
-    @contributor_csv ||= begin
+    @contributor_csv ||= Rails.cache.fetch("mc_csv:contributor:#{@end_date}", expires_in: 24.hours) do
       response = sThree_response("contributor.csv")
       response ? csv_data(response).to_a : []
     end
