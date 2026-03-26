@@ -32,6 +32,33 @@ class GaResponseBuilder
     builder
   end
 
+  # Send multiple GA4 report requests in a single HTTP call.
+  # Takes an array of already-built GaResponseBuilder instances and
+  # returns an array of Ga4Response objects in the same order.
+  def self.batch_responses(builders)
+    return [] if builders.empty?
+
+    service = builders.first.instance_variable_get(:@analytics)
+    service.authorization = GaAuthorizer.credentials
+
+    property = "properties/#{Settings.google_analytics.property_id}"
+    requests = builders.map { |b| b.send(:build_request, b.instance_variable_get(:@offset)) }
+    batch_req = Google::Apis::AnalyticsdataV1beta::BatchRunReportsRequest.new(requests: requests)
+    batch_resp = service.batch_run_reports(property, batch_req)
+
+    batch_resp.reports.each_with_index.map do |report, i|
+      b = builders[i]
+      Ga4Response.new(report, b.instance_variable_get(:@dimensions), b.instance_variable_get(:@metrics))
+    end
+  rescue Google::Apis::AuthorizationError
+    service.authorization = GaAuthorizer.credentials
+    retry
+  rescue => e
+    Rails.logger.error(e)
+    Sentry.capture_exception(e)
+    raise
+  end
+
   # GA4 API read timeout. Chosen to be well under the ALB's 60s idle timeout so
   # that slow queries fail fast and return a graceful error rather than a 504.
   GA4_READ_TIMEOUT_SEC = 25
