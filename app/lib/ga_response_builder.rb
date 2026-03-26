@@ -32,6 +32,33 @@ class GaResponseBuilder
     builder
   end
 
+  # Send multiple GA4 report requests in a single HTTP call.
+  # Takes an array of already-built GaResponseBuilder instances and
+  # returns an array of Ga4Response objects in the same order.
+  def self.batch_responses(builders)
+    return [] if builders.empty?
+
+    service = builders.first.analytics
+    service.authorization = GaAuthorizer.credentials
+
+    property = "properties/#{Settings.google_analytics.property_id}"
+    requests = builders.map { |b| b.build_request(b.offset) }
+    batch_req = Google::Apis::AnalyticsdataV1beta::BatchRunReportsRequest.new(requests: requests)
+    batch_resp = service.batch_run_reports(property, batch_req)
+
+    batch_resp.reports.each_with_index.map do |report, i|
+      b = builders[i]
+      Ga4Response.new(report, b.dimensions, b.metrics)
+    end
+  rescue Google::Apis::AuthorizationError
+    service.authorization = GaAuthorizer.credentials
+    retry
+  rescue => e
+    Rails.logger.error(e)
+    Sentry.capture_exception(e)
+    raise
+  end
+
   # GA4 API read timeout. Chosen to be well under the ALB's 60s idle timeout so
   # that slow queries fail fast and return a graceful error rather than a 504.
   GA4_READ_TIMEOUT_SEC = 25
@@ -77,16 +104,27 @@ class GaResponseBuilder
     raise
   end
 
-  def multi_page_response
+  def multi_page_response(max_pages: 10)
     results = []
     offset  = 0
     limit   = 10_000
+    page    = 0
 
     loop do
       @offset = offset
       resp = response
       break unless resp&.rows&.any?
       results << resp
+      page += 1
+
+      if page >= max_pages
+        Rails.logger.warn(
+          "GaResponseBuilder: multi_page_response hit max_pages=#{max_pages} " \
+          "(#{page * limit} rows). Some data may be truncated."
+        )
+        break
+      end
+
       break unless resp.row_count > offset + limit
       offset += limit
     end
@@ -94,19 +132,9 @@ class GaResponseBuilder
     results
   end
 
-  private
+  protected
 
-  def property_id
-    "properties/#{Settings.google_analytics.property_id}"
-  end
-
-  def ga4_metric_names
-    @metrics.map { |m| GA4_METRICS[m] || m }
-  end
-
-  def ga4_dimension_names
-    @dimensions.map { |d| GA4_DIMENSIONS[d] || d }
-  end
+  attr_reader :analytics, :dimensions, :metrics, :offset
 
   def build_request(offset)
     params = {
@@ -125,6 +153,20 @@ class GaResponseBuilder
     params[:dimension_filter] = filter    if filter
     params[:order_bys]        = order_bys if order_bys
     Google::Apis::AnalyticsdataV1beta::RunReportRequest.new(**params)
+  end
+
+  private
+
+  def property_id
+    "properties/#{Settings.google_analytics.property_id}"
+  end
+
+  def ga4_metric_names
+    @metrics.map { |m| GA4_METRICS[m] || m }
+  end
+
+  def ga4_dimension_names
+    @dimensions.map { |d| GA4_DIMENSIONS[d] || d }
   end
 
   def build_filter_expression

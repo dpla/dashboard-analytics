@@ -1,5 +1,6 @@
 class WebsiteEventTotals
   include GaErrorTracking
+  include GaCacheable
 
   ##
   # @return [WebsiteEventTotals]
@@ -68,7 +69,9 @@ class WebsiteEventTotals
   # @return [GaResponseBuilder::Ga4Response, nil]
   #
   def response
-    @response ||= event_overview_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      event_overview_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     record_ga_error(e)

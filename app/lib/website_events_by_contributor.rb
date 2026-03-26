@@ -1,4 +1,5 @@
 class WebsiteEventsByContributor
+  include GaCacheable
 
   ##
   # @return [WebsiteEventsByContributor]
@@ -34,6 +35,21 @@ class WebsiteEventsByContributor
     @end_date = end_date
   end
 
+  # Returns the configured GaResponseBuilder for use in batch requests.
+  def ga_builder
+    @ga_builder ||= events_by_contributor_builder
+  end
+
+  # Inject a pre-fetched response (e.g. from a batch call) to skip
+  # the individual GA4 API call when response is next accessed.
+  # Writes to Rails.cache for within-process reuse. Note: with MemoryStore
+  # this is not visible to other ECS tasks — a shared cache (e.g. Redis)
+  # is required for cross-process warming.
+  def prefetch(ga4_response)
+    Rails.cache.write(cache_key, ga4_response, expires_in: 2.hours)
+    @response = ga4_response
+  end
+
   def parse_data
     return Hash.new unless response.present?
     # Create Hash of data
@@ -60,7 +76,9 @@ class WebsiteEventsByContributor
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= events_by_contributor_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      events_by_contributor_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     nil

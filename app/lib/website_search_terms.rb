@@ -1,6 +1,7 @@
 require 'csv'
 
 class WebsiteSearchTerms
+  include GaCacheable
 
   ##
   # @return [WebsiteSearchTerms]
@@ -37,7 +38,9 @@ class WebsiteSearchTerms
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= search_terms_builder.response
+    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+      search_terms_builder.response
+    end
   rescue => e
     Rails.logger.error(e)
     nil
@@ -50,7 +53,9 @@ class WebsiteSearchTerms
   # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
   #
   def multi_page_response
-    @multi_page_response ||= search_terms_builder.multi_page_response
+    @multi_page_response ||= Rails.cache.fetch("#{cache_key}:multi", expires_in: 2.hours) do
+      search_terms_builder.multi_page_response
+    end
   rescue => e
     Rails.logger.error(e)
     Array.new
