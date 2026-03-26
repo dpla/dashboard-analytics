@@ -142,6 +142,17 @@ nav .divider {
   background-color: #d7ebf4
 }
 
+.alert-banner {
+  clear: both;
+  background-color: #fef9ec;
+  border: 2px solid #ad5c1d;
+  border-radius: 4px;
+  color: #515354;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  font-size: 0.95em;
+}
+
 .data-content {
   float: right;
   width: 80%;
