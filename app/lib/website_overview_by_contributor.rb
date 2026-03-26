@@ -42,7 +42,9 @@ class WebsiteOverviewByContributor
 
   # Inject a pre-fetched response (e.g. from a batch call) to skip
   # the individual GA4 API call when response is next accessed.
+  # Also writes to Rails.cache so the value is available to future requests.
   def prefetch(ga4_response)
+    Rails.cache.write(cache_key, ga4_response, expires_in: 2.hours)
     @response = ga4_response
   end
 

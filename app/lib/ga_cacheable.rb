@@ -18,7 +18,7 @@ module GaCacheable
       @contributor,
       @event_name,
       @start_date,
-      @end_date
+      @end_date,
     ].map(&:to_s).join(":")
   end
 end
