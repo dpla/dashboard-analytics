@@ -1,5 +1,6 @@
 class WebsiteOverview
   include GaErrorTracking
+  include GaCacheable
 
   ##
   # @return [WebsiteOverview]
@@ -98,7 +99,4 @@ class WebsiteOverview
     Settings.google_analytics.frontend_profile_id
   end
 
-  def cache_key
-    "ga:website_overview:#{@hub}:#{@contributor}:#{@start_date}:#{@end_date}"
-  end
 end

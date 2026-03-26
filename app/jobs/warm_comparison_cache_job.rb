@@ -12,10 +12,10 @@ class WarmComparisonCacheJob < ApplicationJob
     start_date = Date.new(2012, 1, 1)
     end_date   = Date.today
 
-    Hub.all.each do |hub|
-      warm_hub(hub.name, start_date, end_date)
+    Hub.all.map(&:name).each do |hub_name|
+      warm_hub(hub_name, start_date, end_date)
     rescue => e
-      Rails.logger.error("WarmComparisonCacheJob: failed warming #{hub.name}: #{e.message}")
+      Rails.logger.error("WarmComparisonCacheJob: failed warming #{hub_name}: #{e.message}")
       Sentry.capture_exception(e)
     end
   end

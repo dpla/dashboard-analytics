@@ -1,6 +1,7 @@
 require 'csv'
 
 class WebsiteSearchTerms
+  include GaCacheable
 
   ##
   # @return [WebsiteSearchTerms]
@@ -77,10 +78,6 @@ class WebsiteSearchTerms
   end
 
   private
-
-  def cache_key
-    "ga:website_search_terms:#{@start_date}:#{@end_date}"
-  end
 
   def profile_id
     Settings.google_analytics.frontend_profile_id

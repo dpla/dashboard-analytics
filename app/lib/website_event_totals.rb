@@ -1,5 +1,6 @@
 class WebsiteEventTotals
   include GaErrorTracking
+  include GaCacheable
 
   ##
   # @return [WebsiteEventTotals]
@@ -107,10 +108,6 @@ class WebsiteEventTotals
     else
       Hash.new
     end
-  end
-
-  def cache_key
-    "ga:website_event_totals:#{@hub}:#{@contributor}:#{@start_date}:#{@end_date}"
   end
 
   def profile_id

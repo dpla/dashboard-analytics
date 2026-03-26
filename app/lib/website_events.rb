@@ -1,4 +1,5 @@
 class WebsiteEvents
+  include GaCacheable
 
   ##
   # @return [WebsiteEvents]
@@ -100,10 +101,6 @@ class WebsiteEvents
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
     end
-  end
-
-  def cache_key
-    "ga:website_events:#{@hub}:#{@contributor}:#{@event_name}:#{@start_date}:#{@end_date}"
   end
 
   def profile_id

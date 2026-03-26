@@ -38,17 +38,17 @@ class GaResponseBuilder
   def self.batch_responses(builders)
     return [] if builders.empty?
 
-    service = builders.first.instance_variable_get(:@analytics)
+    service = builders.first.analytics
     service.authorization = GaAuthorizer.credentials
 
     property = "properties/#{Settings.google_analytics.property_id}"
-    requests = builders.map { |b| b.send(:build_request, b.instance_variable_get(:@offset)) }
+    requests = builders.map { |b| b.build_request(b.offset) }
     batch_req = Google::Apis::AnalyticsdataV1beta::BatchRunReportsRequest.new(requests: requests)
     batch_resp = service.batch_run_reports(property, batch_req)
 
     batch_resp.reports.each_with_index.map do |report, i|
       b = builders[i]
-      Ga4Response.new(report, b.instance_variable_get(:@dimensions), b.instance_variable_get(:@metrics))
+      Ga4Response.new(report, b.dimensions, b.metrics)
     end
   rescue Google::Apis::AuthorizationError
     service.authorization = GaAuthorizer.credentials
@@ -132,19 +132,9 @@ class GaResponseBuilder
     results
   end
 
-  private
+  protected
 
-  def property_id
-    "properties/#{Settings.google_analytics.property_id}"
-  end
-
-  def ga4_metric_names
-    @metrics.map { |m| GA4_METRICS[m] || m }
-  end
-
-  def ga4_dimension_names
-    @dimensions.map { |d| GA4_DIMENSIONS[d] || d }
-  end
+  attr_reader :analytics, :dimensions, :metrics, :offset
 
   def build_request(offset)
     params = {
@@ -163,6 +153,20 @@ class GaResponseBuilder
     params[:dimension_filter] = filter    if filter
     params[:order_bys]        = order_bys if order_bys
     Google::Apis::AnalyticsdataV1beta::RunReportRequest.new(**params)
+  end
+
+  private
+
+  def property_id
+    "properties/#{Settings.google_analytics.property_id}"
+  end
+
+  def ga4_metric_names
+    @metrics.map { |m| GA4_METRICS[m] || m }
+  end
+
+  def ga4_dimension_names
+    @dimensions.map { |d| GA4_DIMENSIONS[d] || d }
   end
 
   def build_filter_expression

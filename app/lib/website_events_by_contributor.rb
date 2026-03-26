@@ -1,4 +1,5 @@
 class WebsiteEventsByContributor
+  include GaCacheable
 
   ##
   # @return [WebsiteEventsByContributor]
@@ -94,10 +95,6 @@ class WebsiteEventsByContributor
       builder.dimensions = %w(ga:eventCategory ga:eventAction)
       builder.filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
     end
-  end
-
-  def cache_key
-    "ga:website_events_by_contributor:#{@hub}:#{@start_date}:#{@end_date}"
   end
 
   def profile_id
