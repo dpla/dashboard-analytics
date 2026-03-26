@@ -119,24 +119,6 @@ class ContributorComparison
     data
   end
 
-  def contributor_mc(contributor)
-    all_contributors_mc.find do |row|
-      row['dataProvider'] == contributor
-    end
-  end
-
-  def contributor_wp(contributor)
-    all_contributors_wp.find do |row|
-      row['dataProvider'] == contributor
-    end
-  end
-
-  def contributor_wa(contributor)
-    all_contributors_wa.find do |row|
-      row['Institution'] == contributor
-    end
-  end
-
   ##
   # Generate a CSV file with the data from totals.
   def to_csv
@@ -240,5 +222,29 @@ class ContributorComparison
 
   def all_contributors_wa
     @all_contributors_wa ||= @wa_presenter.all_contributors(@hub)
+  end
+
+  def contributor_mc(contributor)
+    mc_by_name[contributor]
+  end
+
+  def contributor_wp(contributor)
+    wp_by_name[contributor]
+  end
+
+  def contributor_wa(contributor)
+    wa_by_name[contributor]
+  end
+
+  def mc_by_name
+    @mc_by_name ||= all_contributors_mc.index_by { |row| row['dataProvider'] }
+  end
+
+  def wp_by_name
+    @wp_by_name ||= all_contributors_wp.index_by { |row| row['dataProvider'] }
+  end
+
+  def wa_by_name
+    @wa_by_name ||= all_contributors_wa.index_by { |row| row['Institution'] }
   end
 end
