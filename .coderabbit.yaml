@@ -4,7 +4,3 @@ reviews:
     Do not flag missing YARD docstrings or suggest adding documentation
     comments to methods. This is an internal Rails application, not a
     published library, and YARD documentation is not used or generated.
-
-finishing_touches:
-  docstrings:
-    enabled: false
