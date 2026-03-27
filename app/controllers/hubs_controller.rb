@@ -176,8 +176,9 @@ class HubsController < ApplicationController
     )
     @wa_data = wa_presenter.hub(params[:hub_id])
 
-    @item_count = item_count_thread.value
-    @target     = Hub.new(params[:hub_id], @start_date, @end_date)
+    @item_count           = item_count_thread.value
+    @target               = Hub.new(params[:hub_id], @start_date, @end_date)
+    @wikimedia_participant = WikimediaParticipants.hub?(params[:hub_id])
 
     render partial: "shared/wikimedia_overview"
   end
