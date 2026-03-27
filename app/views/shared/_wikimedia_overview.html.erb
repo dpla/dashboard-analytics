@@ -1,4 +1,4 @@
-<%# Local variables: @wa_data[Hash], @wp_data[Hash], @item_count[Int|Nil], @target[Hub|Contributor] %>
+<%# Local variables: @wa_data[Hash], @wp_data[Hash], @item_count[Int|Nil], @target[Hub|Contributor], @wikimedia_participant[Boolean] %>
 
 <% if @wa_data.present? && @wa_data.any? { |_, v| v.to_i > 0 } %>
 
@@ -21,7 +21,11 @@
   </table>
 
 <% else %>
-  <div class="no-data">Wikimedia upload and page view data not available</div>
+  <% if @wikimedia_participant %>
+    <div class="no-data">Wikimedia upload and page view data not available</div>
+  <% else %>
+    <div class="no-data">Not a Wikimedia pipeline participant. <a href="mailto:network@dp.la">Contact us</a> to learn more.</div>
+  <% end %>
 <% end %>
 
 <% key = 'wikimediaReady' %>
