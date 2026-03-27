@@ -35,13 +35,18 @@ class WikimediaParticipants
     data.dig(hub, "institutions", contributor, "upload") == true
   end
 
-  private
-
-  def self.fetch
+  private_class_method def self.fetch
     Rails.cache.fetch(CACHE_KEY, expires_in: CACHE_TTL) do
-      uri      = URI(INSTITUTIONS_URL)
-      response = Net::HTTP.get_response(uri)
-      JSON.parse(response.body)
+      uri = URI(INSTITUTIONS_URL)
+      Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                      open_timeout: 5, read_timeout: 10) do |http|
+        response = http.get(uri.request_uri, "User-Agent" => "DPLA Analytics Dashboard/1.0")
+        unless response.is_a?(Net::HTTPSuccess)
+          Rails.logger.error("[WikimediaParticipants] Unexpected HTTP #{response.code} fetching institutions JSON")
+          next {}
+        end
+        JSON.parse(response.body)
+      end
     end
   rescue StandardError => e
     Rails.logger.error("[WikimediaParticipants] Failed to fetch institutions JSON: #{e.message}")
