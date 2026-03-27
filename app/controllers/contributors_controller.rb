@@ -226,15 +226,18 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    # Fire all five independent network calls concurrently. DPLA API results
-    # are returned directly; GA4/S3 calls warm each object's memoized cache
-    # so ContributorComparison#totals reads from memory instead of the network.
+    # Fire all independent network calls concurrently. The two GA4 calls are
+    # combined into a single batch HTTP request to halve round-trips on a cold
+    # cache load. DPLA API and S3 calls run in parallel threads alongside it.
     hub_id = params[:hub_id]
     results = [
       Thread.new { DplaApiResponseBuilder.new.contributors_item_count(hub_id) },
       Thread.new { DplaApiResponseBuilder.new.contributors_bws_item_count(hub_id) },
-      Thread.new { website_overview.response },
-      Thread.new { website_events.response },
+      Thread.new {
+        batch = GaResponseBuilder.batch_responses([website_overview.ga_builder, website_events.ga_builder])
+        website_overview.prefetch(batch[0])
+        website_events.prefetch(batch[1])
+      },
       Thread.new { metadata_completeness.contributor_csv },
     ].map(&:value)
 
