@@ -3,7 +3,7 @@ name: Build ECR
 on:
   workflow_dispatch:
 
-env: 
+env:
   ECR_REPOSITORY: "analytics-dashboard"
 
 jobs:
@@ -15,12 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-        with:
-          image: tonistiigi/binfmt:latest
-          platforms: arm64,arm
 
       - name: Set AWS credentials
         if: ${{ !env.ACT }}
@@ -28,17 +22,14 @@ jobs:
         with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1    
+            aws-region: us-east-1
 
       - name: Login to Amazon ECR
         if: ${{ !env.ACT }}
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-        # Get branch names for ECR tagging 
+        # Get branch names for ECR tagging
       - name: Get branch name (merge)
         if: github.event_name != 'pull_request'
         shell: bash
@@ -49,8 +40,8 @@ jobs:
         shell: bash
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
 
-      # Rename config files 
-      - name: Rename config files 
+      # Rename config files
+      - name: Rename config files
         run: |
           mv ./config/settings.yml.template ./config/settings.yml
           mv ./config/database.yml.template ./config/database.yml
@@ -65,9 +56,11 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
         run: |
-          docker buildx build \
+          docker build \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-          . \
-          --push
+          .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
