@@ -177,11 +177,12 @@ class ContributorsController < ApplicationController
     )
     @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
-    @item_count = item_count_thread.value
-    @target     = Contributor.new(params[:contributor_id],
-                                  params[:hub_id],
-                                  @start_date,
-                                  @end_date)
+    @item_count           = item_count_thread.value
+    @target               = Contributor.new(params[:contributor_id],
+                                            params[:hub_id],
+                                            @start_date,
+                                            @end_date)
+    @wikimedia_participant = WikimediaParticipants.contributor?(params[:hub_id], params[:contributor_id])
 
     render partial: "shared/wikimedia_overview"
   end
