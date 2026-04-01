@@ -20,7 +20,7 @@ class DplaApiResponseBuilder
                          page_size: 0 } }
 
     begin
-      json_response('/items', options)['facets']['provider.name']['terms']
+      (json_response('/items', options).dig('facets', 'provider.name', 'terms') || [])
         .sort_by { |f| f['term'] }
     rescue StandardError => e
       Sentry.capture_exception(e)
@@ -41,7 +41,7 @@ class DplaApiResponseBuilder
                          :'provider.name' => hub } }
 
     begin
-      json_response('/items', options)['facets']['dataProvider']['terms']
+      (json_response('/items', options).dig('facets', 'dataProvider', 'terms') || [])
         .map{ |f| f['term'] }
     rescue StandardError => e
       Sentry.capture_exception(e)
@@ -62,7 +62,7 @@ class DplaApiResponseBuilder
                          :'provider.name' => hub } }
 
     begin
-      json_response('/items', options)['facets']['dataProvider']['terms']
+      json_response('/items', options).dig('facets', 'dataProvider', 'terms') || []
     rescue StandardError => e
       Sentry.capture_exception(e)
       Rails.logger.debug(e)
@@ -86,11 +86,8 @@ class DplaApiResponseBuilder
 
     begin
       count = json_response('/items', options)['count']
-      if (count.is_a? Integer)
-        count # ElasticSearch 6
-      else
-        count['value'] # ElasticSearch 7
-      end
+      return nil if count.nil?
+      count.is_a?(Integer) ? count : count['value'] # Integer: ES6, Hash: ES7
     rescue StandardError => e
       Sentry.capture_exception(e)
       Rails.logger.debug(e)
@@ -115,11 +112,8 @@ class DplaApiResponseBuilder
 
     begin
       count = json_response('/items', options)['count']
-      if (count.is_a? Integer)
-        count # ElasticSearch 6
-      else
-        count['value'] # ElasticSearch 7
-      end
+      return nil if count.nil?
+      count.is_a?(Integer) ? count : count['value'] # Integer: ES6, Hash: ES7
     rescue StandardError => e
       Sentry.capture_exception(e)
       Rails.logger.debug(e)
@@ -140,7 +134,7 @@ class DplaApiResponseBuilder
                          :tags => "blackwomensuffrage" } }
 
     begin
-      json_response('/items', options)['facets']['dataProvider']['terms']
+      (json_response('/items', options).dig('facets', 'dataProvider', 'terms') || [])
         .map{ |t| [t["term"], t["count"]] }.to_h
     rescue StandardError => e
       Sentry.capture_exception(e)
