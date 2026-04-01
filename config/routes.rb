@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   end
 
   resources :hubs, id: /.*/, only: [:index, :show] do
+    get :sections
     get :website_overview
     get :api_overview
     get :bws_overview
@@ -33,6 +34,7 @@ Rails.application.routes.draw do
     get :wikimedia_overview
 
     resources :contributors, id: /.*/, only: [:index, :show] do
+      get :sections
       get :contributor_website_overview
       get :contributor_api_overview
       get :contributor_bws_overview
