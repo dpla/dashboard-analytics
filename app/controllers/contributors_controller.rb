@@ -45,35 +45,35 @@ class ContributorsController < ApplicationController
     end_date   = @end_date
 
     item_count_t = Thread.new { DplaApiResponseBuilder.new.item_count(hub_id, contrib_id) rescue nil }
-    website_views_t = Thread.new {
+    website_views_t = Thread.new do
       WebsiteOverview.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
       }.events
     rescue => e
       Rails.logger.error(e); nil
-    }
-    wiki_views_t = Thread.new {
+    end
+    wiki_views_t = Thread.new do
       WikimediaAnalyticsPresenter.new(
         start_month: all_start.strftime("%Y-%m"), end_month: all_end.strftime("%Y-%m")
       ).contributor(hub_id, contrib_id)["Page views"]
     rescue => e
       Rails.logger.error(e); nil
-    }
-    website_overview_t = Thread.new {
+    end
+    website_overview_t = Thread.new do
       WebsiteOverview.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
       }
     rescue => e
       Rails.logger.error(e); nil
-    }
-    website_events_t = Thread.new {
+    end
+    website_events_t = Thread.new do
       WebsiteEventTotals.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
       }
     rescue => e
       Rails.logger.error(e); nil
-    }
-    mc_thread = Thread.new {
+    end
+    mc_thread = Thread.new do
       mc = MetadataCompleteness.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.end_date = end_date
       }
@@ -87,7 +87,7 @@ class ContributorsController < ApplicationController
       }
     rescue => e
       Rails.logger.error(e); {}
-    }
+    end
 
     [item_count_t, website_views_t, wiki_views_t,
      website_overview_t, website_events_t, mc_thread].each(&:join)
