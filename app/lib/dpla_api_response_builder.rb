@@ -157,7 +157,7 @@ class DplaApiResponseBuilder
     result = {}
     ids.uniq.compact.each_slice(50) do |batch|
       begin
-        docs = json_response("/items/\#{batch.join(',')}", query: { api_key: api_key })['docs'] || []
+        docs = json_response("/items/#{batch.join(',')}", query: { api_key: api_key })['docs'] || []
         docs.each do |doc|
           item_hash = doc['id']&.split('/')&.last
           name = doc.dig('dataProvider', 'name')
@@ -194,7 +194,7 @@ class DplaApiResponseBuilder
     res = self.class.get(path, options)
 
     if res.code != 200
-      Rails.logger.debug("A \#{res.code} error occurred when attempting to call the DPLA API")
+      Rails.logger.debug("A #{res.code} error occurred when attempting to call the DPLA API")
       raise HttpRateLimitError if res.code == 429
       raise HttpServerError if res.code.in? [500, 502, 503, 504]
     end
@@ -206,7 +206,7 @@ class DplaApiResponseBuilder
       retry
     else
       Sentry.capture_exception(e)
-      Rails.logger.warn("DPLA API request failed after \#{tries} attempts: \#{e.class}")
+      Rails.logger.warn("DPLA API request failed after #{tries} attempts: #{e.class}")
       nil
     end
   end
