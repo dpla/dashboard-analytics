@@ -29,6 +29,88 @@ class HubsController < ApplicationController
     end
   end
 
+  ##
+  # Single async endpoint that loads all four data sections for the hub show page
+  # concurrently, returning one combined HTML response instead of four.
+  #
+  def sections
+    assign_start_and_end_dates
+
+    hub_id    = params[:hub_id]
+    all_start = min_date
+    all_end   = max_date
+    sec_start = params[:start_date].present? ? @start_date : all_start
+    sec_end   = params[:start_date].present? ? @end_date   : all_end
+    end_date  = @end_date
+
+    first_month = Rails.cache.fetch("wikimedia_start_month:#{hub_id}", expires_in: 24.hours) do
+      WikimediaCache.where(hub: hub_id, contributor: "").minimum(:month)
+    end
+    @wikimedia_start_date = Date.parse("#{first_month}-01") if first_month
+
+    item_count_t = Thread.new { DplaApiResponseBuilder.new.item_count(hub_id) rescue nil }
+    contributor_t = Thread.new { DplaApiResponseBuilder.new.contributors(hub_id).count rescue nil }
+    website_views_t = Thread.new {
+      WebsiteOverview.build { |b|
+        b.hub = hub_id; b.start_date = all_start; b.end_date = all_end
+      }.events
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    wiki_views_t = Thread.new {
+      WikimediaAnalyticsPresenter.new(
+        start_month: all_start.strftime("%Y-%m"), end_month: all_end.strftime("%Y-%m")
+      ).hub(hub_id)["Page views"]
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    website_overview_t = Thread.new {
+      WebsiteOverview.build { |b|
+        b.hub = hub_id; b.start_date = sec_start; b.end_date = sec_end
+      }
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    website_events_t = Thread.new {
+      WebsiteEventTotals.build { |b|
+        b.hub = hub_id; b.start_date = sec_start; b.end_date = sec_end
+      }
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    mc_thread = Thread.new {
+      mc = MetadataCompleteness.build { |b| b.hub = hub_id; b.end_date = end_date }
+      {
+        wp: WikimediaPreparationsPresenter.new(mc).hub(hub_id),
+        wa: WikimediaAnalyticsPresenter.new(
+              start_month: sec_start.strftime("%Y-%m"),
+              end_month: sec_end.strftime("%Y-%m")
+            ).hub(hub_id),
+        mc: MetadataCompletenessPresenter.new(mc).hub(hub_id)
+      }
+    rescue => e
+      Rails.logger.error(e); {}
+    }
+
+    [item_count_t, contributor_t, website_views_t, wiki_views_t,
+     website_overview_t, website_events_t, mc_thread].each(&:join)
+
+    mc_data = mc_thread.value || {}
+
+    @item_count           = item_count_t.value
+    @contributor_count    = contributor_t.value
+    @website_views        = website_views_t.value
+    @wikimedia_views      = wiki_views_t.value
+    @website_overview     = website_overview_t.value
+    @website_event_totals = website_events_t.value
+    @wp_data              = mc_data[:wp]
+    @wa_data              = mc_data[:wa]
+    @mc_data              = mc_data[:mc]
+    @target               = Hub.new(hub_id, sec_start, sec_end)
+
+    render partial: "shared/hub_sections"
+  end
+
   def website_overview
     params[:start_date].present? ? assign_start_and_end_dates : assign_all_time_dates
 
@@ -64,7 +146,7 @@ class HubsController < ApplicationController
 
     @bws_item_count = DplaApiResponseBuilder.new()
       .bws_item_count(params[:hub_id])
-    
+
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
       builder.start_date = @start_date
@@ -176,9 +258,8 @@ class HubsController < ApplicationController
     )
     @wa_data = wa_presenter.hub(params[:hub_id])
 
-    @item_count           = item_count_thread.value
-    @target               = Hub.new(params[:hub_id], @start_date, @end_date)
-    @wikimedia_participant = WikimediaParticipants.hub?(params[:hub_id])
+    @item_count = item_count_thread.value
+    @target     = Hub.new(params[:hub_id], @start_date, @end_date)
 
     render partial: "shared/wikimedia_overview"
   end

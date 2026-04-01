@@ -1,0 +1,46 @@
+<div class="data-section">
+
+  <%# === Column 1 (left): Totals card + DPLA Website stacked === %>
+  <div class="metrics-left-col">
+
+    <div class="metrics">
+      <%= render partial: "shared/totals" %>
+    </div>
+
+    <div class="metrics">
+
+      <div class="tooltip">
+        <h2>DPLA Website (dp.la)</h2>
+        <span class="tooltiptext"><%= website_use_tooltip %></span>
+      </div>
+
+      <%= render partial: "shared/frontend_use_metrics" %>
+
+    </div>
+
+  </div>
+
+  <%# === Column 2 (middle): Wikimedia Integration === %>
+  <div class="metrics">
+
+    <div class="tooltip">
+      <h2>Wikimedia Integration</h2>
+    </div>
+
+    <%= render partial: "shared/wikimedia_overview" %>
+
+  </div>
+
+  <%# === Column 3 (right): Metadata Completeness === %>
+  <div class="metrics">
+
+    <div class="tooltip">
+      <h2>Metadata Completeness</h2>
+      <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
+    </div>
+
+    <%= render partial: "shared/metadata_completeness" %>
+
+  </div>
+
+</div>

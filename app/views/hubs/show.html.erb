@@ -18,71 +18,16 @@
 
   <div class="data-content">
 
-    <%= render partial: "shared/all_time_notice" %>
-
-    <div class="data-section">
-
-      <%# === Column 1 (left): Totals card + DPLA Website stacked === %>
-      <div class="metrics-left-col">
-
-        <div class="metrics">
-          <%= render_async_section hub_totals_path(@hub.name, date_opts) do %>
-            <div>Loading...</div>
-          <% end %>
+    <%= render_async_section hub_sections_path(@hub.name, date_opts) do %>
+      <div class="data-section">
+        <div class="metrics-left-col">
+          <div class="metrics"><div>Loading...</div></div>
+          <div class="metrics"><div>Loading...</div></div>
         </div>
-
-        <div class="metrics">
-
-          <div class="tooltip">
-            <h2>DPLA Website (dp.la)</h2>
-            <span class="tooltiptext"><%= website_use_tooltip %></span>
-          </div>
-
-          <%= render partial: "shared/date_range_note", locals: { data_start_date: website_data_start_date } %>
-
-          <%= render_async_section hub_website_overview_path(@hub.name, date_opts) do %>
-            <div>Loading...</div>
-          <% end %>
-
-          <%# TODO: Re-enable BWS section when GA4 property ID is available.
-               hub_bws_overview_path / bws_use_tooltip / BwsOverview %>
-
-        </div>
-
+        <div class="metrics"><div>Loading...</div></div>
+        <div class="metrics"><div>Loading...</div></div>
       </div>
+    <% end %>
 
-      <%# === Column 2 (middle): Wikimedia Integration === %>
-      <div class="metrics">
-
-        <div class="tooltip">
-          <h2>Wikimedia Integration</h2>
-        </div>
-
-        <%= render partial: "shared/date_range_note", locals: { data_start_date: @wikimedia_start_date } %>
-
-        <%= render_async_section hub_wikimedia_overview_path(@hub.name, date_opts) do %>
-          <div>Loading...</div>
-        <% end %>
-
-      </div>
-
-      <%# === Column 3 (right): Metadata Completeness === %>
-      <div class="metrics">
-
-        <div class="tooltip">
-          <h2>Metadata Completeness</h2>
-          <span class="tooltiptext"><%= metadata_completeness_tooltip %></span>
-        </div>
-
-        <%= render_async_section hub_metadata_completeness_path(@hub.name, date_opts) do %>
-          <div>Loading...</div>
-        <% end %>
-
-      </div>
-
-      <%# TODO: Re-enable DPLA API section when data source is confirmed.
-           hub_api_overview_path / api_use_tooltip / ApiOverview %>
-
-    </div>
   </div>
-</main>
+  </main>
