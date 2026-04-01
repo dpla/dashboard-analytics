@@ -254,6 +254,7 @@ th, td {
 
 .metrics .no-data {
   display: table;
+  margin-bottom: 10px;
 }
 
 .date-select {
