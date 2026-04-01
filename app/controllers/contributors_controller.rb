@@ -30,6 +30,83 @@ class ContributorsController < ApplicationController
     end
   end
 
+
+  ##
+  # Single async endpoint that loads all four data sections for the contributor show page
+  # concurrently, returning one combined HTML response instead of four.
+  #
+  def sections
+    assign_start_and_end_dates
+
+    hub_id     = params[:hub_id]
+    contrib_id = params[:contributor_id]
+    all_start  = min_date
+    all_end    = max_date
+    end_date   = @end_date
+
+    item_count_t = Thread.new { DplaApiResponseBuilder.new.item_count(hub_id, contrib_id) rescue nil }
+    website_views_t = Thread.new {
+      WebsiteOverview.build { |b|
+        b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
+      }.events
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    wiki_views_t = Thread.new {
+      WikimediaAnalyticsPresenter.new(
+        start_month: all_start.strftime("%Y-%m"), end_month: all_end.strftime("%Y-%m")
+      ).contributor(hub_id, contrib_id)["Page views"]
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    website_overview_t = Thread.new {
+      WebsiteOverview.build { |b|
+        b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
+      }
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    website_events_t = Thread.new {
+      WebsiteEventTotals.build { |b|
+        b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
+      }
+    rescue => e
+      Rails.logger.error(e); nil
+    }
+    mc_thread = Thread.new {
+      mc = MetadataCompleteness.build { |b|
+        b.hub = hub_id; b.contributor = contrib_id; b.end_date = end_date
+      }
+      {
+        wp: WikimediaPreparationsPresenter.new(mc).contributor(hub_id, contrib_id),
+        wa: WikimediaAnalyticsPresenter.new(
+              start_month: all_start.strftime("%Y-%m"),
+              end_month:   all_end.strftime("%Y-%m")
+            ).contributor(hub_id, contrib_id),
+        mc: MetadataCompletenessPresenter.new(mc).contributor(hub_id, contrib_id)
+      }
+    rescue => e
+      Rails.logger.error(e); {}
+    }
+
+    [item_count_t, website_views_t, wiki_views_t,
+     website_overview_t, website_events_t, mc_thread].each(&:join)
+
+    mc_data = mc_thread.value || {}
+
+    @item_count           = item_count_t.value
+    @website_views        = website_views_t.value
+    @wikimedia_views      = wiki_views_t.value
+    @website_overview     = website_overview_t.value
+    @website_event_totals = website_events_t.value
+    @wp_data              = mc_data[:wp]
+    @wa_data              = mc_data[:wa]
+    @mc_data              = mc_data[:mc]
+    @target               = Contributor.new(contrib_id, hub_id, all_start, all_end)
+
+    render partial: "shared/contributor_sections"
+  end
+
   def contributor_website_overview
     assign_all_time_dates
 
@@ -177,12 +254,11 @@ class ContributorsController < ApplicationController
     )
     @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
-    @item_count           = item_count_thread.value
-    @target               = Contributor.new(params[:contributor_id],
-                                            params[:hub_id],
-                                            @start_date,
-                                            @end_date)
-    @wikimedia_participant = WikimediaParticipants.contributor?(params[:hub_id], params[:contributor_id])
+    @item_count = item_count_thread.value
+    @target     = Contributor.new(params[:contributor_id],
+                                  params[:hub_id],
+                                  @start_date,
+                                  @end_date)
 
     render partial: "shared/wikimedia_overview"
   end
@@ -226,18 +302,15 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    # Fire all independent network calls concurrently. The two GA4 calls are
-    # combined into a single batch HTTP request to halve round-trips on a cold
-    # cache load. DPLA API and S3 calls run in parallel threads alongside it.
+    # Fire all five independent network calls concurrently. DPLA API results
+    # are returned directly; GA4/S3 calls warm each object's memoized cache
+    # so ContributorComparison#totals reads from memory instead of the network.
     hub_id = params[:hub_id]
     results = [
       Thread.new { DplaApiResponseBuilder.new.contributors_item_count(hub_id) },
       Thread.new { DplaApiResponseBuilder.new.contributors_bws_item_count(hub_id) },
-      Thread.new {
-        batch = GaResponseBuilder.batch_responses([website_overview.ga_builder, website_events.ga_builder])
-        website_overview.prefetch(batch[0])
-        website_events.prefetch(batch[1])
-      },
+      Thread.new { website_overview.response },
+      Thread.new { website_events.response },
       Thread.new { metadata_completeness.contributor_csv },
     ].map(&:value)
 
