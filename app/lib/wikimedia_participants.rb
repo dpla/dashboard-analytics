@@ -12,14 +12,17 @@ class WikimediaParticipants
   CACHE_TTL        = 24.hours
 
   ##
-  # Returns true if the hub is an active Wikimedia upload participant.
+  # Returns true if the hub is in the Wikimedia pipeline — i.e., has a
+  # hub-level Wikidata ID in institutions_v2.json. Hub-level entries always
+  # have upload: false (uploads are attributed to individual contributors),
+  # so upload: true is not the right signal here.
   #
   # @param hub [String]
   # @return [Boolean]
   #
   def self.hub?(hub)
     data = fetch
-    data.dig(hub, "upload") == true
+    data.dig(hub, "Wikidata").present?
   end
 
   ##
