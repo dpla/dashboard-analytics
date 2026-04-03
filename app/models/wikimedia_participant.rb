@@ -9,4 +9,8 @@
 #
 class WikimediaParticipant < ApplicationRecord
   self.table_name = "wikimedia_participants"
+
+  def self.participant?(hub, contributor)
+    where(hub: hub, contributor: contributor).pick(:participant) || false
+  end
 end
