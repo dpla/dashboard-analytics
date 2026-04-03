@@ -19,7 +19,7 @@ class WikimediaCacheBuilder
   end
 
   def rebuild
-    Rails.logger.warn "[WikimediaCacheBuilder] Starting rebuild"
+    Rails.logger.error "[WikimediaCacheBuilder] Starting rebuild"
     institutions = fetch_json(INSTITUTIONS_URL)
 
     # Sync contributor participant flags to DB first (fast, DB-only, no external calls).
@@ -27,7 +27,7 @@ class WikimediaCacheBuilder
 
     work_items   = build_work_items(institutions)
 
-    Rails.logger.warn "[WikimediaCacheBuilder] #{work_items.size} work items to process"
+    Rails.logger.error "[WikimediaCacheBuilder] #{work_items.size} work items to process"
 
     # Resolve each unique Wikidata ID to a Commons category in batches of 50
     # via the anonymous MediaWiki API (~55 requests for Phase 1, ~8 for Phase 2).
@@ -35,7 +35,7 @@ class WikimediaCacheBuilder
     wikidata_to_cat = batch_resolve_commons_categories(unique_ids)
 
     processable = work_items.select { |i| wikidata_to_cat.key?(i[:wikidata_id]) }
-    Rails.logger.warn "[WikimediaCacheBuilder] #{processable.size}/#{work_items.size} items have resolvable Commons categories"
+    Rails.logger.error "[WikimediaCacheBuilder] #{processable.size}/#{work_items.size} items have resolvable Commons categories"
 
     queue = Queue.new
     processable.each { |item| queue << item }
@@ -52,7 +52,7 @@ class WikimediaCacheBuilder
     end
 
     threads.each(&:join)
-    Rails.logger.warn "[WikimediaCacheBuilder] Rebuild complete"
+    Rails.logger.error "[WikimediaCacheBuilder] Rebuild complete"
   end
 
   private
@@ -89,7 +89,7 @@ class WikimediaCacheBuilder
       end
     end
 
-    Rails.logger.warn "[WikimediaCacheBuilder] Synced participant flags for #{rows.size} contributors"
+    Rails.logger.error "[WikimediaCacheBuilder] Synced participant flags for #{rows.size} contributors"
   end
 
   def build_work_items(institutions)
@@ -118,7 +118,7 @@ class WikimediaCacheBuilder
         .first&.dig("mainsnak", "datavalue", "value", "id")
     end
 
-    Rails.logger.warn "[WikimediaCacheBuilder] Phase 1: #{wikidata_to_m_id.size}/#{wikidata_ids.size} Wikidata IDs resolved to P8464 MediaInfo entities"
+    Rails.logger.error "[WikimediaCacheBuilder] Phase 1: #{wikidata_to_m_id.size}/#{wikidata_ids.size} Wikidata IDs resolved to P8464 MediaInfo entities"
 
     # Phase 2: Commons — resolve each MediaInfo entity ID to a category name
     unique_m_ids     = wikidata_to_m_id.values.uniq
@@ -127,7 +127,7 @@ class WikimediaCacheBuilder
       title&.sub(/\ACategory:/i, "")&.gsub(" ", "_")
     end
 
-    Rails.logger.warn "[WikimediaCacheBuilder] Phase 2: #{m_id_to_category.size}/#{unique_m_ids.size} MediaInfo entities resolved to Commons categories"
+    Rails.logger.error "[WikimediaCacheBuilder] Phase 2: #{m_id_to_category.size}/#{unique_m_ids.size} MediaInfo entities resolved to Commons categories"
 
     # Combine: map wikidata_id -> category_name
     wikidata_to_m_id.each_with_object({}) do |(wikidata_id, m_id), result|
@@ -152,7 +152,7 @@ class WikimediaCacheBuilder
         response = http.get("#{uri.path}?#{URI.encode_www_form(params)}", headers)
         if response.is_a?(Net::HTTPTooManyRequests)
           wait = response["Retry-After"]&.to_i || 10
-          Rails.logger.warn "[WikimediaCacheBuilder] 429 from #{uri.host}, retrying in #{wait}s"
+          Rails.logger.error "[WikimediaCacheBuilder] 429 from #{uri.host}, retrying in #{wait}s"
           sleep(wait)
           response = http.get("#{uri.path}?#{URI.encode_www_form(params)}", headers)
         end
@@ -160,7 +160,7 @@ class WikimediaCacheBuilder
         data = JSON.parse(response.body)
 
         if data["error"]
-          Rails.logger.warn "[WikimediaCacheBuilder] #{uri.host} API error: #{data['error']['code']}: #{data['error']['info']}"
+          Rails.logger.error "[WikimediaCacheBuilder] #{uri.host} API error: #{data['error']['code']}: #{data['error']['info']}"
           failed += 1
           next
         end
@@ -172,11 +172,11 @@ class WikimediaCacheBuilder
         end
       rescue StandardError => e
         failed += 1
-        Rails.logger.warn "[WikimediaCacheBuilder] #{uri.host} batch failed: #{e.message}"
+        Rails.logger.error "[WikimediaCacheBuilder] #{uri.host} batch failed: #{e.message}"
       end
     end
 
-    Rails.logger.warn "[WikimediaCacheBuilder] #{uri.host}: #{result.size} resolved, #{failed} batches failed" if failed > 0
+    Rails.logger.error "[WikimediaCacheBuilder] #{uri.host}: #{result.size} resolved, #{failed} batches failed" if failed > 0
     result
   end
 
@@ -236,7 +236,7 @@ class WikimediaCacheBuilder
       hash[month] = item if month
     end
   rescue StandardError => e
-    Rails.logger.warn "[WikimediaCacheBuilder] fetch_snapshot failed for #{category}: #{e.message}"
+    Rails.logger.error "[WikimediaCacheBuilder] fetch_snapshot failed for #{category}: #{e.message}"
     {}
   end
 
@@ -254,7 +254,7 @@ class WikimediaCacheBuilder
       hash[month] = views.to_i if month && views
     end
   rescue StandardError => e
-    Rails.logger.warn "[WikimediaCacheBuilder] fetch_pageviews failed for #{category}: #{e.message}"
+    Rails.logger.error "[WikimediaCacheBuilder] fetch_pageviews failed for #{category}: #{e.message}"
     {}
   end
 
