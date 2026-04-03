@@ -77,9 +77,15 @@ class WikimediaCacheBuilder
       end
     end
 
-    rows.each_slice(100) do |batch|
-      ActiveRecord::Base.connection_pool.with_connection do
-        WikimediaParticipant.upsert_all(batch, unique_by: [:hub, :contributor])
+    # Delete-then-insert inside a transaction so stale rows (contributors removed
+    # from institutions_v2.json) are cleaned up atomically with no window where
+    # the table is empty.
+    ActiveRecord::Base.connection_pool.with_connection do
+      ActiveRecord::Base.transaction do
+        WikimediaParticipant.delete_all
+        rows.each_slice(100) do |batch|
+          WikimediaParticipant.upsert_all(batch, unique_by: [:hub, :contributor])
+        end
       end
     end
 
