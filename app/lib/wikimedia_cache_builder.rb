@@ -20,6 +20,10 @@ class WikimediaCacheBuilder
 
   def rebuild
     institutions = fetch_json(INSTITUTIONS_URL)
+
+    # Sync contributor participant flags to DB first (fast, DB-only, no external calls).
+    sync_participant_flags(institutions)
+
     work_items   = build_work_items(institutions)
 
     Rails.logger.info "[WikimediaCacheBuilder] #{work_items.size} work items to process"
@@ -51,6 +55,33 @@ class WikimediaCacheBuilder
   end
 
   private
+
+  # Writes each contributor's participant status to the wikimedia_participants
+  # table based on the upload flag in institutions_v2.json. Hub-level
+  # upload: true cascades to all contributors in that hub. Called at the start
+  # of every rebuild so the page-load path never needs to make external API
+  # calls to determine participant status.
+  def sync_participant_flags(institutions)
+    rows = []
+    institutions.each do |hub_name, hub_data|
+      hub_upload = hub_data["upload"] == true
+      (hub_data["institutions"] || {}).each do |contributor_name, contributor_data|
+        next unless contributor_data["Wikidata"].present?
+        contrib_upload = contributor_data["upload"] == true
+        rows << {
+          hub:         hub_name,
+          contributor: contributor_name,
+          participant: hub_upload || contrib_upload
+        }
+      end
+    end
+
+    rows.each_slice(100) do |batch|
+      WikimediaParticipant.upsert_all(batch, unique_by: [:hub, :contributor])
+    end
+
+    Rails.logger.info "[WikimediaCacheBuilder] Synced participant flags for #{rows.size} contributors"
+  end
 
   def build_work_items(institutions)
     items = []
