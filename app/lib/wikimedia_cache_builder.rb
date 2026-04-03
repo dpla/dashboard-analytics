@@ -4,7 +4,6 @@ require "json"
 class WikimediaCacheBuilder
   INSTITUTIONS_URL  = "https://raw.githubusercontent.com/dpla/ingestion3/main/src/main/resources/wiki/institutions_v2.json"
   WIKIDATA_API_URL  = "https://www.wikidata.org/w/api.php"
-  COMMONS_API_URL   = "https://commons.wikimedia.org/w/api.php"
   CIM_BASE_URL      = "https://wikimedia.org/api/rest_v1/metrics/commons-analytics"
   # Fetch all months in one call by using a wide date window.
   # Snapshot: /{category}/{start}/{end}  — date format YYYYMMDD
@@ -107,31 +106,34 @@ class WikimediaCacheBuilder
   end
 
   # Resolves an array of Wikidata IDs to Commons category names in two batched
-  # phases via the anonymous MediaWiki API (50 IDs per request):
-  #   Phase 1 — wikidata.org: fetch P8464 claims to get MediaInfo entity IDs
-  #   Phase 2 — commons.wikimedia.org: fetch sitelinks to get category titles
+  # phases via the Wikidata API (50 IDs per request):
+  #   Phase 1 — fetch P8464 claims: each institution's Wikidata item carries a
+  #              P8464 value that is the Q-id of the Wikidata item for its
+  #              Commons category (e.g. Q112194444 → Q113547185).
+  #   Phase 2 — fetch sitelinks for those category Q-ids: the commonswiki
+  #              sitelink title gives the Commons category name
+  #              (e.g. "Category:Media contributed by Northwest Digital Heritage").
   # Returns { wikidata_id => category_name } for all successfully resolved IDs.
   def batch_resolve_commons_categories(wikidata_ids)
-    # Phase 1: Wikidata — resolve each ID to a MediaInfo entity ID via P8464 claim
-    wikidata_to_m_id = batch_fetch_entities(WIKIDATA_API_URL, wikidata_ids, "claims") do |entity|
+    # Phase 1: resolve each institution/hub Wikidata ID to its Commons category Q-id via P8464
+    wikidata_to_cat_qid = batch_fetch_entities(WIKIDATA_API_URL, wikidata_ids, "claims") do |entity|
       (entity.dig("claims", "P8464") || [])
         .first&.dig("mainsnak", "datavalue", "value", "id")
     end
 
-    Rails.logger.error "[WikimediaCacheBuilder] Phase 1: #{wikidata_to_m_id.size}/#{wikidata_ids.size} Wikidata IDs resolved to P8464 MediaInfo entities"
+    Rails.logger.error "[WikimediaCacheBuilder] Phase 1: #{wikidata_to_cat_qid.size}/#{wikidata_ids.size} Wikidata IDs resolved to P8464 category Q-ids"
 
-    # Phase 2: Commons — resolve each MediaInfo entity ID to a category name
-    unique_m_ids     = wikidata_to_m_id.values.uniq
-    m_id_to_category = batch_fetch_entities(COMMONS_API_URL, unique_m_ids, "sitelinks") do |entity|
+    # Phase 2: resolve each category Q-id to its Commons category name via commonswiki sitelink
+    unique_cat_qids  = wikidata_to_cat_qid.values.uniq
+    cat_qid_to_name  = batch_fetch_entities(WIKIDATA_API_URL, unique_cat_qids, "sitelinks") do |entity|
       title = entity.dig("sitelinks", "commonswiki", "title")
       title&.sub(/\ACategory:/i, "")&.gsub(" ", "_")
     end
 
-    Rails.logger.error "[WikimediaCacheBuilder] Phase 2: #{m_id_to_category.size}/#{unique_m_ids.size} MediaInfo entities resolved to Commons categories"
+    Rails.logger.error "[WikimediaCacheBuilder] Phase 2: #{cat_qid_to_name.size}/#{unique_cat_qids.size} category Q-ids resolved to Commons category names"
 
-    # Combine: map wikidata_id -> category_name
-    wikidata_to_m_id.each_with_object({}) do |(wikidata_id, m_id), result|
-      cat = m_id_to_category[m_id]
+    wikidata_to_cat_qid.each_with_object({}) do |(wikidata_id, cat_qid), result|
+      cat = cat_qid_to_name[cat_qid]
       result[wikidata_id] = cat if cat
     end
   end
