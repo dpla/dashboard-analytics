@@ -13,4 +13,8 @@ class WikimediaParticipant < ApplicationRecord
   def self.participant?(hub, contributor)
     where(hub: hub, contributor: contributor).pick(:participant) || false
   end
+
+  def self.hub_participant?(hub)
+    where(hub: hub, participant: true).exists?
+  end
 end
