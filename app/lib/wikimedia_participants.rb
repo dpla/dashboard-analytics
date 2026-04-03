@@ -46,10 +46,7 @@ class WikimediaParticipants
       Net::HTTP.start(uri.host, uri.port, use_ssl: true,
                       open_timeout: 5, read_timeout: 10) do |http|
         response = http.get(uri.request_uri, "User-Agent" => "DPLA Analytics Dashboard/1.0")
-        unless response.is_a?(Net::HTTPSuccess)
-          Rails.logger.error("[WikimediaParticipants] HTTP #{response.code} fetching institutions JSON")
-          next {}
-        end
+        response.value
         JSON.parse(response.body)
       end
     end
@@ -84,6 +81,8 @@ class WikimediaParticipants
 
   # Batch-queries the Wikidata API for P8464 claims, returning the Set of
   # IDs that have one. Reuses a single TCP connection for all batches.
+  # Raises on any HTTP or parse failure so the caller's rescue returns an
+  # unfresh fallback rather than caching incomplete data.
   private_class_method def self.resolve_p8464_ids(wikidata_ids)
     result = Set.new
     uri = URI(WIKIDATA_API_URL)
@@ -94,7 +93,7 @@ class WikimediaParticipants
                      props: "claims", format: "json" }
         response = http.get("#{uri.path}?#{URI.encode_www_form(params)}",
                             "User-Agent" => "DPLA Analytics Dashboard/1.0")
-        next unless response.is_a?(Net::HTTPSuccess)
+        response.value
 
         data = JSON.parse(response.body)
         (data["entities"] || {}).each do |id, entity|
@@ -103,6 +102,7 @@ class WikimediaParticipants
         end
       rescue StandardError => e
         Rails.logger.warn("[WikimediaParticipants] Batch failed: #{e.message}")
+        raise
       end
     end
 
