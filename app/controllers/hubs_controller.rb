@@ -106,6 +106,7 @@ class HubsController < ApplicationController
     @wp_data              = mc_data[:wp]
     @wa_data              = mc_data[:wa]
     @mc_data              = mc_data[:mc]
+    @wikimedia_participant = WikimediaParticipants.hub?(hub_id)
     @target               = Hub.new(hub_id, sec_start, sec_end)
 
     render partial: "shared/hub_sections"
@@ -258,8 +259,9 @@ class HubsController < ApplicationController
     )
     @wa_data = wa_presenter.hub(params[:hub_id])
 
-    @item_count = item_count_thread.value
-    @target     = Hub.new(params[:hub_id], @start_date, @end_date)
+    @item_count            = item_count_thread.value
+    @wikimedia_participant = WikimediaParticipants.hub?(params[:hub_id])
+    @target                = Hub.new(params[:hub_id], @start_date, @end_date)
 
     render partial: "shared/wikimedia_overview"
   end
