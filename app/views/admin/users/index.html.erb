@@ -12,10 +12,11 @@
     <%= button_to "Rebuild Wikimedia Cache",
           admin_wikimedia_cache_rebuild_path,
           method: :post,
-          data: { turbo_confirm: "This will rebuild the Wikimedia cache from the CIM API. It runs in the background and may take several minutes. Continue?" },
+          data: { turbo: false },
           style: "margin-left: 1em;" %>
     <span style="margin-left: 0.5em; font-size: 0.85em; color: #777;">
       Monthly automatic rebuild planned for the 8th of each month.
+      The rebuild runs in the background and takes 20&ndash;30 minutes.
     </span>
   </div>
 
