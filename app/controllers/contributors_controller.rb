@@ -102,7 +102,7 @@ class ContributorsController < ApplicationController
     @wp_data              = mc_data[:wp]
     @wa_data              = mc_data[:wa]
     @mc_data              = mc_data[:mc]
-    @wikimedia_participant = WikimediaParticipant.where(hub: hub_id, contributor: contrib_id).pick(:participant) || false
+    @wikimedia_participant = WikimediaParticipant.participant?(hub_id, contrib_id)
     @target               = Contributor.new(contrib_id, hub_id, all_start, all_end)
 
     render partial: "shared/contributor_sections"
@@ -256,7 +256,7 @@ class ContributorsController < ApplicationController
     @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
     @item_count            = item_count_thread.value
-    @wikimedia_participant = WikimediaParticipant.where(hub: params[:hub_id], contributor: params[:contributor_id]).pick(:participant) || false
+    @wikimedia_participant = WikimediaParticipant.participant?(params[:hub_id], params[:contributor_id])
     @target                = Contributor.new(params[:contributor_id],
                                              params[:hub_id],
                                              @start_date,
