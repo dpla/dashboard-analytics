@@ -40,6 +40,15 @@ class WikimediaParticipants
     wikidata_id.present? && fetch_p8464_ids.include?(wikidata_id)
   end
 
+  ##
+  # Pre-warms both caches (institutions JSON + P8464 IDs). Intended to be
+  # called from an initializer in a background thread so the first real
+  # request hits a warm cache rather than blocking on ~40 Wikidata API calls.
+  #
+  def self.warm_cache!
+    fetch_p8464_ids
+  end
+
   private_class_method def self.fetch_institutions
     Rails.cache.fetch(INSTITUTIONS_KEY, expires_in: CACHE_TTL) do
       uri = URI(INSTITUTIONS_URL)
