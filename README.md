@@ -99,7 +99,7 @@ API calls are made via `DplaApiResponseBuilder` (using HTTParty). The API key is
 Monthly metadata completeness reports are stored as CSV files in an S3 bucket. Each file contains field-level completeness percentages for a hub or contributor.
 
 **File layout in S3:**
-```
+```text
 <bucket>/
   YYYY/MM/
     provider.csv      ← hub-level completeness
@@ -160,14 +160,14 @@ All routes require a logged-in user.
 
 **Async partial routes** — the hub and contributor overview pages load all expensive sections with a single async request to a `sections` endpoint, which fetches all data concurrently server-side and returns one combined HTML fragment:
 
-```
+```text
 GET /hubs/:hub_id/sections
 GET /hubs/:hub_id/contributors/:contributor_id/sections
 ```
 
 Individual section routes still exist for sub-pages that load only one section at a time:
 
-```
+```text
 GET /hubs/:hub_id/website_overview
 GET /hubs/:hub_id/api_overview
 GET /hubs/:hub_id/bws_overview
@@ -224,7 +224,7 @@ Subsequent users are created via the admin UI at `/admin/users`. A generated pas
 
 All data views support a `start_date` / `end_date` URL parameter pair in `YYYY-MM` format:
 
-```
+```text
 /hubs/Texas?start_date=2024-06&end_date=2024-06
 ```
 
@@ -281,7 +281,7 @@ Wikimedia Commons analytics are pre-cached in two PostgreSQL tables rather than 
 
 **`wikimedia_cache`** — monthly metrics per hub/contributor:
 
-```
+```text
 wikimedia_cache
   hub             string   — hub name (e.g., "Minnesota Digital Library")
   contributor     string   — contributor name, or "" for hub-level rows
@@ -297,7 +297,7 @@ Each `(hub, contributor, month)` combination is a unique row. `WikimediaAnalytic
 
 **`wikimedia_participants`** — participant status per contributor:
 
-```
+```text
 wikimedia_participants
   hub             string   — hub name
   contributor     string   — contributor name
@@ -313,7 +313,7 @@ A contributor is a Wikimedia pipeline participant if `upload: true` is set on th
 
 The `wikimedia_participants` table is populated at rebuild time by `WikimediaCacheBuilder#sync_participant_flags`. Hub-level `upload: true` cascades to all contributors in that hub. The full table is replaced atomically on each rebuild (delete-all inside a transaction, then re-insert), so removed contributors are cleaned up automatically.
 
-Hub pages do not use `wikimedia_participants` — they rely solely on whether data exists in `wikimedia_cache`.
+Hub pages use `WikimediaParticipant.hub_participant?` to check whether any contributor in the hub has `participant: true`, which determines whether to show "No usage recorded yet" vs "Not a Wikimedia pipeline participant" when no cached data is available.
 
 ### Rebuilding the Cache
 
@@ -330,12 +330,12 @@ Hub pages do not use `wikimedia_participants` — they rely solely on whether da
 
 The rebuild takes approximately 20–30 minutes. Progress is logged at `error` level (the default production `LOG_LEVEL`) so milestones appear in CloudWatch:
 
-```
+```text
 [WikimediaCacheBuilder] Starting rebuild
 [WikimediaCacheBuilder] Synced participant flags for 421 contributors
 [WikimediaCacheBuilder] 2750 work items to process
-[WikimediaCacheBuilder] Phase 1: 423/519 Wikidata IDs resolved to P8464 MediaInfo entities
-[WikimediaCacheBuilder] Phase 2: 421/423 MediaInfo entities resolved to Commons categories
+[WikimediaCacheBuilder] Phase 1: 423/519 Wikidata IDs resolved to P8464 category Q-ids
+[WikimediaCacheBuilder] Phase 2: 421/423 category Q-ids resolved to Commons category names
 [WikimediaCacheBuilder] 2708/2750 items have resolvable Commons categories
 [WikimediaCacheBuilder] Rebuild complete
 ```
@@ -354,18 +354,18 @@ Until the scheduled workflow is deployed, trigger the rebuild manually each mont
 
 Each institution in `institutions_v2.json` has a Wikidata entity ID (e.g., `Q83878485` for the Minnesota Digital Library). The cache builder resolves this to a Commons category name in two batched API phases:
 
-**Phase 1 — Wikidata (wikidata.org):** Fetches P8464 claims in batches of 50 IDs per request. P8464 is the "Commons MediaInfo category" property; entities without a P8464 claim have no Commons category and are skipped.
+**Phase 1 — Wikidata (wikidata.org):** Fetches P8464 claims in batches of 50 IDs per request. P8464 links each institution's Wikidata item to the Wikidata item for its Commons category (e.g., `Q112194444` → `Q113547185`). Entities without a P8464 claim have no Commons category and are skipped.
 
-**Phase 2 — Commons (commons.wikimedia.org):** Fetches sitelinks for the resolved MediaInfo entity IDs in batches of 50. Extracts the `commonswiki` sitelink title, strips the `"Category:"` prefix, and replaces spaces with underscores.
+**Phase 2 — Wikidata (wikidata.org):** Fetches sitelinks for the resolved category Q-ids in batches of 50. Extracts the `commonswiki` sitelink title, strips the `"Category:"` prefix, and replaces spaces with underscores to produce the CIM API category name.
 
-```
-Wikidata entity ID  (e.g., Q83878485)
+```text
+Wikidata entity ID  (e.g., Q112194444)
   ↓ Phase 1: wbgetentities?ids=...&props=claims  (batches of 50)
   claims.P8464[0].mainsnak.datavalue.value.id
-  ↓ MediaInfo entity ID  (e.g., M97584242)
+  ↓ Commons category Q-id  (e.g., Q113547185)
   ↓ Phase 2: wbgetentities?ids=...&props=sitelinks  (batches of 50)
   sitelinks.commonswiki.title  →  strip "Category:", replace spaces with "_"
-  ↓ Commons category name  (e.g., "Media_contributed_by_the_Minnesota_Digital_Library")
+  ↓ Commons category name  (e.g., "Media_contributed_by_Northwest_Digital_Heritage")
 ```
 
 Each phase reuses a single TLS connection for all batches to minimize overhead.
