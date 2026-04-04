@@ -13,11 +13,12 @@ class WikimediaCacheBuilder
   CIM_PAGEVIEWS_URL = "#{CIM_BASE_URL}/pageviews-per-category-monthly/%s/deep/all-wikis/00000101/99991231"
   THREAD_POOL_SIZE  = 20
   BATCH_SIZE        = 50  # MediaWiki anonymous API limit
-  # Limits concurrent in-flight CIM HTTP requests across all worker threads.
-  # The CIM API throttles at the storage layer with no published hard limit;
-  # 4 concurrent slots keeps us well within observed tolerance while still
-  # completing a full rebuild in a reasonable time.
-  CIM_CONCURRENCY   = 4
+  # Serialises all CIM HTTP requests to a single in-flight connection.
+  # The CIM API has no published rate limit and throttles at the storage layer;
+  # since the rebuild only runs monthly, throughput is not a concern and
+  # sequential access is the safest way to avoid 429s entirely.
+  CIM_CONCURRENCY   = 1
+  CIM_MAX_RETRIES   = 3
 
   def self.rebuild
     new.rebuild
@@ -299,15 +300,21 @@ class WikimediaCacheBuilder
     JSON.parse(response.body)
   end
 
-  # Performs an HTTP GET and retries once on 429, honoring Retry-After (default 10s).
+  # Performs an HTTP GET, retrying up to CIM_MAX_RETRIES times on 429.
+  # Uses linear backoff (Retry-After × attempt number) so the storage layer
+  # has progressively more time to recover between attempts.
   def http_get_with_retry(http, request_uri, headers)
     response = http.get(request_uri, headers)
-    return response unless response.is_a?(Net::HTTPTooManyRequests)
-
-    wait = parse_retry_after(response["Retry-After"])
-    Rails.logger.error "[WikimediaCacheBuilder] 429 from #{http.address}, retrying in #{wait}s"
-    sleep(wait)
-    http.get(request_uri, headers)
+    CIM_MAX_RETRIES.times do |attempt|
+      break unless response.is_a?(Net::HTTPTooManyRequests)
+      base_wait = parse_retry_after(response["Retry-After"])
+      wait      = base_wait * (attempt + 1)
+      Rails.logger.error "[WikimediaCacheBuilder] 429 from #{http.address}, " \
+                         "retry #{attempt + 1}/#{CIM_MAX_RETRIES} in #{wait}s"
+      sleep(wait)
+      response = http.get(request_uri, headers)
+    end
+    response
   end
 
   # Parses a Retry-After header value (integer seconds or HTTP-date).
