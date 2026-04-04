@@ -19,6 +19,11 @@ class WikimediaCacheBuilder
   # sequential access is the safest way to avoid 429s entirely.
   CIM_CONCURRENCY   = 1
   CIM_MAX_RETRIES   = 3
+  # Without this, sequential requests at full Ruby/network speed still trigger
+  # storage-layer 429s even with CIM_CONCURRENCY = 1.  0.5 s keeps us well
+  # under the burst threshold observed in production while adding only ~5 min
+  # to a full rebuild.
+  CIM_INTER_REQUEST_DELAY = 0.5
 
   def self.rebuild
     new.rebuild
@@ -340,6 +345,9 @@ class WikimediaCacheBuilder
     begin
       yield
     ensure
+      # Sleep while still holding the slot so the next request cannot start
+      # until the inter-request delay has elapsed (prevents burst on release).
+      sleep(CIM_INTER_REQUEST_DELAY)
       @cim_semaphore << true
     end
   end
