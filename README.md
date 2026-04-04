@@ -328,7 +328,7 @@ Hub pages use `WikimediaParticipant.hub_participant?` to check whether any contr
 5. For each category, fetches all historical snapshot and pageview data in single wide-range API calls.
 6. Upserts the results into `wikimedia_cache`. Snapshot fields and pageview fields are upserted separately so that a failed call for one does not overwrite cached values for the other with `nil`.
 
-The rebuild takes approximately 20–30 minutes. Progress is logged at `error` level (the default production `LOG_LEVEL`) so milestones appear in CloudWatch:
+The rebuild takes approximately 10 minutes. Progress is logged at `error` level (the default production `LOG_LEVEL`) so milestones appear in CloudWatch:
 
 ```text
 [WikimediaCacheBuilder] Starting rebuild

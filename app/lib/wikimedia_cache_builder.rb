@@ -1,5 +1,6 @@
 require "net/http"
 require "json"
+require "time"
 
 class WikimediaCacheBuilder
   INSTITUTIONS_URL  = "https://raw.githubusercontent.com/dpla/ingestion3/main/src/main/resources/wiki/institutions_v2.json"
@@ -12,6 +13,11 @@ class WikimediaCacheBuilder
   CIM_PAGEVIEWS_URL = "#{CIM_BASE_URL}/pageviews-per-category-monthly/%s/deep/all-wikis/00000101/99991231"
   THREAD_POOL_SIZE  = 20
   BATCH_SIZE        = 50  # MediaWiki anonymous API limit
+  # Limits concurrent in-flight CIM HTTP requests across all worker threads.
+  # The CIM API throttles at the storage layer with no published hard limit;
+  # 4 concurrent slots keeps us well within observed tolerance while still
+  # completing a full rebuild in a reasonable time.
+  CIM_CONCURRENCY   = 4
 
   def self.rebuild
     new.rebuild
@@ -19,6 +25,8 @@ class WikimediaCacheBuilder
 
   def rebuild
     Rails.logger.error "[WikimediaCacheBuilder] Starting rebuild"
+    @cim_semaphore = SizedQueue.new(CIM_CONCURRENCY)
+    CIM_CONCURRENCY.times { @cim_semaphore << true }
     institutions = fetch_json(INSTITUTIONS_URL)
 
     # Sync contributor participant flags to DB first (fast, DB-only, no external calls).
@@ -151,13 +159,7 @@ class WikimediaCacheBuilder
         params   = { action: "wbgetentities", ids: batch.join("|"),
                      format: "json", props: props }
         headers  = { "User-Agent" => "DPLA Analytics Dashboard/1.0" }
-        response = http.get("#{uri.path}?#{URI.encode_www_form(params)}", headers)
-        if response.is_a?(Net::HTTPTooManyRequests)
-          wait = response["Retry-After"]&.to_i || 10
-          Rails.logger.error "[WikimediaCacheBuilder] 429 from #{uri.host}, retrying in #{wait}s"
-          sleep(wait)
-          response = http.get("#{uri.path}?#{URI.encode_www_form(params)}", headers)
-        end
+        response = http_get_with_retry(http, "#{uri.path}?#{URI.encode_www_form(params)}", headers)
         response.value
         data = JSON.parse(response.body)
 
@@ -190,10 +192,12 @@ class WikimediaCacheBuilder
   end
 
   def fetch_and_upsert(hub, contributor, category)
-    # The 20-thread outer pool already provides sufficient I/O parallelism;
-    # spawning additional threads here would cause unbounded thread proliferation.
-    snapshot_data  = fetch_snapshot(category)
-    pageviews_data = fetch_pageviews(category)
+    # Each fetch acquires its own semaphore slot so actual in-flight HTTP
+    # requests are capped at CIM_CONCURRENCY, not CIM_CONCURRENCY × 2.
+    snap_t = Thread.new { with_cim_slot { fetch_snapshot(category) } }
+    pv_t   = Thread.new { with_cim_slot { fetch_pageviews(category) } }
+    snapshot_data  = snap_t.value
+    pageviews_data = pv_t.value
 
     return if snapshot_data.empty? && pageviews_data.empty?
 
@@ -289,8 +293,45 @@ class WikimediaCacheBuilder
   # the failure instead of silently parsing an error response body as JSON.
   def fetch_json_via(http, url)
     uri      = URI(url)
-    response = http.get(uri.request_uri, "User-Agent" => "DPLA Analytics Dashboard/1.0")
+    headers  = { "User-Agent" => "DPLA Analytics Dashboard/1.0" }
+    response = http_get_with_retry(http, uri.request_uri, headers)
     response.value
     JSON.parse(response.body)
+  end
+
+  # Performs an HTTP GET and retries once on 429, honoring Retry-After (default 10s).
+  def http_get_with_retry(http, request_uri, headers)
+    response = http.get(request_uri, headers)
+    return response unless response.is_a?(Net::HTTPTooManyRequests)
+
+    wait = parse_retry_after(response["Retry-After"])
+    Rails.logger.error "[WikimediaCacheBuilder] 429 from #{http.address}, retrying in #{wait}s"
+    sleep(wait)
+    http.get(request_uri, headers)
+  end
+
+  # Parses a Retry-After header value (integer seconds or HTTP-date).
+  # Falls back to 10s if the value is absent, unparseable, or non-positive.
+  def parse_retry_after(value)
+    return 10 unless value
+
+    wait = Integer(value)
+    wait > 0 ? wait : 10
+  rescue ArgumentError, TypeError
+    begin
+      wait = (Time.httpdate(value) - Time.now).ceil
+      wait > 0 ? wait : 10
+    rescue ArgumentError, TypeError
+      10
+    end
+  end
+
+  def with_cim_slot
+    @cim_semaphore.pop
+    begin
+      yield
+    ensure
+      @cim_semaphore << true
+    end
   end
 end
