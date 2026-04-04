@@ -1,5 +1,6 @@
 require "net/http"
 require "json"
+require "time"
 
 class WikimediaCacheBuilder
   INSTITUTIONS_URL  = "https://raw.githubusercontent.com/dpla/ingestion3/main/src/main/resources/wiki/institutions_v2.json"
@@ -191,17 +192,12 @@ class WikimediaCacheBuilder
   end
 
   def fetch_and_upsert(hub, contributor, category)
-    # One semaphore slot covers both fetches; they run in parallel since each
-    # opens its own connection and neither depends on the other's result.
-    @cim_semaphore.pop
-    begin
-      snap_t = Thread.new { fetch_snapshot(category) }
-      pv_t   = Thread.new { fetch_pageviews(category) }
-      snapshot_data  = snap_t.value
-      pageviews_data = pv_t.value
-    ensure
-      @cim_semaphore << true
-    end
+    # Each fetch acquires its own semaphore slot so actual in-flight HTTP
+    # requests are capped at CIM_CONCURRENCY, not CIM_CONCURRENCY × 2.
+    snap_t = Thread.new { with_cim_slot { fetch_snapshot(category) } }
+    pv_t   = Thread.new { with_cim_slot { fetch_pageviews(category) } }
+    snapshot_data  = snap_t.value
+    pageviews_data = pv_t.value
 
     return if snapshot_data.empty? && pageviews_data.empty?
 
@@ -308,9 +304,34 @@ class WikimediaCacheBuilder
     response = http.get(request_uri, headers)
     return response unless response.is_a?(Net::HTTPTooManyRequests)
 
-    wait = response["Retry-After"]&.to_i || 10
+    wait = parse_retry_after(response["Retry-After"])
     Rails.logger.error "[WikimediaCacheBuilder] 429 from #{http.address}, retrying in #{wait}s"
     sleep(wait)
     http.get(request_uri, headers)
+  end
+
+  # Parses a Retry-After header value (integer seconds or HTTP-date).
+  # Falls back to 10s if the value is absent, unparseable, or non-positive.
+  def parse_retry_after(value)
+    return 10 unless value
+
+    wait = Integer(value)
+    wait > 0 ? wait : 10
+  rescue ArgumentError, TypeError
+    begin
+      wait = (Time.httpdate(value) - Time.now).ceil
+      wait > 0 ? wait : 10
+    rescue ArgumentError, TypeError
+      10
+    end
+  end
+
+  def with_cim_slot
+    @cim_semaphore.pop
+    begin
+      yield
+    ensure
+      @cim_semaphore << true
+    end
   end
 end
