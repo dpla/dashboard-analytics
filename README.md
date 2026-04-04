@@ -22,11 +22,14 @@ A Rails application that aggregates analytics data from multiple sources to prov
   - [Data Builders and Presenters](#data-builders-and-presenters)
 - [Wikimedia Cache System](#wikimedia-cache-system)
   - [How It Works](#how-it-works)
+  - [Participant Status](#participant-status)
   - [Rebuilding the Cache](#rebuilding-the-cache)
+  - [Scheduled Automatic Rebuild](#scheduled-automatic-rebuild)
   - [Wikidata Resolution Chain](#wikidata-resolution-chain)
 - [Infrastructure and Deployment](#infrastructure-and-deployment)
   - [AWS Architecture](#aws-architecture)
   - [Deploying a Change](#deploying-a-change)
+  - [Database Migrations in Production](#database-migrations-in-production)
   - [One-Off Tasks in Production](#one-off-tasks-in-production)
 - [Local Development Setup](#local-development-setup)
   - [Prerequisites](#prerequisites)
@@ -96,7 +99,7 @@ API calls are made via `DplaApiResponseBuilder` (using HTTParty). The API key is
 Monthly metadata completeness reports are stored as CSV files in an S3 bucket. Each file contains field-level completeness percentages for a hub or contributor.
 
 **File layout in S3:**
-```
+```text
 <bucket>/
   YYYY/MM/
     provider.csv      ← hub-level completeness
@@ -155,9 +158,16 @@ All routes require a logged-in user.
 | `/hubs/:hub_id/wikimedia_preparations` | Wikimedia Commons readiness metrics |
 | `/contributor_comparison` | Full contributor comparison export (HTML + CSV) |
 
-**Async partial routes** — the hub and contributor overview pages load expensive sections via `render_async`. Each has a dedicated route that returns an HTML fragment:
+**Async partial routes** — the hub and contributor overview pages load all expensive sections with a single async request to a `sections` endpoint, which fetches all data concurrently server-side and returns one combined HTML fragment:
 
+```text
+GET /hubs/:hub_id/sections
+GET /hubs/:hub_id/contributors/:contributor_id/sections
 ```
+
+Individual section routes still exist for sub-pages that load only one section at a time:
+
+```text
 GET /hubs/:hub_id/website_overview
 GET /hubs/:hub_id/api_overview
 GET /hubs/:hub_id/bws_overview
@@ -174,7 +184,7 @@ GET /hubs/:hub_id/wikimedia_overview
 | `GET/POST /admin/users/new` | Create a user |
 | `GET/PATCH /admin/users/:id/edit` | Edit user permissions |
 | `DELETE /admin/users/:id` | Delete a user |
-| `POST /admin/wikimedia_cache/rebuild` | Trigger a Wikimedia cache rebuild |
+| `POST /admin/wikimedia_cache/rebuild` | Trigger an on-demand Wikimedia cache rebuild |
 
 **Other**
 
@@ -214,26 +224,24 @@ Subsequent users are created via the admin UI at `/admin/users`. A generated pas
 
 All data views support a `start_date` / `end_date` URL parameter pair in `YYYY-MM` format:
 
-```
+```text
 /hubs/Texas?start_date=2024-06&end_date=2024-06
 ```
 
-When no params are provided, the date range defaults to the current month. The `DateSetter` concern (included by all controllers) parses and validates these params, clamping them to the configured `min_date` and the current date.
+When no params are provided, the date range defaults to all-time data. The `DateSetter` concern (included by all controllers) parses and validates these params, clamping them to the configured `min_date` and the current date.
 
-Links between pages preserve the selected date range. When the current month is selected (the default), date params are omitted from URLs to keep them clean.
+Links between pages preserve the selected date range.
 
 ---
 
 ### Async Rendering
 
-Hub and contributor overview pages use the [`render_async`](https://github.com/rendercoffee/render_async) gem to load each metric section independently. This means:
+Hub and contributor overview pages use the [`render_async`](https://github.com/rendercoffee/render_async) gem to load metric sections independently from the initial page render. A single async request is made to the `sections` endpoint, which executes all data fetches concurrently in server-side threads and returns a combined HTML fragment. This means:
 
 - The page structure renders immediately
-- Each metric section fires its own background HTTP request
-- Slow sections (e.g., GA4 calls) don't block faster ones (e.g., item counts)
-- Individual sections can fail without taking down the whole page
-
-Each async section has a dedicated controller action and route. The partial is rendered into a `<div>` placeholder and swapped in via JavaScript when the request completes.
+- All metric sections are fetched in one background request via concurrent threads
+- Slow sections (e.g., GA4 calls) don't block faster ones (e.g., item counts from the DPLA API)
+- Individual data fetches can fail without taking down the whole page
 
 ---
 
@@ -258,7 +266,7 @@ Data fetching is organized into a library of plain Ruby classes in `app/lib/`. T
 | `DplaApiResponseBuilder` | DPLA API | Item counts and contributor lists |
 | `SThreeResponseBuilder` | AWS S3 | Metadata completeness CSVs |
 | `MetadataCompleteness` | S3 CSVs | Parses field-level completeness data |
-| `WikimediaCacheBuilder` | Wikidata + CIM API | Populates the PostgreSQL Wikimedia cache |
+| `WikimediaCacheBuilder` | Wikidata + CIM API | Populates the PostgreSQL Wikimedia cache tables |
 | `WikimediaAnalyticsPresenter` | PostgreSQL cache | Formats Wikimedia metrics for display |
 | `WikimediaPreparationsPresenter` | Wikidata | Wikimedia readiness metrics |
 | `ContributorComparison` | All sources | Combines all metrics for the comparison table/CSV |
@@ -269,9 +277,11 @@ Data fetching is organized into a library of plain Ruby classes in `app/lib/`. T
 
 ### How It Works
 
-Wikimedia Commons analytics are pre-cached in a PostgreSQL table (`wikimedia_cache`) rather than fetched live. The table schema is:
+Wikimedia Commons analytics are pre-cached in two PostgreSQL tables rather than fetched live on every page load.
 
-```
+**`wikimedia_cache`** — monthly metrics per hub/contributor:
+
+```text
 wikimedia_cache
   hub             string   — hub name (e.g., "Minnesota Digital Library")
   contributor     string   — contributor name, or "" for hub-level rows
@@ -283,43 +293,82 @@ wikimedia_cache
   created_at / updated_at
 ```
 
-Each `(hub, contributor, month)` combination is a unique row. The `WikimediaAnalyticsPresenter` queries this table with the selected date range, summing `page_views` across months and taking the maximum of the cumulative snapshot fields within the range.
+Each `(hub, contributor, month)` combination is a unique row. `WikimediaAnalyticsPresenter` queries this table with the selected date range, summing `page_views` across months and taking the maximum of the cumulative snapshot fields within the range.
+
+**`wikimedia_participants`** — participant status per contributor:
+
+```text
+wikimedia_participants
+  hub             string   — hub name
+  contributor     string   — contributor name
+  participant     boolean  — true if upload: true in institutions_v2.json
+  created_at / updated_at
+```
+
+Each `(hub, contributor)` pair is unique. This table is read at page load to choose the appropriate "no data" message: participants with no cached data yet see "No usage recorded yet across Wikimedia"; non-participants see "Not a Wikimedia pipeline participant."
+
+### Participant Status
+
+A contributor is a Wikimedia pipeline participant if `upload: true` is set on that contributor or its parent hub in `institutions_v2.json`. Having a Wikidata ID alone does not imply participation — all cultural institutions may have Wikidata IDs regardless of whether they contribute files to Wikimedia Commons.
+
+The `wikimedia_participants` table is populated at rebuild time by `WikimediaCacheBuilder#sync_participant_flags`. Hub-level `upload: true` cascades to all contributors in that hub. The full table is replaced atomically on each rebuild (delete-all inside a transaction, then re-insert), so removed contributors are cleaned up automatically.
+
+Hub pages use `WikimediaParticipant.hub_participant?` to check whether any contributor in the hub has `participant: true`, which determines whether to show "No usage recorded yet" vs "Not a Wikimedia pipeline participant" when no cached data is available.
 
 ### Rebuilding the Cache
 
-**Via the admin UI:** Go to `/admin/users` and click **Rebuild Wikimedia Cache**. The rebuild runs in a background thread and takes several minutes. A flash notice confirms the job was started.
-
-**Via rake task:**
-```bash
-bundle exec rake wikimedia:rebuild_cache
-```
+**Via the admin UI:** Go to `/admin/users` and click **Rebuild Wikimedia Cache**. Use this for on-demand rebuilds (e.g., after a new hub is onboarded, or to recover from a failed scheduled run). The rebuild runs in a background thread; a flash notice confirms it was started. The button disables on click to prevent double-submission.
 
 **What the rebuild does:**
 
-1. Fetches `institutions_v2.json` from the ingestion3 repository — the authoritative list of hubs and contributors with their Wikidata IDs.
-2. Resolves each unique Wikidata ID to a Wikimedia Commons category name (see below). This step is sequential to avoid rate-limiting by Wikidata.
-3. Spawns a pool of 20 worker threads. Each thread picks work items off a queue and fetches data from the CIM API for its assigned category.
-4. For each category, fetches all historical snapshot data and all historical pageview data in single wide-range API calls.
-5. Upserts the results into `wikimedia_cache`. Snapshot fields and pageview fields are upserted separately so that a failed call for one doesn't overwrite cached values for the other with `nil`.
+1. Fetches `institutions_v2.json` from the ingestion3 repository.
+2. Writes participant flags to `wikimedia_participants` (atomic delete + re-insert in a transaction).
+3. Resolves each unique Wikidata ID to a Wikimedia Commons category name via two batched MediaWiki API phases (see [Wikidata Resolution Chain](#wikidata-resolution-chain)).
+4. Spawns a pool of 20 worker threads. Each thread picks work items off a queue and fetches CIM API data for its assigned Commons category.
+5. For each category, fetches all historical snapshot and pageview data in single wide-range API calls.
+6. Upserts the results into `wikimedia_cache`. Snapshot fields and pageview fields are upserted separately so that a failed call for one does not overwrite cached values for the other with `nil`.
 
-**Monthly automatic rebuild** is planned for the 8th of each month via an EventBridge scheduled task. Until that scheduler is deployed, use the admin button or rake task each month after the ingestion cycle completes.
+The rebuild takes approximately 20–30 minutes. Progress is logged at `error` level (the default production `LOG_LEVEL`) so milestones appear in CloudWatch:
+
+```text
+[WikimediaCacheBuilder] Starting rebuild
+[WikimediaCacheBuilder] Synced participant flags for 421 contributors
+[WikimediaCacheBuilder] 2750 work items to process
+[WikimediaCacheBuilder] Phase 1: 423/519 Wikidata IDs resolved to P8464 category Q-ids
+[WikimediaCacheBuilder] Phase 2: 421/423 category Q-ids resolved to Commons category names
+[WikimediaCacheBuilder] 2708/2750 items have resolvable Commons categories
+[WikimediaCacheBuilder] Rebuild complete
+```
+
+### Scheduled Automatic Rebuild
+
+The cache should be rebuilt monthly after the ingestion cycle closes. The planned approach is a **scheduled GitHub Actions workflow** that triggers the rebuild on the 8th of each month.
+
+**To implement:**
+1. Add `.github/workflows/wikimedia-cache-rebuild.yml` with `on: schedule: - cron: '0 12 8 * *'` (noon UTC on the 8th).
+2. The workflow should invoke `rake wikimedia:rebuild_cache` via a one-off ECS task (see [One-Off Tasks in Production](#one-off-tasks-in-production)), or POST to the rebuild endpoint with admin credentials stored as GitHub Actions secrets.
+
+Until the scheduled workflow is deployed, trigger the rebuild manually each month via the admin UI button after the ingestion cycle completes.
 
 ### Wikidata Resolution Chain
 
-Each institution in `institutions_v2.json` has a Wikidata entity ID (e.g., `Q83878485` for the Minnesota Digital Library). The cache builder resolves this to a Commons category name using two Wikidata API calls per unique ID:
+Each institution in `institutions_v2.json` has a Wikidata entity ID (e.g., `Q83878485` for the Minnesota Digital Library). The cache builder resolves this to a Commons category name in two batched API phases:
 
-```
-Wikidata entity ID (e.g., Q83878485)
-  → fetch entity JSON from wikidata.org
-  → extract claims.P8464[0] (MediaInfo entity on Commons)
-  → get the Commons entity ID (e.g., Q97584242)
-  → fetch that entity's JSON
-  → extract sitelinks.commonswiki.title
-  → strip "Category:" prefix, replace spaces with underscores
-  → Commons category name (e.g., "Media_contributed_by_the_Minnesota_Digital_Library")
+**Phase 1 — Wikidata (wikidata.org):** Fetches P8464 claims in batches of 50 IDs per request. P8464 links each institution's Wikidata item to the Wikidata item for its Commons category (e.g., `Q112194444` → `Q113547185`). Entities without a P8464 claim have no Commons category and are skipped.
+
+**Phase 2 — Wikidata (wikidata.org):** Fetches sitelinks for the resolved category Q-ids in batches of 50. Extracts the `commonswiki` sitelink title, strips the `"Category:"` prefix, and replaces spaces with underscores to produce the CIM API category name.
+
+```text
+Wikidata entity ID  (e.g., Q112194444)
+  ↓ Phase 1: wbgetentities?ids=...&props=claims  (batches of 50)
+  claims.P8464[0].mainsnak.datavalue.value.id
+  ↓ Commons category Q-id  (e.g., Q113547185)
+  ↓ Phase 2: wbgetentities?ids=...&props=sitelinks  (batches of 50)
+  sitelinks.commonswiki.title  →  strip "Category:", replace spaces with "_"
+  ↓ Commons category name  (e.g., "Media_contributed_by_Northwest_Digital_Heritage")
 ```
 
-This category name is then used in CIM API calls. Both Wikidata lookups reuse a single TLS connection per institution to minimize overhead.
+Each phase reuses a single TLS connection for all batches to minimize overhead.
 
 ---
 
@@ -333,7 +382,6 @@ This category name is then used in CIM API calls. Both Wikidata lookups reuse a 
 | ECS Service | `analytics-dashboard` |
 | ECR Repository | `283408157088.dkr.ecr.us-east-1.amazonaws.com/analytics-dashboard` |
 | CodePipeline | `analytics-dashboard-pipeline` |
-| CodeBuild Project | See pipeline |
 | Deployment strategy | Blue/green via CodeDeploy (auto-rollback on failure) |
 | Load balancer | Shared ALB (`baggins`) — routed by host header |
 | Secrets Manager | `arn:aws:secretsmanager:us-east-1:283408157088:secret:terraform-20240821214923751700000001-7CZ7Cq` |
@@ -352,6 +400,7 @@ This category name is then used in CIM API calls. Both Wikidata lookups reuse a 
 | `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` | PostgreSQL credentials |
 | `SENTRY_DSN` | Sentry error tracking |
 | `SMTP_PASSWORD` | AWS SES credentials for outbound email |
+| `LOG_LEVEL` | Rails log level (defaults to `error` if unset — `warn` or `info` for more verbosity) |
 
 **CodePipeline note:** The pipeline has a stale webhook (a known AWS CodeStar Connections migration issue) and does not auto-trigger on push to `main`. It must be started manually after merging:
 
@@ -367,21 +416,53 @@ Use the `deploy-analytics-dashboard` Claude skill, which enforces the correct or
 2. **Merge the PR** — squash merge and delete the branch. Do not merge before the image is built.
 3. **Start the pipeline** — start `analytics-dashboard-pipeline` manually (stale webhook).
 4. **Monitor** — CodeBuild compiles assets (~2 min), then CodeDeploy performs the blue/green ECS swap (~5–8 min).
-5. **Verify** — health check: `curl -I https://analytics-dashboard.dp.la`
+5. **Run migrations** — if the deployment includes new migrations, run them as a one-off ECS task (see below).
+6. **Verify** — health check: `curl -I https://analytics-dashboard.dp.la`
 
-If the deployment includes new database migrations, they run automatically as part of the Docker entrypoint (`bundle exec rails db:migrate`) before the Rails server starts.
+### Database Migrations in Production
 
-### One-Off Tasks in Production
-
-To run a rake task or Rails runner against the production database, use ECS `run-task` with the current ECR image:
+**Migrations do not run automatically as part of the ECS deployment.** After deploying code that adds new migrations, run them as a separate one-off ECS task:
 
 ```bash
 aws ecs run-task \
   --cluster analytics-dashboard \
-  --task-definition analytics-dashboard \
+  --task-definition arn:aws:ecs:us-east-1:283408157088:task-definition/analytics-dashboard:<VERSION> \
   --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[<subnet>],securityGroups=[<sg>],assignPublicIp=ENABLED}" \
-  --overrides '{"containerOverrides":[{"name":"analytics-dashboard","environment":[{"name":"DISABLE_SPRING","value":"1"}],"command":["bundle","exec","rake","wikimedia:rebuild_cache"]}]}'
+  --network-configuration '{"awsvpcConfiguration":{"subnets":["subnet-0e6dbb3a02a55a416","subnet-00f8056d6e59465ca"],"securityGroups":["sg-09e35b96da021355c"],"assignPublicIp":"ENABLED"}}' \
+  --overrides '{"containerOverrides":[{"name":"analytics-dashboard-container","command":["bundle","exec","rails","db:migrate"],"environment":[{"name":"DISABLE_SPRING","value":"1"}]}]}'
+```
+
+`DISABLE_SPRING=1` is required — Spring's preloader fails in the production environment and causes the task to exit with code 1 without it.
+
+Get the current task definition version:
+```bash
+aws ecs describe-services --cluster analytics-dashboard --services analytics-dashboard \
+  --query 'services[0].taskDefinition' --output text
+```
+
+After the task stops, check the exit code and view migration output in CloudWatch:
+```bash
+aws ecs describe-tasks --cluster analytics-dashboard --tasks <TASK_ARN> \
+  --query 'tasks[0].{status:lastStatus,exit:containers[0].exitCode}'
+
+aws logs get-log-events \
+  --log-group-name /ecs/analytics-dashboard \
+  --log-stream-name "ecs/analytics-dashboard-container/<TASK_ID>"
+```
+
+**Important:** After running migrations that add new tables or indexes, the running ECS tasks have a stale schema cache and may not recognize the new schema until restarted. If application code immediately uses the new schema (e.g., `upsert_all` with `unique_by`), restart the task after migrating by stopping it — ECS will automatically start a replacement with a fresh schema cache.
+
+### One-Off Tasks in Production
+
+To run a rake task or Rails runner against the production database, use ECS `run-task` with `DISABLE_SPRING=1`:
+
+```bash
+aws ecs run-task \
+  --cluster analytics-dashboard \
+  --task-definition arn:aws:ecs:us-east-1:283408157088:task-definition/analytics-dashboard:<VERSION> \
+  --launch-type FARGATE \
+  --network-configuration '{"awsvpcConfiguration":{"subnets":["subnet-0e6dbb3a02a55a416","subnet-00f8056d6e59465ca"],"securityGroups":["sg-09e35b96da021355c"],"assignPublicIp":"ENABLED"}}' \
+  --overrides '{"containerOverrides":[{"name":"analytics-dashboard-container","environment":[{"name":"DISABLE_SPRING","value":"1"}],"command":["bundle","exec","rake","wikimedia:rebuild_cache"]}]}'
 ```
 
 ---
@@ -391,7 +472,7 @@ aws ecs run-task \
 ### Prerequisites
 
 - Ruby 3.1.2 (use `rbenv` or `asdf`)
-- Rails 7.1 (`gem 'rails', '~> 7.1.0'` — note: `config.load_defaults` is intentionally kept at `7.0`; see [Known Issues](#rails-71-load_defaults-pinned-at-70))
+- Rails 7.2
 - Bundler 2.x
 - SQLite 3 (development database)
 - Node.js (for asset compilation if needed)
@@ -498,15 +579,11 @@ The Black Women's Suffrage (BWS) digital exhibit at [blackwomenssuffrage.dp.la](
 
 ### Missing Data — Primary Source Sets
 
-Primary Source Set (PSS) page view data is not tracked in the dashboard. The PSS pages on dp.la fire GA4 analytics events, but no PSS-specific query or metric section exists in the dashboard. This is a gap in the GA4 migration work.
+Primary Source Set (PSS) page view data is not tracked in the dashboard. The PSS pages on dp.la fire GA4 analytics events, but no PSS-specific query or metric section exists in the dashboard.
 
-### Wikimedia Cache — No Automatic Rebuild
+### Wikimedia Cache — No Scheduled Rebuild
 
-The Wikimedia cache must be rebuilt manually each month (via the admin UI button or `rake wikimedia:rebuild_cache`). An EventBridge scheduled task to run the rebuild automatically on the 8th of each month is planned but not yet deployed. Until the scheduler exists, stale data will accumulate after the ingestion cycle closes for the month.
-
-### Wikimedia Cache — Stale Rows
-
-The cache rebuild is additive (upsert-only). If an institution is removed from `institutions_v2.json` or its Wikidata ID becomes unresolvable, its old rows remain in the table and continue to appear in the dashboard. A cleanup pass to delete rows not touched by the most recent rebuild is not yet implemented.
+The Wikimedia cache must currently be rebuilt manually each month via the admin UI button. A scheduled GitHub Actions workflow to trigger the rebuild automatically on the 8th of each month has not yet been implemented. See [Scheduled Automatic Rebuild](#scheduled-automatic-rebuild) for the planned approach.
 
 ### Metadata Completeness — Monthly Lag
 
@@ -515,10 +592,6 @@ Metadata completeness CSVs are generated as part of the monthly ingestion cycle 
 ### Contributor Comparison — Potential Timeouts
 
 The contributor comparison page (`/contributor_comparison`) makes parallel GA4 API calls for every contributor in a hub. For hubs with many contributors, this can be slow and may time out under heavy load. The page includes a CSV export option for offline analysis.
-
-### Rails 7.1 — `load_defaults` Pinned at 7.0
-
-The app runs Rails 7.1 but `config/application.rb` calls `config.load_defaults 7.0`. Upgrading to `load_defaults 7.1` enables several behavior changes (notably `ActiveRecord::Base.automatically_invert_plural_associations`) that have not been reviewed or tested. The pin is intentional until a compatibility audit is done.
 
 ### Hard-Coded Configuration
 
