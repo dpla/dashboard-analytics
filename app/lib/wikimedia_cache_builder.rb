@@ -19,6 +19,11 @@ class WikimediaCacheBuilder
   # sequential access is the safest way to avoid 429s entirely.
   CIM_CONCURRENCY   = 1
   CIM_MAX_RETRIES   = 3
+  # Without this, sequential requests at full Ruby/network speed still trigger
+  # storage-layer 429s even with CIM_CONCURRENCY = 1.  0.5 s keeps us well
+  # under the burst threshold observed in production while adding only ~5 min
+  # to a full rebuild.  Override via CIM_INTER_REQUEST_DELAY env var.
+  CIM_INTER_REQUEST_DELAY = [Settings.wikimedia.cim_inter_request_delay.to_f, 0.0].max
 
   def self.rebuild
     new.rebuild
@@ -302,15 +307,16 @@ class WikimediaCacheBuilder
 
   # Performs an HTTP GET with up to CIM_MAX_RETRIES additional attempts on 429
   # (1 initial request + CIM_MAX_RETRIES retries = 4 total attempts).
-  # Uses linear backoff (Retry-After × attempt number). With CIM_CONCURRENCY=1
+  # Respects the Retry-After header from the API verbatim — no multiplier.
+  # Each retry gets a fresh Retry-After from the new response, so there is no
+  # need to escalate beyond what the server requests. With CIM_CONCURRENCY=1
   # the sleep holds the semaphore slot, pausing all CIM work during backoff —
   # intentional, as it gives the storage layer time to recover.
   def http_get_with_retry(http, request_uri, headers)
     response = http.get(request_uri, headers)
     CIM_MAX_RETRIES.times do |attempt|
       break unless response.is_a?(Net::HTTPTooManyRequests)
-      base_wait = parse_retry_after(response["Retry-After"])
-      wait      = base_wait * (attempt + 1)
+      wait = parse_retry_after(response["Retry-After"])
       Rails.logger.error "[WikimediaCacheBuilder] 429 from #{http.address}, " \
                          "retry #{attempt + 1}/#{CIM_MAX_RETRIES} in #{wait}s"
       sleep(wait)
@@ -340,6 +346,9 @@ class WikimediaCacheBuilder
     begin
       yield
     ensure
+      # Sleep while still holding the slot so the next request cannot start
+      # until the inter-request delay has elapsed (prevents burst on release).
+      sleep(CIM_INTER_REQUEST_DELAY)
       @cim_semaphore << true
     end
   end
