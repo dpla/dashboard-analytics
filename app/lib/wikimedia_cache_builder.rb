@@ -300,9 +300,11 @@ class WikimediaCacheBuilder
     JSON.parse(response.body)
   end
 
-  # Performs an HTTP GET, retrying up to CIM_MAX_RETRIES times on 429.
-  # Uses linear backoff (Retry-After × attempt number) so the storage layer
-  # has progressively more time to recover between attempts.
+  # Performs an HTTP GET with up to CIM_MAX_RETRIES additional attempts on 429
+  # (1 initial request + CIM_MAX_RETRIES retries = 4 total attempts).
+  # Uses linear backoff (Retry-After × attempt number). With CIM_CONCURRENCY=1
+  # the sleep holds the semaphore slot, pausing all CIM work during backoff —
+  # intentional, as it gives the storage layer time to recover.
   def http_get_with_retry(http, request_uri, headers)
     response = http.get(request_uri, headers)
     CIM_MAX_RETRIES.times do |attempt|
