@@ -22,8 +22,8 @@ class WikimediaCacheBuilder
   # Without this, sequential requests at full Ruby/network speed still trigger
   # storage-layer 429s even with CIM_CONCURRENCY = 1.  0.5 s keeps us well
   # under the burst threshold observed in production while adding only ~5 min
-  # to a full rebuild.
-  CIM_INTER_REQUEST_DELAY = 0.5
+  # to a full rebuild.  Override via CIM_INTER_REQUEST_DELAY env var.
+  CIM_INTER_REQUEST_DELAY = [Settings.wikimedia.cim_inter_request_delay.to_f, 0.0].max
 
   def self.rebuild
     new.rebuild

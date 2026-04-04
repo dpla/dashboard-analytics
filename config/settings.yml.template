@@ -38,3 +38,8 @@ bws_min_date:
 mc_min_date:
   month: 04
   year: 2018
+
+wikimedia:
+  # Minimum pause between consecutive CIM API requests (seconds, float).
+  # Increase if the CIM API starts returning 429s despite CIM_CONCURRENCY=1.
+  cim_inter_request_delay: <%= ENV["CIM_INTER_REQUEST_DELAY"] || "0.5" %>
