@@ -46,7 +46,7 @@ class DplaApiResponseBuilder
     rescue StandardError => e
       Sentry.capture_exception(e)
       Rails.logger.debug(e)
-      Array.new
+      nil
     end
   end
 

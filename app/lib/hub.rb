@@ -49,7 +49,7 @@ class Hub
   # @return [Array<String>]
   def contributors
     @contributors ||= Rails.cache.fetch("hub:#{name}:contributors", expires_in: 1.hour, skip_nil: true) do
-      self.class.dpla_api.contributors(name).sort.presence
+      self.class.dpla_api.contributors(name)&.sort
     end || []
   rescue => e
     Rails.logger.warn("Hub#contributors failed for #{name} (#{e.class}): #{e.message}\n#{e.backtrace&.first(3)&.join("\n")}")
