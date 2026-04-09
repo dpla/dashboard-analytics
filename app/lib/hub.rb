@@ -52,7 +52,7 @@ class Hub
       self.class.dpla_api.contributors(name).sort
     end
   rescue => e
-    Rails.logger.warn("Hub#contributors failed for #{name}: #{e.message}")
+    Rails.logger.warn("Hub#contributors failed for #{name} (#{e.class}): #{e.message}\n#{e.backtrace&.first(3)&.join("\n")}")
     []
   end
 
