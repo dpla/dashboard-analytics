@@ -41,7 +41,9 @@ class DplaApiResponseBuilder
                          :'provider.name' => hub } }
 
     begin
-      (json_response('/items', options).dig('facets', 'dataProvider', 'terms') || [])
+      result = json_response('/items', options)
+      return nil if result == {}
+      (result.dig('facets', 'dataProvider', 'terms') || [])
         .map{ |f| f['term'] }
     rescue StandardError => e
       Sentry.capture_exception(e)
