@@ -31,7 +31,7 @@ class DplaApiResponseBuilder
 
   ##
   # @param [String]
-  # @return [Array<String>]
+  # @return [Array<String>, nil] nil on API error; [] for a hub with no contributors
   #
   def contributors(hub)
     options = { query: { :api_key => api_key,
@@ -41,12 +41,14 @@ class DplaApiResponseBuilder
                          :'provider.name' => hub } }
 
     begin
-      (json_response('/items', options).dig('facets', 'dataProvider', 'terms') || [])
+      result = json_response('/items', options)
+      return nil if result == {}
+      (result.dig('facets', 'dataProvider', 'terms') || [])
         .map{ |f| f['term'] }
     rescue StandardError => e
       Sentry.capture_exception(e)
       Rails.logger.debug(e)
-      Array.new
+      nil
     end
   end
 

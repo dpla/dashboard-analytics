@@ -48,7 +48,12 @@ class Hub
   # Get names of all contributors that belonging to this hub
   # @return [Array<String>]
   def contributors
-    @contributors ||= self.class.dpla_api.contributors(name).sort
+    @contributors ||= Rails.cache.fetch("hub:#{name}:contributors", expires_in: 1.hour, skip_nil: true) do
+      self.class.dpla_api.contributors(name)&.sort
+    end || []
+  rescue => e
+    Rails.logger.warn("Hub#contributors failed for #{name} (#{e.class}): #{e.message}\n#{e.backtrace&.first(3)&.join("\n")}")
+    @contributors = []
   end
 
   protected
