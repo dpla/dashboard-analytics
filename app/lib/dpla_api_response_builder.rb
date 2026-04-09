@@ -31,7 +31,7 @@ class DplaApiResponseBuilder
 
   ##
   # @param [String]
-  # @return [Array<String>]
+  # @return [Array<String>, nil] nil on API error; [] for a hub with no contributors
   #
   def contributors(hub)
     options = { query: { :api_key => api_key,

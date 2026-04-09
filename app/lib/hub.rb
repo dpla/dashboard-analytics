@@ -53,7 +53,7 @@ class Hub
     end || []
   rescue => e
     Rails.logger.warn("Hub#contributors failed for #{name} (#{e.class}): #{e.message}\n#{e.backtrace&.first(3)&.join("\n")}")
-    []
+    @contributors = []
   end
 
   protected
