@@ -21,7 +21,7 @@ class Hub
   # @return [Integer, nil]
   #
   def self.item_count(hub, contributor = nil)
-    dig_count(HubStats.fetch, hub, contributor)
+    dig_count(HubStats.fetch, hub, contributor) || 0
   end
 
   ##
