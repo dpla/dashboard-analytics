@@ -48,8 +48,8 @@ class HubsController < ApplicationController
     end
     @wikimedia_start_date = Date.parse("#{first_month}-01") if first_month
 
-    item_count_t = Thread.new { DplaApiResponseBuilder.new.item_count(hub_id) rescue nil }
-    contributor_t = Thread.new { DplaApiResponseBuilder.new.contributors(hub_id).count rescue nil }
+    @item_count        = Hub.item_count(hub_id)
+    @contributor_count = Hub.contributors(hub_id).size
     website_views_t = Thread.new do
       WebsiteOverview.build { |b|
         b.hub = hub_id; b.start_date = all_start; b.end_date = all_end
@@ -97,13 +97,11 @@ class HubsController < ApplicationController
       Rails.logger.error(e); false
     end
 
-    [item_count_t, contributor_t, website_views_t, wiki_views_t,
+    [website_views_t, wiki_views_t,
      website_overview_t, website_events_t, mc_thread, participant_t].each(&:join)
 
     mc_data = mc_thread.value || {}
 
-    @item_count           = item_count_t.value
-    @contributor_count    = contributor_t.value
     @website_views        = website_views_t.value
     @wikimedia_views      = wiki_views_t.value
     @website_overview     = website_overview_t.value
@@ -150,8 +148,7 @@ class HubsController < ApplicationController
   def bws_overview
     assign_start_and_end_dates
 
-    @bws_item_count = DplaApiResponseBuilder.new()
-      .bws_item_count(params[:hub_id])
+    @bws_item_count = Hub.bws_item_count(params[:hub_id])
 
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
@@ -169,29 +166,15 @@ class HubsController < ApplicationController
   end
 
   def item_count
-    @item_count = DplaApiResponseBuilder.new().item_count(params[:hub_id])
+    @item_count = Hub.item_count(params[:hub_id])
     render partial: "shared/item_count"
   end
 
   def totals
-    api = DplaApiResponseBuilder.new
+    @item_count        = Hub.item_count(params[:hub_id])
+    @contributor_count = Hub.contributors(params[:hub_id]).size
+
     results = [
-      Thread.new {
-        begin
-          api.item_count(params[:hub_id])
-        rescue => e
-          Rails.logger.error(e)
-          nil
-        end
-      },
-      Thread.new {
-        begin
-          api.contributors(params[:hub_id]).count
-        rescue => e
-          Rails.logger.error(e)
-          nil
-        end
-      },
       Thread.new {
         begin
           WebsiteOverview.build do |b|
@@ -217,10 +200,8 @@ class HubsController < ApplicationController
       }
     ].map(&:value)
 
-    @item_count        = results[0]
-    @contributor_count = results[1]
-    @website_views     = results[2]
-    @wikimedia_views   = results[3]
+    @website_views   = results[0]
+    @wikimedia_views = results[1]
 
     render partial: "shared/totals"
   end
@@ -242,14 +223,6 @@ class HubsController < ApplicationController
   def wikimedia_overview
     params[:start_date].present? ? assign_start_and_end_dates : assign_all_time_dates
 
-    # Fetch item_count concurrently while building Wikimedia data.
-    item_count_thread = Thread.new do
-      DplaApiResponseBuilder.new.item_count(params[:hub_id])
-    rescue => e
-      Rails.logger.error(e)
-      nil
-    end
-
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub      = params[:hub_id]
       builder.end_date = @end_date
@@ -264,7 +237,7 @@ class HubsController < ApplicationController
     )
     @wa_data = wa_presenter.hub(params[:hub_id])
 
-    @item_count            = item_count_thread.value
+    @item_count            = Hub.item_count(params[:hub_id])
     @wikimedia_participant = WikimediaParticipant.hub_participant?(params[:hub_id])
     @target                = Hub.new(params[:hub_id], @start_date, @end_date)
 
