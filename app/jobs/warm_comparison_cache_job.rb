@@ -47,9 +47,10 @@ class WarmComparisonCacheJob < ApplicationJob
       b.end_date = end_date
     end
 
+    Hub.contributors_item_count(hub_name)
+    Hub.contributors_bws_item_count(hub_name)
+
     [
-      Thread.new { DplaApiResponseBuilder.new.contributors_item_count(hub_name) },
-      Thread.new { DplaApiResponseBuilder.new.contributors_bws_item_count(hub_name) },
       Thread.new {
         batch = GaResponseBuilder.batch_responses([website_overview.ga_builder, website_events.ga_builder])
         website_overview.prefetch(batch[0])
