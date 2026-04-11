@@ -18,7 +18,7 @@ class Hub
   ##
   # @param hub [String]
   # @param contributor [String, nil]
-  # @return [Integer, nil]
+  # @return [Integer]
   #
   def self.item_count(hub, contributor = nil)
     dig_count(HubStats.fetch, hub, contributor) || 0
