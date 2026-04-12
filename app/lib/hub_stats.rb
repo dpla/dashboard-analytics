@@ -12,6 +12,9 @@ class HubStats
     rescue Aws::S3::Errors::NoSuchKey
       Rails.logger.warn("HubStats: #{KEY} not found in S3 — hub stats not yet generated")
       EMPTY
+    rescue Aws::S3::Errors::ServiceError, JSON::ParserError => e
+      Rails.logger.warn("HubStats: failed to load #{KEY}: #{e.class}: #{e.message}")
+      EMPTY
     end
   end
 
@@ -23,6 +26,9 @@ class HubStats
       JSON.parse(SThreeResponseBuilder.response(BWS_KEY).body.read)
     rescue Aws::S3::Errors::NoSuchKey
       Rails.logger.warn("HubStats: #{BWS_KEY} not found in S3 — hub stats not yet generated")
+      EMPTY
+    rescue Aws::S3::Errors::ServiceError, JSON::ParserError => e
+      Rails.logger.warn("HubStats: failed to load #{BWS_KEY}: #{e.class}: #{e.message}")
       EMPTY
     end
   end

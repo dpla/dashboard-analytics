@@ -17,7 +17,7 @@ class WarmComparisonCacheJob < ApplicationJob
     start_date = Date.new(2012, 1, 1)
     end_date   = Date.today
 
-    Hub.all.map(&:name).each do |hub_name|
+    Hub.all.each do |hub_name|
       warm_hub(hub_name, start_date, end_date)
     rescue => e
       Rails.logger.error("WarmComparisonCacheJob: failed warming #{hub_name}: #{e.message}")
