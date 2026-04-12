@@ -1,15 +1,15 @@
 module ApplicationHelper
 
-  ##
-  # Wrapper around render_async that adds a default error message shown when
-  # the async request fails instead of silently replacing the container with
-  # an empty string.
-  #
   # Returns a formatted number or an em dash when value is nil (still loading).
   def dash_or(value, delimiter: ',')
     value.nil? ? "—" : number_with_delimiter(value, delimiter: delimiter)
   end
 
+  ##
+  # Wrapper around render_async that adds a default error message shown when
+  # the async request fails instead of silently replacing the container with
+  # an empty string.
+  #
   def render_async_section(path, options = {}, &block)
     default_error = '<div class="error-message">Data unavailable. Please try refreshing.</div>'
     render_async(path, { error_message: default_error }.merge(options), &block)

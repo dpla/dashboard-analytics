@@ -1,7 +1,7 @@
 <%# Local variables: @website_overview [WebsiteOverview],
                      @website_event_totals [WebsiteEventTotals] %>
 
-<% if @website_overview.nil? %>
+<% if @website_overview.nil? || @website_event_totals.nil? %>
   <table>
     <tr>
       <td><div class="tooltip">Item views<span class="tooltiptext"><%= view_item_tooltip %></span></div></td>
