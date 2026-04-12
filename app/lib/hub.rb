@@ -43,6 +43,14 @@ class Hub
 
   ##
   # @param hub [String]
+  # @return [Integer]
+  #
+  def self.contributor_count(hub)
+    (HubStats.fetch.dig("hubs", hub, "contributors") || {}).size
+  end
+
+  ##
+  # @param hub [String]
   # @return [Array<Hash>] [{ "term" => name, "count" => count }, ...] sorted by count desc
   #
   def self.contributors_item_count(hub)

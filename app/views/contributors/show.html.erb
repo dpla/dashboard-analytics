@@ -23,7 +23,9 @@
           @contributor.hub.name, @contributor.name, date_opts) do %>
       <div class="data-section">
         <div class="metrics-left-col">
-          <div class="metrics"><div>Loading...</div></div>
+          <div class="metrics">
+            <%= render partial: "shared/totals" %>
+          </div>
           <div class="metrics"><div>Loading...</div></div>
         </div>
         <div class="metrics"><div>Loading...</div></div>
