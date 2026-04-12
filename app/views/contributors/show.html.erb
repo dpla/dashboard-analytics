@@ -21,16 +21,7 @@
 
     <%= render_async_section hub_contributor_sections_path(
           @contributor.hub.name, @contributor.name, date_opts) do %>
-      <div class="data-section">
-        <div class="metrics-left-col">
-          <div class="metrics">
-            <%= render partial: "shared/totals" %>
-          </div>
-          <div class="metrics"><div>Loading...</div></div>
-        </div>
-        <div class="metrics"><div>Loading...</div></div>
-        <div class="metrics"><div>Loading...</div></div>
-      </div>
+      <%= render partial: "shared/contributor_sections" %>
     <% end %>
 
   </div>

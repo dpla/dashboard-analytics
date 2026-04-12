@@ -13,8 +13,10 @@
     <p class="not-time-bound-note">These totals reflect current data and are not affected by the selected date range.</p>
   <% end %>
 
+  <%# nil means still loading; treat as "data may arrive" so the row stays visible %>
   <% any_data = @item_count.to_i > 0 || @contributor_count.to_i > 0 ||
-                @website_views.to_i > 0 || @wikimedia_views.to_i > 0 %>
+                @website_views.nil? || @website_views.to_i > 0 ||
+                @wikimedia_views.nil? || @wikimedia_views.to_i > 0 %>
 
   <% if any_data %>
     <table>
@@ -42,7 +44,7 @@
         </tr>
       <% end %>
 
-      <% if @website_views.to_i > 0 %>
+      <% if @website_views.nil? || @website_views.to_i > 0 %>
         <tr>
           <td>
             <div class="tooltip">
@@ -50,11 +52,11 @@
               <span class="tooltiptext"><%= website_views_total_tooltip %></span>
             </div>
           </td>
-          <td><%= number_with_delimiter(@website_views, delimiter: ',') %></td>
+          <td><%= dash_or(@website_views) %></td>
         </tr>
       <% end %>
 
-      <% if @wikimedia_views.to_i > 0 %>
+      <% if @wikimedia_views.nil? || @wikimedia_views.to_i > 0 %>
         <tr>
           <td>
             <div class="tooltip">
@@ -62,7 +64,7 @@
               <span class="tooltiptext"><%= wikimedia_views_total_tooltip %></span>
             </div>
           </td>
-          <td><%= number_with_delimiter(@wikimedia_views, delimiter: ',') %></td>
+          <td><%= dash_or(@wikimedia_views) %></td>
         </tr>
       <% end %>
     </table>
