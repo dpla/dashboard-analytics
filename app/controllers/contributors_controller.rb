@@ -44,7 +44,7 @@ class ContributorsController < ApplicationController
     all_end    = max_date
     end_date   = @end_date
 
-    item_count_t = Thread.new { DplaApiResponseBuilder.new.item_count(hub_id, contrib_id) rescue nil }
+    @item_count = Hub.item_count(hub_id, contrib_id)
     website_views_t = Thread.new do
       WebsiteOverview.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
@@ -89,12 +89,11 @@ class ContributorsController < ApplicationController
       Rails.logger.error(e); {}
     end
 
-    [item_count_t, website_views_t, wiki_views_t,
+    [website_views_t, wiki_views_t,
      website_overview_t, website_events_t, mc_thread].each(&:join)
 
     mc_data = mc_thread.value || {}
 
-    @item_count           = item_count_t.value
     @website_views        = website_views_t.value
     @wikimedia_views      = wiki_views_t.value
     @website_overview     = website_overview_t.value
@@ -144,8 +143,7 @@ class ContributorsController < ApplicationController
   def contributor_bws_overview
     assign_start_and_end_dates
 
-    @bws_item_count = DplaApiResponseBuilder.new()
-      .bws_item_count(params[:hub_id], params[:contributor_id])
+    @bws_item_count = Hub.bws_item_count(params[:hub_id], params[:contributor_id])
 
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
@@ -165,23 +163,14 @@ class ContributorsController < ApplicationController
   end
 
   def contributor_item_count
-    @item_count = DplaApiResponseBuilder.new()
-      .item_count(params[:hub_id], params[:contributor_id])
-
+    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
     render partial: "shared/item_count"
   end
 
   def contributor_totals
-    api = DplaApiResponseBuilder.new
+    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
+
     results = [
-      Thread.new {
-        begin
-          api.item_count(params[:hub_id], params[:contributor_id])
-        rescue => e
-          Rails.logger.error(e)
-          nil
-        end
-      },
       Thread.new {
         begin
           WebsiteOverview.build do |b|
@@ -208,9 +197,8 @@ class ContributorsController < ApplicationController
       }
     ].map(&:value)
 
-    @item_count      = results[0]
-    @website_views   = results[1]
-    @wikimedia_views = results[2]
+    @website_views   = results[0]
+    @wikimedia_views = results[1]
 
     render partial: "shared/totals"
   end
@@ -232,14 +220,6 @@ class ContributorsController < ApplicationController
   def contributor_wikimedia_overview
     assign_all_time_dates
 
-    # Fetch item_count concurrently while building Wikimedia data.
-    item_count_thread = Thread.new do
-      DplaApiResponseBuilder.new.item_count(params[:hub_id], params[:contributor_id])
-    rescue => e
-      Rails.logger.error(e)
-      nil
-    end
-
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub         = params[:hub_id]
       builder.contributor = params[:contributor_id]
@@ -255,7 +235,7 @@ class ContributorsController < ApplicationController
     )
     @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
-    @item_count            = item_count_thread.value
+    @item_count            = Hub.item_count(params[:hub_id], params[:contributor_id])
     @wikimedia_participant = WikimediaParticipant.participant?(params[:hub_id], params[:contributor_id])
     @target                = Contributor.new(params[:contributor_id],
                                              params[:hub_id],
@@ -304,20 +284,16 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    # Fire all five independent network calls concurrently. DPLA API results
-    # are returned directly; GA4/S3 calls warm each object's memoized cache
-    # so ContributorComparison#totals reads from memory instead of the network.
+    # Fire GA4/S3 calls concurrently; item counts come from the local cache.
     hub_id = params[:hub_id]
-    results = [
-      Thread.new { DplaApiResponseBuilder.new.contributors_item_count(hub_id) },
-      Thread.new { DplaApiResponseBuilder.new.contributors_bws_item_count(hub_id) },
+    contributors_item_count = Hub.contributors_item_count(hub_id)
+    bws_item_count          = Hub.contributors_bws_item_count(hub_id)
+
+    [
       Thread.new { website_overview.response },
       Thread.new { website_events.response },
       Thread.new { metadata_completeness.contributor_csv },
-    ].map(&:value)
-
-    contributors_item_count = results[0]
-    bws_item_count          = results[1]
+    ].each(&:join)
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
