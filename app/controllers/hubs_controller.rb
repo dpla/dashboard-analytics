@@ -27,6 +27,7 @@ class HubsController < ApplicationController
     # Pre-load S3-cached counts so the totals card renders on initial page load.
     @item_count        = Hub.item_count(params[:id])
     @contributor_count = Hub.contributor_count(params[:id])
+    @target            = @hub
 
     unless current_user.hub == params[:id] || current_user.hub == "All"
       redirect_to hub_path(current_user.hub)

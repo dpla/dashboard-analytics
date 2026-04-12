@@ -4,25 +4,27 @@
   <p class="not-time-bound-note">Metadata completeness reflects the current state of your records and is not affected by the selected date range.</p>
 <% end %>
 
-<% if @mc_data.present? %>
+<%# nil = still loading (show skeleton); present = has data; blank non-nil = no data %>
+<% if @mc_data.nil? || @mc_data.present? %>
 
   <table>
-    <% @mc_data.each do |key, value| %>
-      <% if MetadataCompletenessPresenter.fields.include?(key) && key != "count" %>
-        <tr>
-          <td>
-            <div class="tooltip">
-              <span><%= key.titleize %></span>
-              <% if key == 'mediaAccess' %>
-                <span class="tooltiptext"><%= media_access_tooltip %></span>
-              <% end %>
-            </div>
-          </td>
-          <td class="bar <%= percentage_class(value) %>">
-            <%= render_percentage(value) %>
-          </td>
-        </tr>
-      <% end %>
+    <% MetadataCompletenessPresenter.fields.reject { |f| f == "count" }.each do |key| %>
+      <%# When data is loaded, only show keys returned by the API %>
+      <% next if @mc_data && !@mc_data.key?(key) %>
+      <% value = @mc_data&.[](key) %>
+      <tr>
+        <td>
+          <div class="tooltip">
+            <span><%= key.titleize %></span>
+            <% if key == 'mediaAccess' %>
+              <span class="tooltiptext"><%= media_access_tooltip %></span>
+            <% end %>
+          </div>
+        </td>
+        <td class="bar <%= percentage_class(value) unless value.nil? %>">
+          <%= value.nil? ? "—" : render_percentage(value) %>
+        </td>
+      </tr>
     <% end %>
   </table>
 

@@ -19,16 +19,7 @@
   <div class="data-content">
 
     <%= render_async_section hub_sections_path(@hub.name, date_opts) do %>
-      <div class="data-section">
-        <div class="metrics-left-col">
-          <div class="metrics">
-            <%= render partial: "shared/totals" %>
-          </div>
-          <div class="metrics"><div>Loading...</div></div>
-        </div>
-        <div class="metrics"><div>Loading...</div></div>
-        <div class="metrics"><div>Loading...</div></div>
-      </div>
+      <%= render partial: "shared/hub_sections" %>
     <% end %>
 
   </div>

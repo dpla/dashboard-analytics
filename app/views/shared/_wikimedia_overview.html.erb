@@ -1,11 +1,13 @@
 <%# Local variables: @wa_data[Hash], @wp_data[Hash], @item_count[Int|Nil], @target[Hub|Contributor], @wikimedia_participant[Boolean] %>
 
-<% if @wa_data.present? && @wa_data.any? { |_, v| v.to_i > 0 } %>
+<%# nil = still loading (skeleton); present with values = show data; otherwise = no-data message %>
+<% if @wa_data.nil? || (@wa_data.present? && @wa_data.any? { |_, v| v.to_i > 0 }) %>
 
   <table>
     <% WikimediaAnalyticsPresenter.fields.each do |key| %>
-      <% value = @wa_data[key] %>
-      <% next unless value.to_i > 0 %>
+      <% value = @wa_data&.[](key) %>
+      <%# Skip zero-value rows when data is loaded; show all rows in skeleton mode %>
+      <% next if @wa_data && value.to_i == 0 %>
       <tr>
         <td>
           <div class="tooltip">
@@ -13,9 +15,7 @@
             <span class="tooltiptext"><%= find_tooltip(key) %></span>
           </div>
         </td>
-        <td>
-          <%= number_with_delimiter(value, delimiter: ',') %>
-        </td>
+        <td><%= dash_or(value) %></td>
       </tr>
     <% end %>
   </table>
@@ -30,7 +30,19 @@
 
 <% key = 'wikimediaReady' %>
 
-<% if @wp_data.present? && @wp_data.key?(key) %>
+<% if @wp_data.nil? %>
+  <table>
+    <tr>
+      <td>
+        <div class="tooltip">
+          <span>Wikimedia Ready</span>
+          <span class="tooltiptext"><%= wikimedia_readiness_tooltip %></span>
+        </div>
+      </td>
+      <td class="bar">—</td>
+    </tr>
+  </table>
+<% elsif @wp_data.present? && @wp_data.key?(key) %>
   <% value = @wp_data[key] %>
   <% ready_count = @item_count ? (@item_count.to_f * value.to_f).round : nil %>
 

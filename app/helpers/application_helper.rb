@@ -1,5 +1,10 @@
 module ApplicationHelper
 
+  # Returns a formatted number or an em dash when value is nil (still loading).
+  def dash_or(value, delimiter: ',')
+    value.nil? ? "—" : number_with_delimiter(value, delimiter: delimiter)
+  end
+
   ##
   # Wrapper around render_async that adds a default error message shown when
   # the async request fails instead of silently replacing the container with
