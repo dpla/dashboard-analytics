@@ -61,6 +61,7 @@ Rails.application.routes.draw do
   get :api_search_terms, controller: :search_terms
   get :website_search_terms, controller: :search_terms
   get :contributor_comparison, controller: :contributors
+  get :contributor_ga_data,   controller: :contributors
 
   root 'hubs#index'
 end

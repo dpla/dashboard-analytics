@@ -2,7 +2,7 @@ module Admin
   class UsersController < ApplicationController
 
     def index
-      @users = current_user.hub == "All" ? User.all : 
+      @users = admin_for_all_hubs? ? User.all : 
         User.where("hub = ?", current_user.hub)
 
       redirect_to admin_user_path(current_user) unless current_user.admin
@@ -91,11 +91,17 @@ module Admin
     private
 
     def user_params
-      params.require(:user).permit(:email,
-                                   :admin,
-                                   :hub,
-                                   :password,
-                                   :password_confirmation)
+      permitted = params.require(:user).permit(:email,
+                                               :admin,
+                                               :hub,
+                                               :password,
+                                               :password_confirmation)
+      # Hub-scoped admins may only create/edit users within their own hub.
+      # Override any submitted hub value and disallow escalation to "All".
+      unless admin_for_all_hubs?
+        permitted[:hub] = current_user.hub
+      end
+      permitted
     end
   end
 end

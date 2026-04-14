@@ -26,7 +26,7 @@
 
     <div>
       <%= f.label :hub %>
-      <% if current_user.hub == "All" %>
+      <% if admin_for_all_hubs? %>
           <%= f.select :hub, Hub.all.unshift("All") %>
       <% else %>
           <%= f.select :hub, [current_user.hub] %>

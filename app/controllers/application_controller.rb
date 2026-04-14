@@ -8,6 +8,15 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def render_not_found
+    render "errors/not_found", status: :not_found, layout: "application"
+  end
+
+  def admin_for_all_hubs?
+    current_user.hub == "All"
+  end
+  helper_method :admin_for_all_hubs?
+
   def layout_by_resource
     if devise_controller?
       "devise"

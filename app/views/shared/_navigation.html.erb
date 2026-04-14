@@ -1,6 +1,6 @@
 <nav>
   <ul>
-    <% if current_user.hub == "All" %>
+    <% if admin_for_all_hubs? %>
         <li>
           <%= link_to "Hubs", hubs_path %>
         </li>

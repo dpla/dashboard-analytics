@@ -12,10 +12,12 @@ class HubsController < ApplicationController
   def index
     assign_start_and_end_dates
     @hubs = Hub.all_with_counts
-    redirect_to hub_path(current_user.hub) unless current_user.hub == "All"
+    redirect_to hub_path(current_user.hub) unless admin_for_all_hubs?
   end
 
   def show
+    return render_not_found unless Hub.exists?(params[:id])
+
     assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
@@ -29,7 +31,7 @@ class HubsController < ApplicationController
     @contributor_count = Hub.contributor_count(params[:id])
     @target            = @hub
 
-    unless current_user.hub == params[:id] || current_user.hub == "All"
+    unless current_user.hub == params[:id] || admin_for_all_hubs?
       redirect_to hub_path(current_user.hub)
     end
   end

@@ -37,6 +37,14 @@ class Hub
   # @param hub [String]
   # @return [Array<String>] sorted contributor names
   #
+  def self.exists?(hub)
+    HubStats.fetch.dig("hubs", hub) != nil
+  end
+
+  def self.contributor?(hub, contributor)
+    HubStats.fetch.dig("hubs", hub, "contributors", contributor) != nil
+  end
+
   def self.contributors(hub)
     (HubStats.fetch.dig("hubs", hub, "contributors") || {}).keys.sort
   end

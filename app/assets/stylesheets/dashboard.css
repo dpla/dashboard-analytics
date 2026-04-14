@@ -13,6 +13,10 @@ body, button, input, label, select, textarea {
   display: none;
 }
 
+.ga-loading {
+  color: #aaa;
+}
+
 .clear {
   clear: both;
 }
