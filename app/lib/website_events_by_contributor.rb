@@ -51,15 +51,15 @@ class WebsiteEventsByContributor
   end
 
   def parse_data
-    return Hash.new unless response.present?
+    return Hash.new unless response.present? && response.rows.present?
     # Create Hash of data
     # e.g. "The Library" => { "Click Throughs" => 2, "Total Views" => 5 }
     data = {}
 
-    response.rows.map do |r|
+    response.rows.each do |r|
       event = r[0].split(" : ").first
       contributor = r[1]
-      count = r[2].to_i rescue 0
+      count = r[2]&.to_i || 0
 
       data[contributor] ||= { "Views" => 0, "Click Throughs" => 0 }
       data[contributor]["Click Throughs"] += count if event == "Click Through"
