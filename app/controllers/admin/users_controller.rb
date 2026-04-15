@@ -27,8 +27,10 @@ module Admin
     end
 
     def edit
-      @user = User.find(params[:id])
-      redirect_to admin_user_path(current_user) unless current_user.admin
+      unless current_user.admin
+        redirect_to admin_user_path(current_user) and return
+      end
+      @user = manageable_users.find(params[:id])
     end
 
     def create
@@ -59,7 +61,7 @@ module Admin
         redirect_to admin_user_path(current_user) and return
       end
 
-      @user = User.find(params[:id])
+      @user = manageable_users.find(params[:id])
 
       if @user.update(user_params)
         redirect_to admin_users_path
@@ -74,7 +76,7 @@ module Admin
         redirect_to admin_user_path(current_user) and return
       end
 
-      @user = User.find(params[:id])
+      @user = manageable_users.find(params[:id])
       email = @user.email
 
       if @user.destroy
@@ -92,13 +94,17 @@ module Admin
         redirect_to admin_user_path(current_user) and return
       end
 
-      @user = User.find(params[:id])
+      @user = manageable_users.find(params[:id])
       @user.send_reset_password_instructions
       flash[:notice] = "Password reset instructions sent to #{@user.email}."
       redirect_to admin_users_path
     end
 
     private
+
+    def manageable_users
+      admin_for_all_hubs? ? User.all : User.where(hub: current_user.hub)
+    end
 
     def user_params
       permitted = params.require(:user).permit(:email,
