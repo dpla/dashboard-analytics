@@ -3,10 +3,6 @@
 
   <div class="clear" />
 
-  <% if flash[:notice] %>
-    <div class="notice"><%= flash[:notice] %></div>
-  <% end %>
-
   <div style="margin-bottom: 1.5em; padding: 1em; border: 1px solid #e9dec8; border-radius: 3px; background: #fdf8f0;">
     <strong>Wikimedia Cache</strong>
     <%= button_to "Rebuild Wikimedia Cache",
