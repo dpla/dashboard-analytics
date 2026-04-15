@@ -62,9 +62,11 @@ class ContributorsController < ApplicationController
       Rails.logger.error(e); nil
     end
     website_overview_t = Thread.new do
-      WebsiteOverview.build { |b|
+      overview = WebsiteOverview.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.start_date = @start_date; b.end_date = @end_date
       }
+      overview.response
+      overview
     rescue => e
       Rails.logger.error(e); nil
     end
