@@ -449,19 +449,19 @@ footer {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 300px;
+    white-space: nowrap;
     background-color: #273443;
     color: #fff;
     text-align: center;
     border-radius: 6px;
-    padding: 5px;
+    padding: 5px 10px;
 
-    /* Position the tooltip text */
+    /* Position above, anchored to right edge so it never overflows the viewport */
     position: absolute;
     z-index: 1;
     bottom: 125%;
-    left: 50%;
-    margin-left: -80px;
+    right: 0;
+    left: auto;
 
     /* Fade in tooltip */
     opacity: 0;
@@ -473,8 +473,9 @@ footer {
     content: "";
     position: absolute;
     top: 100%;
-    left: 20%;
-    margin-left: -5px;
+    right: 10%;
+    left: auto;
+    margin-left: 0;
     border-width: 5px;
     border-style: solid;
     border-color: #555 transparent transparent transparent;
