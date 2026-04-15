@@ -23,7 +23,7 @@ class WikimediaPreparationsController < ApplicationController
 
     @id = params[:id]
 
-    unless current_user.hub == params[:hub_id] || current_user.hub == "All"
+    unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
       redirect_to hub_path(current_user.hub)
     end
   end

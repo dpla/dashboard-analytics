@@ -10,15 +10,20 @@ class ContributorsController < ApplicationController
   include TooltipsHelper
 
   def index
+    return render_not_found unless Hub.exists?(params[:hub_id])
+
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
 
-    unless current_user.hub == params[:hub_id] || current_user.hub == "All"
+    unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
       redirect_to hub_contributors_path(current_user.hub)
     end
   end
 
   def show
+    return render_not_found unless Hub.exists?(params[:hub_id])
+    return render_not_found unless Hub.contributor?(params[:hub_id], params[:id])
+
     assign_start_and_end_dates
     @contributor = Contributor.new(params[:id],
                                    params[:hub_id],
@@ -29,7 +34,7 @@ class ContributorsController < ApplicationController
     @item_count = Hub.item_count(params[:hub_id], params[:id])
     @target     = @contributor
 
-    unless current_user.hub == params[:hub_id] || current_user.hub == "All"
+    unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
       redirect_to hub_path(current_user.hub)
     end
   end
@@ -43,7 +48,7 @@ class ContributorsController < ApplicationController
     assign_start_and_end_dates
 
     hub_id     = params[:hub_id]
-    contrib_id = params[:contributor_id]
+    contrib_id = params[:id]
     all_start  = min_date
     all_end    = max_date
     end_date   = @end_date
@@ -116,14 +121,14 @@ class ContributorsController < ApplicationController
 
     @website_overview = WebsiteOverview.build do |builder|
       builder.hub         = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.start_date  = @start_date
       builder.end_date    = @end_date
     end
 
     @website_event_totals = WebsiteEventTotals.build do |builder|
       builder.hub         = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.start_date  = @start_date
       builder.end_date    = @end_date
     end
@@ -136,7 +141,7 @@ class ContributorsController < ApplicationController
 
     @api_overview = ApiOverview.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
@@ -147,18 +152,18 @@ class ContributorsController < ApplicationController
   def contributor_bws_overview
     assign_start_and_end_dates
 
-    @bws_item_count = Hub.bws_item_count(params[:hub_id], params[:contributor_id])
+    @bws_item_count = Hub.bws_item_count(params[:hub_id], params[:id])
 
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
 
     @bws_event_totals = BwsEventTotals.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
@@ -167,19 +172,19 @@ class ContributorsController < ApplicationController
   end
 
   def contributor_item_count
-    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
+    @item_count = Hub.item_count(params[:hub_id], params[:id])
     render partial: "shared/item_count"
   end
 
   def contributor_totals
-    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
+    @item_count = Hub.item_count(params[:hub_id], params[:id])
 
     results = [
       Thread.new {
         begin
           WebsiteOverview.build do |b|
             b.hub         = params[:hub_id]
-            b.contributor = params[:contributor_id]
+            b.contributor = params[:id]
             b.start_date  = min_date
             b.end_date    = max_date
           end.events
@@ -193,7 +198,7 @@ class ContributorsController < ApplicationController
           WikimediaAnalyticsPresenter.new(
             start_month: min_date.strftime("%Y-%m"),
             end_month:   max_date.strftime("%Y-%m")
-          ).contributor(params[:hub_id], params[:contributor_id])["Page views"]
+          ).contributor(params[:hub_id], params[:id])["Page views"]
         rescue => e
           Rails.logger.error(e)
           nil
@@ -212,12 +217,12 @@ class ContributorsController < ApplicationController
 
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.end_date = @end_date
     end
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-    @mc_data = mc_presenter.contributor(params[:hub_id], params[:contributor_id])
+    @mc_data = mc_presenter.contributor(params[:hub_id], params[:id])
     render partial: "shared/metadata_completeness"
   end
 
@@ -226,22 +231,22 @@ class ContributorsController < ApplicationController
 
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub         = params[:hub_id]
-      builder.contributor = params[:contributor_id]
+      builder.contributor = params[:id]
       builder.end_date    = @end_date
     end
 
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
-    @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
+    @wp_data = wp_presenter.contributor(params[:hub_id], params[:id])
 
     wa_presenter = WikimediaAnalyticsPresenter.new(
       start_month: @start_date.strftime("%Y-%m"),
       end_month:   @end_date.strftime("%Y-%m")
     )
-    @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
+    @wa_data = wa_presenter.contributor(params[:hub_id], params[:id])
 
-    @item_count            = Hub.item_count(params[:hub_id], params[:contributor_id])
-    @wikimedia_participant = WikimediaParticipant.participant?(params[:hub_id], params[:contributor_id])
-    @target                = Contributor.new(params[:contributor_id],
+    @item_count            = Hub.item_count(params[:hub_id], params[:id])
+    @wikimedia_participant = WikimediaParticipant.participant?(params[:hub_id], params[:id])
+    @target                = Contributor.new(params[:id],
                                              params[:hub_id],
                                              @start_date,
                                              @end_date)
@@ -251,19 +256,6 @@ class ContributorsController < ApplicationController
 
   def contributor_comparison
     assign_start_and_end_dates
-
-    # Build objects first — no network calls yet.
-    website_overview = WebsiteOverviewByContributor.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
-
-    website_events = WebsiteEventsByContributor.build do |builder|
-      builder.hub = params[:hub_id]
-      builder.start_date = @start_date
-      builder.end_date = @end_date
-    end
 
     bws_overview = BwsOverviewByContributor.build do |builder|
       builder.hub = params[:hub_id]
@@ -288,16 +280,27 @@ class ContributorsController < ApplicationController
       builder.end_date = @end_date
     end
 
-    # Fire GA4/S3 calls concurrently; item counts come from the local cache.
     hub_id = params[:hub_id]
     contributors_item_count = Hub.contributors_item_count(hub_id)
     bws_item_count          = Hub.contributors_bws_item_count(hub_id)
 
-    [
-      Thread.new { website_overview.response },
-      Thread.new { website_events.response },
-      Thread.new { metadata_completeness.contributor_csv },
-    ].each(&:join)
+    # For HTML the GA website columns load async via contributor_ga_data; pass nil
+    # so the table renders immediately from fast S3/DB caches.
+    # For CSV exports, prefetch GA data so the download is complete.
+    website_overview = nil
+    website_events   = nil
+    threads = [Thread.new { metadata_completeness.contributor_csv }]
+    if request.format.csv?
+      website_overview = WebsiteOverviewByContributor.build do |builder|
+        builder.hub = params[:hub_id]; builder.start_date = @start_date; builder.end_date = @end_date
+      end
+      website_events = WebsiteEventsByContributor.build do |builder|
+        builder.hub = params[:hub_id]; builder.start_date = @start_date; builder.end_date = @end_date
+      end
+      threads << Thread.new { website_overview.response }
+      threads << Thread.new { website_events.response }
+    end
+    threads.each(&:value)
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
@@ -310,7 +313,7 @@ class ContributorsController < ApplicationController
       builder.hub = params[:hub_id]
       builder.contributors_item_count = contributors_item_count
       builder.website_overview = website_overview
-      builder.website_events = website_events
+      builder.website_events   = website_events
       builder.bws_item_count = bws_item_count
       builder.bws_overview = bws_overview
       builder.bws_events = bws_events
@@ -324,5 +327,57 @@ class ContributorsController < ApplicationController
       format.html { render partial: "shared/contributor_comparison" }
       format.csv { send_data @contributor_comparison.to_csv }
     end
+  end
+
+  ##
+  # Returns GA website metrics for all contributors in a hub as JSON.
+  # Called asynchronously by the comparison table after it renders.
+  #
+  def contributor_ga_data
+    hub_id = params[:hub_id]
+    return head :not_found unless Hub.exists?(hub_id)
+    unless current_user.hub == hub_id || admin_for_all_hubs?
+      return head :forbidden
+    end
+
+    assign_start_and_end_dates
+
+    website_overview = WebsiteOverviewByContributor.build do |builder|
+      builder.hub        = hub_id
+      builder.start_date = @start_date
+      builder.end_date   = @end_date
+    end
+
+    website_events = WebsiteEventsByContributor.build do |builder|
+      builder.hub        = hub_id
+      builder.start_date = @start_date
+      builder.end_date   = @end_date
+    end
+
+    [
+      Thread.new { website_overview.response },
+      Thread.new { website_events.response }
+    ].each(&:value)
+
+    overview_data = website_overview.parse_data
+    events_data   = website_events.parse_data
+
+    result = Hub.contributors_item_count(hub_id).each_with_object({}) do |c, hash|
+      contributor = c["term"]
+      ga_key      = contributor[0, GaResponseBuilder::GA4_EVENT_NAME_MAX_LENGTH]
+      ov          = overview_data[ga_key] || {}
+      ev          = events_data[ga_key]   || {}
+      hash[contributor] = {
+        "views"          => ev["Views"]          || 0,
+        "click-throughs" => ev["Click Throughs"] || 0,
+        "sessions"       => ov["Sessions"]       || 0,
+        "users"          => ov["Users"]          || 0
+      }
+    end
+
+    render json: result
+  rescue => e
+    Rails.logger.error(e)
+    render json: {}, status: :service_unavailable
   end
 end

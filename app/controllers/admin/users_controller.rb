@@ -2,7 +2,7 @@ module Admin
   class UsersController < ApplicationController
 
     def index
-      @users = current_user.hub == "All" ? User.all : 
+      @users = admin_for_all_hubs? ? User.all : 
         User.where("hub = ?", current_user.hub)
 
       redirect_to admin_user_path(current_user) unless current_user.admin
@@ -27,11 +27,18 @@ module Admin
     end
 
     def edit
-      @user = User.find(params[:id])
-      redirect_to admin_user_path(current_user) unless current_user.admin
+      unless current_user.admin
+        redirect_to admin_user_path(current_user) and return
+      end
+      @user = manageable_users.find(params[:id])
     end
 
     def create
+      unless current_user.admin
+        flash[:alert] = "You don't have permission to create a new user."
+        redirect_to admin_user_path(current_user) and return
+      end
+
       generated_password = Devise.friendly_token.first(8)
       create_params = user_params
       create_params[:password] = generated_password
@@ -49,7 +56,12 @@ module Admin
     end
 
     def update
-      @user = User.find(params[:id])
+      unless current_user.admin
+        flash[:alert] = "You don't have permission to edit users."
+        redirect_to admin_user_path(current_user) and return
+      end
+
+      @user = manageable_users.find(params[:id])
 
       if @user.update(user_params)
         redirect_to admin_users_path
@@ -64,7 +76,7 @@ module Admin
         redirect_to admin_user_path(current_user) and return
       end
 
-      @user = User.find(params[:id])
+      @user = manageable_users.find(params[:id])
       email = @user.email
 
       if @user.destroy
@@ -82,7 +94,7 @@ module Admin
         redirect_to admin_user_path(current_user) and return
       end
 
-      @user = User.find(params[:id])
+      @user = manageable_users.find(params[:id])
       @user.send_reset_password_instructions
       flash[:notice] = "Password reset instructions sent to #{@user.email}."
       redirect_to admin_users_path
@@ -90,12 +102,22 @@ module Admin
 
     private
 
+    def manageable_users
+      admin_for_all_hubs? ? User.all : User.where(hub: current_user.hub)
+    end
+
     def user_params
-      params.require(:user).permit(:email,
-                                   :admin,
-                                   :hub,
-                                   :password,
-                                   :password_confirmation)
+      permitted = params.require(:user).permit(:email,
+                                               :admin,
+                                               :hub,
+                                               :password,
+                                               :password_confirmation)
+      # Hub-scoped admins may only create/edit users within their own hub.
+      # Override any submitted hub value and disallow escalation to "All".
+      unless admin_for_all_hubs?
+        permitted[:hub] = current_user.hub
+      end
+      permitted
     end
   end
 end

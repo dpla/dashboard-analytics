@@ -133,7 +133,8 @@
 </div>
 
 <div class="comparison-table-wrapper">
-<table id='comparison'>
+<table id='comparison'
+       data-ga-url="<%= contributor_ga_data_path({ hub_id: params[:hub_id] }.merge(date_opts)) %>">
   <thead>
     <tr>
       <th>Contributor</th>
@@ -173,18 +174,18 @@
           <%= link_to contributor, { controller: :contributors, action: :show,
                                      hub_id: params[:hub_id], id: contributor }.merge(date_opts) %>
         </td>
-        <td class="website-view">
-          <%= totals["Website"]["Views"] || 0 %>
-        </td>
-        <td class="click-through">
-          <%= totals["Website"]["Click Throughs"] || 0 %>
-        </td>
-        <td class="website-session">
-          <%= totals["Website"]["Sessions"] || 0 %>
-        </td>
-        <td class="website-user">
-          <%= totals["Website"]["Users"] || 0 %>
-        </td>
+        <td class="website-view ga-loading"
+            data-ga-contributor="<%= contributor %>"
+            data-ga-field="views">—</td>
+        <td class="click-through ga-loading"
+            data-ga-contributor="<%= contributor %>"
+            data-ga-field="click-throughs">—</td>
+        <td class="website-session ga-loading"
+            data-ga-contributor="<%= contributor %>"
+            data-ga-field="sessions">—</td>
+        <td class="website-user ga-loading"
+            data-ga-contributor="<%= contributor %>"
+            data-ga-field="users">—</td>
         <% if bws_data_for_date_range? %>
           <td class="bws-item-count">
             <%= totals["BWS"]["ItemCount"] || 0 %>
@@ -213,7 +214,7 @@
         <% WikimediaPreparationsPresenter.fields.each do |field| %>
           <% value = totals["WikimediaPreparations"][field] %>
           <td class="<%= field %> <%= percentage_class(value) %>">
-            <%= render_percentage(value) %>
+            <%= render_percentage_with_count(value, totals["ItemCount"]) %>
           </td>
         <% end %>
         <% WikimediaAnalyticsPresenter.fields.each do |field| %>
@@ -226,7 +227,7 @@
           <% unless field == "count" %>
             <% value = totals["MetadataCompleteness"][field] %>
             <td class="<%= field %> <%= percentage_class(value) %>">
-              <%= render_percentage(value) %>
+              <%= render_percentage_with_count(value, totals["ItemCount"]) %>
             </td>
           <% end %>
         <% end %>

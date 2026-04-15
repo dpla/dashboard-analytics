@@ -193,11 +193,11 @@ class ContributorComparison
   private
 
   def frontend_use_by_contributor
-    @frontend_use_by_contributor ||= @website_overview.parse_data
+    @frontend_use_by_contributor ||= @website_overview&.parse_data || {}
   end
 
   def frontend_events_by_contributor
-    @frontend_events_by_contributor ||= @website_events.parse_data
+    @frontend_events_by_contributor ||= @website_events&.parse_data || {}
   end
 
   def bws_use_by_contributor

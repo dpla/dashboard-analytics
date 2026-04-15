@@ -27,7 +27,7 @@
           <tr>
             <td><%= key.titleize %></td>
             <td class="bar <%= percentage_class(value) %>">
-              <%= render_percentage(value) %>
+              <%= render_percentage_with_count(value, @item_count) %>
             </td>
           </tr>
         <% end %>

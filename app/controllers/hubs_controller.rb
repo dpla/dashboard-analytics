@@ -10,12 +10,16 @@ class HubsController < ApplicationController
   include TooltipsHelper
 
   def index
+    return redirect_to(hub_path(current_user.hub)) unless admin_for_all_hubs?
+
     assign_start_and_end_dates
     @hubs = Hub.all_with_counts
-    redirect_to hub_path(current_user.hub) unless current_user.hub == "All"
   end
 
   def show
+    return render_not_found unless Hub.exists?(params[:id])
+    return redirect_to(hub_path(current_user.hub)) unless current_user.hub == params[:id] || admin_for_all_hubs?
+
     assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
@@ -28,10 +32,6 @@ class HubsController < ApplicationController
     @item_count        = Hub.item_count(params[:id])
     @contributor_count = Hub.contributor_count(params[:id])
     @target            = @hub
-
-    unless current_user.hub == params[:id] || current_user.hub == "All"
-      redirect_to hub_path(current_user.hub)
-    end
   end
 
   ##

@@ -22,7 +22,7 @@
           </div>
         </td>
         <td class="bar <%= percentage_class(value) unless value.nil? %>">
-          <%= value.nil? ? "—" : render_percentage(value) %>
+          <%= value.nil? ? "—" : render_percentage_with_count(value, @item_count) %>
         </td>
       </tr>
     <% end %>
