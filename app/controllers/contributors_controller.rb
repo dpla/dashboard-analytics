@@ -14,6 +14,7 @@ class ContributorsController < ApplicationController
 
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
+    @contributors_item_count = Hub.contributors_item_count(params[:hub_id])
 
     unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
       redirect_to hub_contributors_path(current_user.hub)
