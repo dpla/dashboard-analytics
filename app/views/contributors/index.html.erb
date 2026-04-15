@@ -29,9 +29,9 @@
           var contributor = td.dataset.gaContributor;
           var field       = td.dataset.gaField;
           var row         = data[contributor];
+          td.classList.remove("ga-loading");
           if (row && row[field] !== undefined) {
             td.textContent = row[field].toLocaleString();
-            td.classList.remove("ga-loading");
           }
         });
       })

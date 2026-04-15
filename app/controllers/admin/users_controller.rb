@@ -32,6 +32,11 @@ module Admin
     end
 
     def create
+      unless current_user.admin
+        flash[:alert] = "You don't have permission to create a new user."
+        redirect_to admin_user_path(current_user) and return
+      end
+
       generated_password = Devise.friendly_token.first(8)
       create_params = user_params
       create_params[:password] = generated_password
@@ -49,6 +54,11 @@ module Admin
     end
 
     def update
+      unless current_user.admin
+        flash[:alert] = "You don't have permission to edit users."
+        redirect_to admin_user_path(current_user) and return
+      end
+
       @user = User.find(params[:id])
 
       if @user.update(user_params)
