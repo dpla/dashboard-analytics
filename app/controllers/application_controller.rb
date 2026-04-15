@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   private
 
   def redirect_inverted_date_range
-    return unless request.get?
+    return unless request.get? || request.head?
     return if request.xhr?
     return unless params[:start_date] =~ /\A\d{4}-\d{2}\z/ &&
                   params[:end_date]   =~ /\A\d{4}-\d{2}\z/
