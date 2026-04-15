@@ -300,7 +300,7 @@ class ContributorsController < ApplicationController
       threads << Thread.new { website_overview.response }
       threads << Thread.new { website_events.response }
     end
-    threads.each(&:join)
+    threads.each(&:value)
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
@@ -334,9 +334,13 @@ class ContributorsController < ApplicationController
   # Called asynchronously by the comparison table after it renders.
   #
   def contributor_ga_data
-    assign_start_and_end_dates
-
     hub_id = params[:hub_id]
+    return head :not_found unless Hub.exists?(hub_id)
+    unless current_user.hub == hub_id || admin_for_all_hubs?
+      return head :forbidden
+    end
+
+    assign_start_and_end_dates
 
     website_overview = WebsiteOverviewByContributor.build do |builder|
       builder.hub        = hub_id
@@ -353,7 +357,7 @@ class ContributorsController < ApplicationController
     [
       Thread.new { website_overview.response },
       Thread.new { website_events.response }
-    ].each(&:join)
+    ].each(&:value)
 
     overview_data = website_overview.parse_data
     events_data   = website_events.parse_data

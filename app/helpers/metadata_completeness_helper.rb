@@ -21,7 +21,7 @@ module MetadataCompletenessHelper
     pct = render_percentage(value)
     return pct if item_count.nil? || item_count.to_i == 0 || value.nil?
     abs = (value.to_f * item_count.to_i).round
-    content_tag(:div, class: "tooltip") do
+    content_tag(:div, class: "tooltip", tabindex: 0) do
       content_tag(:span, pct) +
         content_tag(:span,
                     "#{number_with_delimiter(abs)} of #{number_with_delimiter(item_count)} items",

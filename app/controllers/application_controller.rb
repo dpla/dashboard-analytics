@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   end
 
   def admin_for_all_hubs?
-    current_user.hub == "All"
+    current_user.admin && current_user.hub == "All"
   end
   helper_method :admin_for_all_hubs?
 
