@@ -11,6 +11,9 @@ WORKDIR /opt/dashboard-analytics
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --deployment
 COPY . .
+RUN useradd --create-home --shell /bin/bash app \
+  && chown -R app:app /opt/dashboard-analytics
+USER app
 # Devise checks for the presence of SECRET_KEY_BASE during precompile, but the
 # environmental vars set in docker-compose are not available in RUN context.
 # RUN SECRET_KEY_BASE=decoy-token bundle exec rake assets:precompile
