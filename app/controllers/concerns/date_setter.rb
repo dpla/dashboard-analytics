@@ -27,6 +27,21 @@ module DateSetter
   end
 
   ##
+  # Returns the effective [start, end] date range for a page section.
+  # When date params are present use the requested range; otherwise fall back to all-time.
+  # Requires assign_start_and_end_dates to have already been called.
+  #
+  # @return [Array<Date>] [sec_start, sec_end]
+  #
+  def section_date_range
+    if params[:start_date].present?
+      [@start_date, @end_date]
+    else
+      [min_date, max_date]
+    end
+  end
+
+  ##
   # This assigns values to @start_date and @end_date using params[:start_date]
   # and params[:end_date], both of which are expected to be in the format
   # "YYYY-MM"

@@ -67,12 +67,10 @@ class ContributorsController < ApplicationController
 
     assign_start_and_end_dates
 
-    hub_id    = params[:hub_id]
-    all_start = min_date
-    all_end   = max_date
-    sec_start = params[:start_date].present? ? @start_date : all_start
-    sec_end   = params[:start_date].present? ? @end_date   : all_end
-    end_date   = @end_date
+    hub_id             = params[:hub_id]
+    all_start, all_end = min_date, max_date
+    sec_start, sec_end = section_date_range
+    end_date           = @end_date
 
     @item_count = Hub.item_count(hub_id, contrib_id)
     wiki_views_t = Thread.new do
@@ -92,9 +90,11 @@ class ContributorsController < ApplicationController
       Rails.logger.error(e); nil
     end
     website_events_t = Thread.new do
-      WebsiteEventTotals.build { |b|
+      totals = WebsiteEventTotals.build { |b|
         b.hub = hub_id; b.contributor = contrib_id; b.start_date = sec_start; b.end_date = sec_end
       }
+      totals.response
+      totals
     rescue => e
       Rails.logger.error(e); nil
     end
