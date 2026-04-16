@@ -41,12 +41,10 @@ class HubsController < ApplicationController
   def sections
     assign_start_and_end_dates
 
-    hub_id    = params[:hub_id]
-    all_start = min_date
-    all_end   = max_date
-    sec_start = params[:start_date].present? ? @start_date : all_start
-    sec_end   = params[:start_date].present? ? @end_date   : all_end
-    end_date  = @end_date
+    hub_id              = params[:hub_id]
+    all_start, all_end  = min_date, max_date
+    sec_start, sec_end  = section_date_range
+    end_date            = @end_date
 
     first_month = Rails.cache.fetch("wikimedia_start_month:#{hub_id}", expires_in: 24.hours) do
       WikimediaCache.where(hub: hub_id, contributor: "").minimum(:month)
@@ -70,16 +68,20 @@ class HubsController < ApplicationController
       Rails.logger.error(e); nil
     end
     website_overview_t = Thread.new do
-      WebsiteOverview.build { |b|
+      overview = WebsiteOverview.build { |b|
         b.hub = hub_id; b.start_date = sec_start; b.end_date = sec_end
       }
+      overview.response
+      overview
     rescue => e
       Rails.logger.error(e); nil
     end
     website_events_t = Thread.new do
-      WebsiteEventTotals.build { |b|
+      totals = WebsiteEventTotals.build { |b|
         b.hub = hub_id; b.start_date = sec_start; b.end_date = sec_end
       }
+      totals.response
+      totals
     rescue => e
       Rails.logger.error(e); nil
     end
