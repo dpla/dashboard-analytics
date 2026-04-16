@@ -65,6 +65,13 @@ class ApplicationController < ActionController::Base
 
   def handle_service_error(exception)
     Rails.logger.error(exception.full_message)
-    render "errors/service_unavailable", status: :service_unavailable, layout: "application"
+    # XHR requests (render_async sections) must return 200 so the response body
+    # is inserted into the container instead of being discarded in favour of the
+    # hard-coded error_message string.
+    if request.xhr?
+      render "errors/service_unavailable", status: :ok, layout: false
+    else
+      render "errors/service_unavailable", status: :service_unavailable, layout: "application"
+    end
   end
 end

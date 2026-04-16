@@ -54,7 +54,7 @@ class ContributorsController < ApplicationController
     assign_start_and_end_dates
 
     hub_id     = params[:hub_id]
-    contrib_id = params[:id]
+    contrib_id = params[:contributor_id]
     all_start  = min_date
     all_end    = max_date
     end_date   = @end_date
@@ -122,14 +122,14 @@ class ContributorsController < ApplicationController
 
     @website_overview = WebsiteOverview.build do |builder|
       builder.hub         = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.start_date  = @start_date
       builder.end_date    = @end_date
     end
 
     @website_event_totals = WebsiteEventTotals.build do |builder|
       builder.hub         = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.start_date  = @start_date
       builder.end_date    = @end_date
     end
@@ -142,7 +142,7 @@ class ContributorsController < ApplicationController
 
     @api_overview = ApiOverview.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
@@ -153,18 +153,18 @@ class ContributorsController < ApplicationController
   def contributor_bws_overview
     assign_start_and_end_dates
 
-    @bws_item_count = Hub.bws_item_count(params[:hub_id], params[:id])
+    @bws_item_count = Hub.bws_item_count(params[:hub_id], params[:contributor_id])
 
     @bws_overview = BwsOverview.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
 
     @bws_event_totals = BwsEventTotals.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.start_date = @start_date
       builder.end_date = @end_date
     end
@@ -173,19 +173,19 @@ class ContributorsController < ApplicationController
   end
 
   def contributor_item_count
-    @item_count = Hub.item_count(params[:hub_id], params[:id])
+    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
     render partial: "shared/item_count"
   end
 
   def contributor_totals
-    @item_count = Hub.item_count(params[:hub_id], params[:id])
+    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
 
     results = [
       Thread.new {
         begin
           WebsiteOverview.build do |b|
             b.hub         = params[:hub_id]
-            b.contributor = params[:id]
+            b.contributor = params[:contributor_id]
             b.start_date  = min_date
             b.end_date    = max_date
           end.events
@@ -199,7 +199,7 @@ class ContributorsController < ApplicationController
           WikimediaAnalyticsPresenter.new(
             start_month: min_date.strftime("%Y-%m"),
             end_month:   max_date.strftime("%Y-%m")
-          ).contributor(params[:hub_id], params[:id])["Page views"]
+          ).contributor(params[:hub_id], params[:contributor_id])["Page views"]
         rescue => e
           Rails.logger.error(e)
           nil
@@ -218,12 +218,12 @@ class ContributorsController < ApplicationController
 
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.end_date = @end_date
     end
 
     mc_presenter = MetadataCompletenessPresenter.new(metadata_completeness)
-    @mc_data = mc_presenter.contributor(params[:hub_id], params[:id])
+    @mc_data = mc_presenter.contributor(params[:hub_id], params[:contributor_id])
     render partial: "shared/metadata_completeness"
   end
 
@@ -232,22 +232,22 @@ class ContributorsController < ApplicationController
 
     metadata_completeness = MetadataCompleteness.build do |builder|
       builder.hub         = params[:hub_id]
-      builder.contributor = params[:id]
+      builder.contributor = params[:contributor_id]
       builder.end_date    = @end_date
     end
 
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
-    @wp_data = wp_presenter.contributor(params[:hub_id], params[:id])
+    @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
 
     wa_presenter = WikimediaAnalyticsPresenter.new(
       start_month: @start_date.strftime("%Y-%m"),
       end_month:   @end_date.strftime("%Y-%m")
     )
-    @wa_data = wa_presenter.contributor(params[:hub_id], params[:id])
+    @wa_data = wa_presenter.contributor(params[:hub_id], params[:contributor_id])
 
-    @item_count            = Hub.item_count(params[:hub_id], params[:id])
-    @wikimedia_participant = WikimediaParticipant.participant?(params[:hub_id], params[:id])
-    @target                = Contributor.new(params[:id],
+    @item_count            = Hub.item_count(params[:hub_id], params[:contributor_id])
+    @wikimedia_participant = WikimediaParticipant.participant?(params[:hub_id], params[:contributor_id])
+    @target                = Contributor.new(params[:contributor_id],
                                              params[:hub_id],
                                              @start_date,
                                              @end_date)
