@@ -62,16 +62,16 @@ class ContributorsController < ApplicationController
   # concurrently, returning one combined HTML response instead of four.
   #
   def sections
-    assign_start_and_end_dates
-
-    hub_id     = params[:hub_id]
     contrib_id = params[:contributor_id]
     return head :not_found if contrib_id.blank?
 
-    all_start  = min_date
-    all_end    = max_date
-    sec_start  = params[:start_date].present? ? @start_date : all_start
-    sec_end    = params[:start_date].present? ? @end_date   : all_end
+    assign_start_and_end_dates
+
+    hub_id    = params[:hub_id]
+    all_start = min_date
+    all_end   = max_date
+    sec_start = params[:start_date].present? ? @start_date : all_start
+    sec_end   = params[:start_date].present? ? @end_date   : all_end
     end_date   = @end_date
 
     @item_count = Hub.item_count(hub_id, contrib_id)
