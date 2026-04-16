@@ -449,22 +449,22 @@ footer {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: max-content;
-    max-width: calc(100vw - 16px);
+    width: 300px;
+    max-width: calc(100vw - 2rem);
     white-space: normal;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     background-color: #273443;
     color: #fff;
     text-align: center;
     border-radius: 6px;
     padding: 5px 10px;
 
-    /* Position above, anchored to right edge so it never overflows the viewport */
+    /* Center above the trigger */
     position: absolute;
     z-index: 1;
     bottom: 125%;
-    right: 0;
-    left: auto;
+    left: 50%;
+    transform: translateX(-50%);
 
     /* Fade in tooltip */
     opacity: 0;
@@ -476,9 +476,8 @@ footer {
     content: "";
     position: absolute;
     top: 100%;
-    right: 10%;
-    left: auto;
-    margin-left: 0;
+    left: 50%;
+    margin-left: -5px;
     border-width: 5px;
     border-style: solid;
     border-color: #555 transparent transparent transparent;
