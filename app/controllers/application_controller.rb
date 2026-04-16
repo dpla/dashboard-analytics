@@ -19,11 +19,7 @@ class ApplicationController < ActionController::Base
     end_d   = Date.parse("#{params[:end_date]}-01")   rescue nil
     return unless start_d && end_d && end_d < start_d
 
-    corrected = request.query_parameters.merge(
-      "start_date" => params[:end_date],
-      "end_date"   => params[:start_date]
-    )
-    redirect_to "#{request.path}?#{corrected.to_query}",
+    redirect_to params.to_unsafe_h.merge(start_date: params[:end_date], end_date: params[:start_date]),
                 flash: { alert: "End date was before start date — dates have been swapped." }
   end
 
