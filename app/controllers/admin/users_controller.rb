@@ -1,11 +1,9 @@
 module Admin
   class UsersController < ApplicationController
+    before_action :require_admin!, except: [:show]
 
     def index
-      @users = admin_for_all_hubs? ? User.all : 
-        User.where("hub = ?", current_user.hub)
-
-      redirect_to admin_user_path(current_user) unless current_user.admin
+      @users = manageable_users
     end
 
     def show
@@ -19,26 +17,13 @@ module Admin
 
     def new
       @user = User.new
-
-      unless current_user.admin
-        flash[:notice] = "You don't have permission to create a new user."
-        redirect_to admin_user_path(current_user)
-      end
     end
 
     def edit
-      unless current_user.admin
-        redirect_to admin_user_path(current_user) and return
-      end
       @user = manageable_users.find(params[:id])
     end
 
     def create
-      unless current_user.admin
-        flash[:alert] = "You don't have permission to create a new user."
-        redirect_to admin_user_path(current_user) and return
-      end
-
       generated_password = Devise.friendly_token.first(8)
       create_params = user_params
       create_params[:password] = generated_password
@@ -56,11 +41,6 @@ module Admin
     end
 
     def update
-      unless current_user.admin
-        flash[:alert] = "You don't have permission to edit users."
-        redirect_to admin_user_path(current_user) and return
-      end
-
       @user = manageable_users.find(params[:id])
 
       if @user.update(user_params)
@@ -71,11 +51,6 @@ module Admin
     end
 
     def destroy
-      unless current_user.admin
-        flash[:alert] = "You don't have permission to do that."
-        redirect_to admin_user_path(current_user) and return
-      end
-
       @user = manageable_users.find(params[:id])
       email = @user.email
 
@@ -89,11 +64,6 @@ module Admin
     end
 
     def send_password_reset
-      unless current_user.admin
-        flash[:notice] = "You don't have permission to do that."
-        redirect_to admin_user_path(current_user) and return
-      end
-
       @user = manageable_users.find(params[:id])
       @user.send_reset_password_instructions
       flash[:notice] = "Password reset instructions sent to #{@user.email}."
