@@ -61,7 +61,23 @@
 
   <%= render_async_section contributor_comparison_path({ hub_id: params[:hub_id] }.merge(date_opts)),
                            event_name: "contributor-comparison-loaded" do %>
-    <div>Loading...</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Contributor</th>
+          <th colspan="99"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contributors_item_count.each do |c| %>
+          <tr>
+            <td><%= link_to c["term"], hub_contributor_path(params[:hub_id], c["term"], date_opts) %></td>
+            <%# colspan spans all data columns; exact count varies by hub (BWS, Wikimedia, API, etc.) %>
+            <td colspan="99">—</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   <% end %>
 
 </main>
