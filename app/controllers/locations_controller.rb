@@ -19,7 +19,7 @@ class LocationsController < ApplicationController
     @target = params[:contributor_id] ? @contributor : @hub
 
     unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
-      redirect_to hub_path(current_user.hub)
+      redirect_to hub_path(route_id(current_user.hub))
     end
   end
 end

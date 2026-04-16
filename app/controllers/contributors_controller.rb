@@ -13,7 +13,7 @@ class ContributorsController < ApplicationController
     return render_not_found unless Hub.exists?(params[:hub_id])
 
     unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
-      return redirect_to hub_contributors_path(current_user.hub)
+      return redirect_to hub_contributors_path(route_id(current_user.hub))
     end
 
     assign_start_and_end_dates
@@ -41,7 +41,7 @@ class ContributorsController < ApplicationController
     @target     = @contributor
 
     unless current_user.hub == params[:hub_id] || admin_for_all_hubs?
-      redirect_to hub_path(current_user.hub)
+      redirect_to hub_path(route_id(current_user.hub))
     end
   end
 

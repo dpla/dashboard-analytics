@@ -71,7 +71,7 @@
       <tbody>
         <% @contributors_item_count.each do |c| %>
           <tr>
-            <td><%= link_to c["term"], hub_contributor_path(params[:hub_id], c["term"], date_opts) %></td>
+            <td><%= link_to c["term"], hub_contributor_path(route_id(params[:hub_id]), route_id(c["term"]), date_opts) %></td>
             <%# colspan spans all data columns; exact count varies by hub (BWS, Wikimedia, API, etc.) %>
             <td colspan="99">—</td>
           </tr>

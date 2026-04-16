@@ -7,7 +7,7 @@
     <ul class="hub-grid">
       <% @hubs.each do |hub| %>
         <li class="hub-card">
-          <%= link_to hub_path(hub['term']), class: "hub-card-link" do %>
+          <%= link_to hub_path(route_id(hub['term'])), class: "hub-card-link" do %>
             <span class="hub-card-name"><%= hub['term'] %></span>
             <span class="hub-card-count"><%= number_with_delimiter(hub['count']) %> items</span>
           <% end %>
