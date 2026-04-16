@@ -68,6 +68,8 @@ class ContributorsController < ApplicationController
     contrib_id = params[:contributor_id]
     all_start  = min_date
     all_end    = max_date
+    sec_start  = params[:start_date].present? ? @start_date : all_start
+    sec_end    = params[:start_date].present? ? @end_date   : all_end
     end_date   = @end_date
 
     @item_count = Hub.item_count(hub_id, contrib_id)
@@ -80,7 +82,7 @@ class ContributorsController < ApplicationController
     end
     website_overview_t = Thread.new do
       overview = WebsiteOverview.build { |b|
-        b.hub = hub_id; b.contributor = contrib_id; b.start_date = @start_date; b.end_date = @end_date
+        b.hub = hub_id; b.contributor = contrib_id; b.start_date = sec_start; b.end_date = sec_end
       }
       overview.response
       overview
@@ -89,7 +91,7 @@ class ContributorsController < ApplicationController
     end
     website_events_t = Thread.new do
       WebsiteEventTotals.build { |b|
-        b.hub = hub_id; b.contributor = contrib_id; b.start_date = @start_date; b.end_date = @end_date
+        b.hub = hub_id; b.contributor = contrib_id; b.start_date = sec_start; b.end_date = sec_end
       }
     rescue => e
       Rails.logger.error(e); nil
@@ -101,8 +103,8 @@ class ContributorsController < ApplicationController
       {
         wp: WikimediaPreparationsPresenter.new(mc).contributor(hub_id, contrib_id),
         wa: WikimediaAnalyticsPresenter.new(
-              start_month: all_start.strftime("%Y-%m"),
-              end_month:   all_end.strftime("%Y-%m")
+              start_month: sec_start.strftime("%Y-%m"),
+              end_month:   sec_end.strftime("%Y-%m")
             ).contributor(hub_id, contrib_id),
         mc: MetadataCompletenessPresenter.new(mc).contributor(hub_id, contrib_id)
       }
@@ -123,7 +125,7 @@ class ContributorsController < ApplicationController
     @wa_data              = mc_data[:wa]
     @mc_data              = mc_data[:mc]
     @wikimedia_participant = WikimediaParticipant.participant?(hub_id, contrib_id)
-    @target               = Contributor.new(contrib_id, hub_id, all_start, all_end)
+    @target               = Contributor.new(contrib_id, hub_id, sec_start, sec_end)
 
     render partial: "shared/contributor_sections"
   end

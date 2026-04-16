@@ -397,6 +397,8 @@ table#comparison td:first-child {
 
 table#comparison th {
   cursor: pointer;
+  white-space: normal;
+  min-width: 4em;
 }
 
 table#comparison th.headerSortUp::after {
