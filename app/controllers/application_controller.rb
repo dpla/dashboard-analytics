@@ -23,7 +23,11 @@ class ApplicationController < ActionController::Base
     end
     return unless end_d < start_d
 
-    redirect_to params.to_unsafe_h.merge(start_date: params[:end_date], end_date: params[:start_date]),
+    swapped_query = request.query_parameters.merge(
+      "start_date" => params[:end_date],
+      "end_date"   => params[:start_date]
+    )
+    redirect_to "#{request.path}?#{swapped_query.to_query}",
                 flash: { alert: "End date was before start date — dates have been swapped." }
   end
 
