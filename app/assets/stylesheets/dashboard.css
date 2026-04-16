@@ -449,7 +449,10 @@ footer {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    white-space: nowrap;
+    width: max-content;
+    max-width: calc(100vw - 16px);
+    white-space: normal;
+    overflow-wrap: anywhere;
     background-color: #273443;
     color: #fff;
     text-align: center;
