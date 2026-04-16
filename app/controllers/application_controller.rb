@@ -15,9 +15,13 @@ class ApplicationController < ActionController::Base
     return unless params[:start_date] =~ /\A\d{4}-\d{2}\z/ &&
                   params[:end_date]   =~ /\A\d{4}-\d{2}\z/
 
-    start_d = Date.parse("#{params[:start_date]}-01") rescue nil
-    end_d   = Date.parse("#{params[:end_date]}-01")   rescue nil
-    return unless start_d && end_d && end_d < start_d
+    begin
+      start_d = Date.strptime("#{params[:start_date]}-01", "%Y-%m-%d")
+      end_d   = Date.strptime("#{params[:end_date]}-01", "%Y-%m-%d")
+    rescue ArgumentError
+      return
+    end
+    return unless end_d < start_d
 
     redirect_to params.to_unsafe_h.merge(start_date: params[:end_date], end_date: params[:start_date]),
                 flash: { alert: "End date was before start date — dates have been swapped." }
