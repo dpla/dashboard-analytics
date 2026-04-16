@@ -43,6 +43,13 @@
       <%= render partial: "shared/navigation" %>
     </header>
 
+    <% if flash[:alert] %>
+      <div class="alert-banner" role="alert"><%= flash[:alert] %></div>
+    <% end %>
+    <% if flash[:notice] %>
+      <div class="alert-banner" role="status"><%= flash[:notice] %></div>
+    <% end %>
+
     <%= yield %>
 
     <footer>
