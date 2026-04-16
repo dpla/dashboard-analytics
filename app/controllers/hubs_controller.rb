@@ -10,7 +10,7 @@ class HubsController < ApplicationController
   include TooltipsHelper
 
   def index
-    return redirect_to(hub_path(current_user.hub)) unless admin_for_all_hubs?
+    return redirect_to(hub_path(route_id(current_user.hub))) unless admin_for_all_hubs?
 
     assign_start_and_end_dates
     @hubs = Hub.all_with_counts
@@ -18,7 +18,7 @@ class HubsController < ApplicationController
 
   def show
     return render_not_found unless Hub.exists?(params[:id])
-    return redirect_to(hub_path(current_user.hub)) unless current_user.hub == params[:id] || admin_for_all_hubs?
+    return redirect_to(hub_path(route_id(current_user.hub))) unless current_user.hub == params[:id] || admin_for_all_hubs?
 
     assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)

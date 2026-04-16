@@ -6,13 +6,13 @@
         </li>
     <% else %>
         <li>
-          <%= link_to "Overview", hub_path(current_user.hub, date_opts) %>
+          <%= link_to "Overview", hub_path(route_id(current_user.hub), date_opts) %>
         </li>
         <% @hub ||= Hub.new(current_user.hub, "", "") %>
         <% if @hub.contributors.count > 1 %>
           <li>
             <%= link_to "Contributors",
-                hub_contributors_path(current_user.hub, date_opts) %>
+                hub_contributors_path(route_id(current_user.hub), date_opts) %>
           </li>
         <% end %>
     <% end %>

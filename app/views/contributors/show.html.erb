@@ -20,7 +20,7 @@
   <div class="data-content">
 
     <%= render_async_section hub_contributor_sections_path(
-          @contributor.hub.name, @contributor.name, date_opts) do %>
+          route_id(@contributor.hub.name), route_id(@contributor.name), date_opts) do %>
       <%= render partial: "shared/contributor_sections" %>
     <% end %>
 

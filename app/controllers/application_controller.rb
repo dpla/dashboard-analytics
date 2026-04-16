@@ -40,6 +40,14 @@ class ApplicationController < ActionController::Base
   end
   helper_method :admin_for_all_hubs?
 
+  # Encode literal slashes in hub/contributor names as %2F so they survive
+  # Rails' id: /[^\/]+/ route constraint during URL generation. The constraint
+  # prevents routing collisions but rejects raw "/" in path helper arguments.
+  def route_id(name)
+    name.to_s.gsub("/", "%2F")
+  end
+  helper_method :route_id
+
   def require_admin!
     unless current_user.admin
       flash[:alert] = "You don't have permission to do that."
