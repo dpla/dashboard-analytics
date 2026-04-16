@@ -259,6 +259,9 @@ class HubsController < ApplicationController
   private
 
   def authorize_hub_scope!
-    render_not_found unless Hub.exists?(params[:hub_id])
+    return render_not_found unless Hub.exists?(params[:hub_id])
+    return if current_user.hub == params[:hub_id] || admin_for_all_hubs?
+
+    head :forbidden
   end
 end
