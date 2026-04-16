@@ -1,0 +1,27 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "30c977c0ea52e6ec5be8fe9f621a184d191b539eb821d77f145af7cd6fce79d1",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/admin/users_controller.rb",
+      "line": 80,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:user).permit(:email, :admin, :hub, :password, :password_confirmation)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::UsersController",
+        "method": "user_params"
+      },
+      "user_input": ":admin",
+      "confidence": "High",
+      "cwe_id": [
+        915
+      ],
+      "note": "Intentional. Hub-scoped admins can promote users to admin within their own hub. Escalation to super-admin (hub=All) is not possible: manageable_users scopes all queries to the current user's hub, and user_params overrides the hub field server-side, so a hub-scoped admin cannot create a super-admin."
+    }
+  ]
+}

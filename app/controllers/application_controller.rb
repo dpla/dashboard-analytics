@@ -40,6 +40,13 @@ class ApplicationController < ActionController::Base
   end
   helper_method :admin_for_all_hubs?
 
+  def require_admin!
+    unless current_user.admin
+      flash[:alert] = "You don't have permission to do that."
+      redirect_to admin_user_path(current_user)
+    end
+  end
+
   def layout_by_resource
     if devise_controller?
       "devise"
