@@ -123,10 +123,13 @@ RSpec.describe "User management", :type => :request do
     end
 
     it "ignores a submitted hub value and locks update to the admin's own hub" do
+      new_email = "updated@example.com"
       patch "/admin/users/#{user.id}", params: {
-        user: { email: user.email, hub: "All", admin: "false" }
+        user: { email: new_email, hub: "All", admin: "false" }
       }
-      expect(user.reload.hub).to eq(hub_admin.hub)
+      user.reload
+      expect(user.email).to eq(new_email)
+      expect(user.hub).to eq(hub_admin.hub)
     end
   end
 end
