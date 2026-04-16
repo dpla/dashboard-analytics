@@ -9,6 +9,11 @@ class HubsController < ApplicationController
   include MetadataCompletenessHelper
   include TooltipsHelper
 
+  before_action :authorize_hub_scope!, only: %i[
+    sections website_overview api_overview bws_overview
+    item_count totals metadata_completeness wikimedia_overview
+  ]
+
   def index
     return redirect_to(hub_path(route_id(current_user.hub))) unless admin_for_all_hubs?
 
@@ -249,5 +254,14 @@ class HubsController < ApplicationController
     @target                = Hub.new(params[:hub_id], @start_date, @end_date)
 
     render partial: "shared/wikimedia_overview"
+  end
+
+  private
+
+  def authorize_hub_scope!
+    return render_not_found unless Hub.exists?(params[:hub_id])
+    return if current_user.hub == params[:hub_id] || admin_for_all_hubs?
+
+    head :forbidden
   end
 end
