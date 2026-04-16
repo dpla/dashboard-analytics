@@ -9,6 +9,17 @@ class ContributorsController < ApplicationController
   include MetadataCompletenessHelper
   include TooltipsHelper
 
+  before_action :authorize_contributor_scope!, only: %i[
+    sections
+    contributor_website_overview
+    contributor_api_overview
+    contributor_bws_overview
+    contributor_item_count
+    contributor_totals
+    contributor_metadata_completeness
+    contributor_wikimedia_overview
+  ]
+
   def index
     return render_not_found unless Hub.exists?(params[:hub_id])
 
@@ -380,5 +391,15 @@ class ContributorsController < ApplicationController
   rescue => e
     Rails.logger.error(e)
     render json: {}, status: :service_unavailable
+  end
+
+  private
+
+  def authorize_contributor_scope!
+    return render_not_found unless Hub.exists?(params[:hub_id])
+    return render_not_found unless Hub.contributor?(params[:hub_id], params[:contributor_id])
+    return if current_user.hub == params[:hub_id] || admin_for_all_hubs?
+
+    head :forbidden
   end
 end
