@@ -128,13 +128,13 @@
 <div class='download'>
   <%= link_to 'Download CSV', { controller: :contributors,
                                 action: params[:action],
-                                hub_id: params[:hub_id],
+                                hub_id: route_id(params[:hub_id]),
                                 format: :csv }.merge(date_opts) %>
 </div>
 
 <div class="comparison-table-wrapper">
 <table id='comparison'
-       data-ga-url="<%= contributor_ga_data_path({ hub_id: params[:hub_id] }.merge(date_opts)) %>">
+       data-ga-url="<%= contributor_ga_data_path({ hub_id: route_id(params[:hub_id]) }.merge(date_opts)) %>">
   <thead>
     <tr>
       <th>Contributor</th>
@@ -172,7 +172,7 @@
       <tr>
         <td>
           <%= link_to contributor, { controller: :contributors, action: :show,
-                                     hub_id: params[:hub_id], id: contributor }.merge(date_opts) %>
+                                     hub_id: route_id(params[:hub_id]), id: route_id(contributor) }.merge(date_opts) %>
         </td>
         <td class="website-view ga-loading"
             data-ga-contributor="<%= contributor %>"
