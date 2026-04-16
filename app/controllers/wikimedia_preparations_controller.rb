@@ -38,6 +38,7 @@ class WikimediaPreparationsController < ApplicationController
 
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
     @wp_data = wp_presenter.hub(params[:hub_id])
+    @item_count = Hub.item_count(params[:hub_id])
   end
 
   def initiate_contributor_wp_presenter
@@ -49,5 +50,6 @@ class WikimediaPreparationsController < ApplicationController
 
     wp_presenter = WikimediaPreparationsPresenter.new(metadata_completeness)
     @wp_data = wp_presenter.contributor(params[:hub_id], params[:contributor_id])
+    @item_count = Hub.item_count(params[:hub_id], params[:contributor_id])
   end
 end
