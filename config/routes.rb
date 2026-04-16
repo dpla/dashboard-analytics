@@ -23,7 +23,7 @@ Rails.application.routes.draw do
     post "wikimedia_cache/rebuild", to: "wikimedia_cache#rebuild"
   end
 
-  resources :hubs, id: /.*/, only: [:index, :show] do
+  resources :hubs, id: /[^\/]+/, only: [:index, :show] do
     get :sections
     get :website_overview
     get :api_overview
@@ -33,7 +33,7 @@ Rails.application.routes.draw do
     get :metadata_completeness
     get :wikimedia_overview
 
-    resources :contributors, id: /.*/, only: [:index, :show] do
+    resources :contributors, id: /[^\/]+/, only: [:index, :show] do
       get :sections
       get :contributor_website_overview
       get :contributor_api_overview
