@@ -66,6 +66,8 @@ class ContributorsController < ApplicationController
 
     hub_id     = params[:hub_id]
     contrib_id = params[:contributor_id]
+    return head :not_found if contrib_id.blank?
+
     all_start  = min_date
     all_end    = max_date
     sec_start  = params[:start_date].present? ? @start_date : all_start
