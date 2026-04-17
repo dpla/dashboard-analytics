@@ -37,8 +37,11 @@ module ApplicationHelper
     # Pass through whatever params are in the current request so date range
     # selections (including the current month) are preserved across navigation.
     # Return {} when no params are set so all-time links stay clean.
-    return {} unless params[:start_date].present?
+    return {} unless date_range_active?
 
-    { start_date: current_start_date, end_date: current_end_date }
+    opts = {}
+    opts[:start_date] = current_start_date if params[:start_date].present?
+    opts[:end_date]   = current_end_date   if params[:end_date].present?
+    opts
   end
 end
