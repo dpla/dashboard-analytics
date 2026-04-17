@@ -73,6 +73,13 @@ class ContributorsController < ApplicationController
     end_date           = @end_date
 
     @item_count = Hub.item_count(hub_id, contrib_id)
+    website_views_t = Thread.new do
+      WebsiteOverview.build { |b|
+        b.hub = hub_id; b.contributor = contrib_id; b.start_date = all_start; b.end_date = all_end
+      }.events
+    rescue => e
+      Rails.logger.error(e); nil
+    end
     wiki_views_t = Thread.new do
       WikimediaAnalyticsPresenter.new(
         start_month: all_start.strftime("%Y-%m"), end_month: all_end.strftime("%Y-%m")
@@ -114,12 +121,12 @@ class ContributorsController < ApplicationController
       Rails.logger.error(e); {}
     end
 
-    [wiki_views_t,
+    [website_views_t, wiki_views_t,
      website_overview_t, website_events_t, mc_thread].each(&:join)
 
     mc_data = mc_thread.value || {}
 
-    @website_views        = website_overview_t.value&.events
+    @website_views        = website_views_t.value
     @wikimedia_views      = wiki_views_t.value
     @website_overview     = website_overview_t.value
     @website_event_totals = website_events_t.value
