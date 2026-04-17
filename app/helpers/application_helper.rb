@@ -15,8 +15,10 @@ module ApplicationHelper
     render_async(path, { error_message: default_error }.merge(options), &block)
   end
 
+  # Returns nil when no start_date param is present so the date dropdown
+  # shows the first available option (earliest month) rather than the current month.
   def current_start_date
-    @start_date.strftime("%Y-%m") rescue nil
+    params[:start_date].present? ? (@start_date.strftime("%Y-%m") rescue nil) : nil
   end
 
   def current_end_date
@@ -32,10 +34,10 @@ module ApplicationHelper
   end
 
   def date_opts
-    # The default view (no params) always shows the current month. Omit params
-    # from links when the selected range matches the default so URLs stay clean.
-    current_month = Date.current.strftime("%Y-%m")
-    return {} if current_start_date == current_month && current_end_date == current_month
+    # Pass through whatever params are in the current request so date range
+    # selections (including the current month) are preserved across navigation.
+    # Return {} when no params are set so all-time links stay clean.
+    return {} unless params[:start_date].present?
 
     { start_date: current_start_date, end_date: current_end_date }
   end
