@@ -61,7 +61,7 @@ class MetadataCompleteness
   # If no data is available for that month, get the previous month.
   # Continue trying until data is available or min date is surpassed.
   #
-  # @return Aws::S3::Types::GetObjectOutput
+  # @return [Aws::S3::Types::GetObjectOutput, nil]
   #
   def sThree_response(file_name)
     date = @end_date
