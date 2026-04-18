@@ -51,6 +51,7 @@ class GaResponseBuilder
       Ga4Response.new(report, b.dimensions, b.metrics)
     end
   rescue Google::Apis::AuthorizationError
+    raise unless service
     service.authorization = GaAuthorizer.credentials
     retry
   rescue => e

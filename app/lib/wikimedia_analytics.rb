@@ -78,7 +78,7 @@ class WikimediaAnalytics
       if key
         begin
           response = SThreeResponseBuilder.response(key)
-        rescue Aws::S3::Errors::NoSuchKey => e
+        rescue Aws::S3::Errors::NoSuchKey
           Rails.logger.debug("#{key} does not exist.")
           # Loop continues
         rescue StandardError => e

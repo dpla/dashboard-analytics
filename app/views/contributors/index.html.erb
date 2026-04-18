@@ -2,7 +2,7 @@
 
 <script>
   function toggle_column(element) {
-    els = document.getElementsByClassName(element.value);
+    var els = document.getElementsByClassName(element.value);
 
     if (element.checked == true) {
       Array.prototype.forEach.call(els, function(el) {
