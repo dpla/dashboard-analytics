@@ -22,7 +22,8 @@ module ApplicationHelper
   end
 
   def current_end_date
-    @end_date.strftime("%Y-%m") rescue nil
+    return nil unless @end_date.respond_to?(:strftime)
+    @end_date.strftime("%Y-%m")
   end
 
   ##
