@@ -18,7 +18,7 @@ module ApplicationHelper
   # Returns nil when no start_date param is present so the date dropdown
   # shows the first available option (earliest month) rather than the current month.
   def current_start_date
-    return nil unless params[:start_date].present? && @start_date.present?
+    return nil unless params[:start_date].present? && @start_date.respond_to?(:strftime)
 
     @start_date.strftime("%Y-%m")
   end
