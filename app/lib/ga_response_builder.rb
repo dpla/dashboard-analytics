@@ -38,26 +38,32 @@ class GaResponseBuilder
   def self.batch_responses(builders)
     return [] if builders.empty?
 
-    service = builders.first.analytics
-    service.authorization = GaAuthorizer.credentials
+    retries = 0
+    service  = nil
+    begin
+      service = builders.first.analytics
+      service.authorization = GaAuthorizer.credentials
 
-    property = "properties/#{Settings.google_analytics.property_id}"
-    requests = builders.map { |b| b.build_request(b.offset) }
-    batch_req = Google::Apis::AnalyticsdataV1beta::BatchRunReportsRequest.new(requests: requests)
-    batch_resp = service.batch_property_run_reports(property, batch_req)
+      property  = "properties/#{Settings.google_analytics.property_id}"
+      requests  = builders.map { |b| b.build_request(b.offset) }
+      batch_req = Google::Apis::AnalyticsdataV1beta::BatchRunReportsRequest.new(requests: requests)
+      batch_resp = service.batch_property_run_reports(property, batch_req)
 
-    batch_resp.reports.each_with_index.map do |report, i|
-      b = builders[i]
-      Ga4Response.new(report, b.dimensions, b.metrics)
+      batch_resp.reports.each_with_index.map do |report, i|
+        b = builders[i]
+        Ga4Response.new(report, b.dimensions, b.metrics)
+      end
+    rescue Google::Apis::AuthorizationError
+      raise unless service
+      retries += 1
+      raise if retries > 3
+      service.authorization = GaAuthorizer.credentials
+      retry
+    rescue => e
+      Rails.logger.error(e)
+      Sentry.capture_exception(e)
+      raise
     end
-  rescue Google::Apis::AuthorizationError
-    raise unless service
-    service.authorization = GaAuthorizer.credentials
-    retry
-  rescue => e
-    Rails.logger.error(e)
-    Sentry.capture_exception(e)
-    raise
   end
 
   # GA4 API read timeout. Chosen to be well under the ALB's 60s idle timeout so
@@ -95,14 +101,19 @@ class GaResponseBuilder
   def response
     return nil if @metrics.empty?
 
-    result = @analytics.run_property_report(property_id, build_request(@offset))
-    Ga4Response.new(result, @dimensions, @metrics)
-  rescue Google::Apis::AuthorizationError
-    authorize
-    retry
-  rescue => e
-    Rails.logger.error(e)
-    raise
+    retries = 0
+    begin
+      result = @analytics.run_property_report(property_id, build_request(@offset))
+      Ga4Response.new(result, @dimensions, @metrics)
+    rescue Google::Apis::AuthorizationError
+      retries += 1
+      raise if retries > 3
+      authorize
+      retry
+    rescue => e
+      Rails.logger.error(e)
+      raise
+    end
   end
 
   def multi_page_response(max_pages: 10)
