@@ -61,13 +61,13 @@ class MetadataCompleteness
   # If no data is available for that month, get the previous month.
   # Continue trying until data is available or min date is surpassed.
   #
-  # @return Aws::S3::Types::GetObjectOutput
+  # @return [Aws::S3::Types::GetObjectOutput, nil]
   #
   def sThree_response(file_name)
     date = @end_date
     response = nil
 
-    while response == nil
+    while response.nil?
       break if date < min_date
 
       # File path in format YYYY/MM/filename.csv
@@ -78,7 +78,7 @@ class MetadataCompleteness
         csv_files = SThreeResponseBuilder.list(prefix).contents
           .select{ |c| c.key.ends_with?(".csv") }
         key = csv_files.first.key unless csv_files.empty?
-      rescue Exception => e
+      rescue StandardError => e
         Rails.logger.debug(e)
         break
       end
@@ -89,18 +89,18 @@ class MetadataCompleteness
         rescue Aws::S3::Errors::NoSuchKey
           Rails.logger.debug("#{key} does not exist.")
           # Loop continues
-        rescue Exception => e
+        rescue StandardError => e
           Rails.logger.debug(e)
           break
         end
       end
 
-      date = date.last_month
+      date = date.last_month unless response
     end
 
     # set @file_date to the date for which a file was found in AWS
-    @file_date = date
-    return response
+    @file_date = response ? date : nil
+    response
   end
 
   ##
