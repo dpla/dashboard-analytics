@@ -23,8 +23,12 @@
     </header>
 
     <main>
-      <p class="notice"><%= notice %></p>
-      <p class="alert"><%= alert %></p>
+      <% if notice.present? %>
+        <div class="alert-banner" role="status"><%= notice %></div>
+      <% end %>
+      <% if alert.present? %>
+        <div class="alert-banner" role="alert"><%= alert %></div>
+      <% end %>
 
       <%= yield %>
     </main>
