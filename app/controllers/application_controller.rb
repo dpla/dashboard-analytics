@@ -40,11 +40,12 @@ class ApplicationController < ActionController::Base
   end
   helper_method :admin_for_all_hubs?
 
-  # Encode literal slashes in hub/contributor names as %2F so they survive
-  # Rails' id: /[^\/]+/ route constraint during URL generation. The constraint
-  # prevents routing collisions but rejects raw "/" in path helper arguments.
+  # Double-encode slashes so they survive Rack's path decoding on the way in.
+  # Rack decodes %252F → %2F before routing (no literal slash, constraint passes),
+  # then Rails decodes %2F → / when setting params[:id]. Single %2F fails because
+  # Rack decodes it to a literal slash which breaks the [^\/]+ route constraint.
   def route_id(name)
-    name.to_s.gsub("/", "%2F")
+    name.to_s.gsub("/", "%252F")
   end
   helper_method :route_id
 
