@@ -23,11 +23,11 @@ class WebsiteEventsPresenter  < GaResponsePresenter
   end
 
   def id(row)
-    row[columns.index("ga:eventLabel")].split(" : ").first rescue nil
+    row[columns.index("ga:eventLabel")].split(" : ").first&.strip rescue nil
   end
 
   def title(row)
-    row[columns.index("ga:eventLabel")].split(" : ").last rescue nil
+    row[columns.index("ga:eventLabel")].split(" : ").last&.strip rescue nil
   end
 
   def count(row)
