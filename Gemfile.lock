@@ -195,7 +195,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-schema (>= 1.12, < 2)
       zeitwerk (~> 2.6)
-    erb (4.0.4)
+    erb (4.0.4.1)
       cgi (>= 0.3.3)
     erubi (1.13.1)
     execjs (2.8.1)
