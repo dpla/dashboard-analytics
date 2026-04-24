@@ -16,7 +16,7 @@ class DplaApiResponseBuilder
     return {} if ids.empty?
 
     result = {}
-    ids.uniq.compact.each_slice(50) do |batch|
+    ids.filter_map { |id| id&.strip.presence }.uniq.each_slice(50) do |batch|
       begin
         docs = json_response("/items/#{batch.join(',')}", query: { api_key: api_key })['docs'] || []
         docs.each do |doc|

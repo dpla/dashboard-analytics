@@ -166,7 +166,7 @@ If the pipeline fails at any stage, print the stage name and stop. Don't attempt
 ## Step 6: Verify the site
 
 ```bash
-curl -o /dev/null -s -w "%{http_code}" https://analytics-dashboard.dp.la
+curl -o /dev/null -s -w "%{http_code}" -A "Mozilla/5.0" https://analytics-dashboard.dp.la
 ```
 
 - `200` or `302` → success (302 is a redirect to the login page, which is normal)
