@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, prepend: true
   before_action :authenticate_user!
+  before_action :normalize_encoded_params
   before_action :redirect_inverted_date_range
   layout :layout_by_resource
 
@@ -8,6 +9,16 @@ class ApplicationController < ActionController::Base
               Timeout::Error, with: :handle_service_error
 
   private
+
+  ENCODED_PARAM_KEYS = %i[id hub_id contributor_id].freeze
+
+  def normalize_encoded_params
+    return unless request.get? || request.head?
+
+    ENCODED_PARAM_KEYS.each do |key|
+      params[key] = CGI.unescape(params[key]) if params[key]
+    end
+  end
 
   def redirect_inverted_date_range
     return unless request.get? || request.head?
@@ -40,12 +51,12 @@ class ApplicationController < ActionController::Base
   end
   helper_method :admin_for_all_hubs?
 
-  # Double-encode slashes so they survive Rack's path decoding on the way in.
-  # Rack decodes %252F → %2F before routing (no literal slash, constraint passes),
-  # then Rails decodes %2F → / when setting params[:id]. Single %2F fails because
-  # Rack decodes it to a literal slash which breaks the [^\/]+ route constraint.
+  # Encode literal slashes as %2F so the string passes Rails' [^\/]+ route
+  # constraint during URL generation. Rails' escape_segment then re-encodes
+  # the % to %25, producing %252F in the final URL. normalize_encoded_params
+  # runs a second CGI.unescape on inbound params to reverse that extra layer.
   def route_id(name)
-    name.to_s.gsub("/", "%252F")
+    name.to_s.gsub("/", "%2F")
   end
   helper_method :route_id
 
