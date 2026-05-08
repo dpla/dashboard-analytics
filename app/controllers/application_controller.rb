@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
     return unless request.get? || request.head?
 
     ENCODED_PARAM_KEYS.each do |key|
-      params[key] = CGI.unescape(params[key]) if params[key]
+      params[key] = CGI.unescape(params[key]) if params[key].is_a?(String)
     end
   end
 
@@ -47,7 +47,7 @@ class ApplicationController < ActionController::Base
   end
 
   def admin_for_all_hubs?
-    current_user.admin && current_user.hub == "All"
+    current_user.admin? && current_user.hub == "All"
   end
   helper_method :admin_for_all_hubs?
 

@@ -40,14 +40,14 @@ class MetadataCompleteness
 
   def hub_csv
     @hub_csv ||= Rails.cache.fetch("mc_csv:hub:#{@end_date}", expires_in: 24.hours) do
-      response = sThree_response("provider.csv")
+      response = s3_response("provider.csv")
       response ? csv_data(response).to_a : []
     end
   end
 
   def contributor_csv
     @contributor_csv ||= Rails.cache.fetch("mc_csv:contributor:#{@end_date}", expires_in: 24.hours) do
-      response = sThree_response("contributor.csv")
+      response = s3_response("contributor.csv")
       response ? csv_data(response).to_a : []
     end
   end
@@ -63,7 +63,7 @@ class MetadataCompleteness
   #
   # @return [Aws::S3::Types::GetObjectOutput, nil]
   #
-  def sThree_response(file_name)
+  def s3_response(file_name)
     date = @end_date
     response = nil
 
@@ -113,7 +113,7 @@ class MetadataCompleteness
   end
 
   ##
-  # Minimum data that data is expected to be available.
+  # Minimum date that data is expected to be available.
   # @return Date
   def min_date
     Date.new(Settings.mc_min_date.year.to_i, Settings.mc_min_date.month.to_i)
