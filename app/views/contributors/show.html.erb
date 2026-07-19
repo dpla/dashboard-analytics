@@ -21,6 +21,7 @@
 
     <%= render_async_section hub_contributor_sections_path(
           route_id(@contributor.hub.name), route_id(@contributor.name), date_opts) do %>
+      <%= render "shared/loading", message: "Loading metrics…" %>
       <%= render partial: "shared/contributor_sections" %>
     <% end %>
 

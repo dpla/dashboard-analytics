@@ -15,34 +15,38 @@
     }
   }
 
-  document.addEventListener("contributor-comparison-loaded", function() {
-    var table = document.getElementById("comparison");
-    if (!table) return;
-    var gaUrl = table.dataset.gaUrl;
-    if (!gaUrl) return;
+  // Turbo re-runs body scripts on every visit; register the listener once.
+  if (!window.gaDataListenerInstalled) {
+    window.gaDataListenerInstalled = true;
+    document.addEventListener("contributor-comparison-loaded", function() {
+      var table = document.getElementById("comparison");
+      if (!table) return;
+      var gaUrl = table.dataset.gaUrl;
+      if (!gaUrl) return;
 
-    var gaCells = document.querySelectorAll("[data-ga-contributor]");
-    fetch(gaUrl, { credentials: "same-origin", headers: { "Accept": "application/json" } })
-      .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
-      .then(function(data) {
-        gaCells.forEach(function(td) {
-          var contributor = td.dataset.gaContributor;
-          var field       = td.dataset.gaField;
-          var row         = data[contributor];
-          td.classList.remove("ga-loading");
-          if (row && row[field] !== undefined) {
-            td.textContent = row[field].toLocaleString();
-          }
+      var gaCells = document.querySelectorAll("[data-ga-contributor]");
+      fetch(gaUrl, { credentials: "same-origin", headers: { "Accept": "application/json" } })
+        .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function(data) {
+          gaCells.forEach(function(td) {
+            var contributor = td.dataset.gaContributor;
+            var field       = td.dataset.gaField;
+            var row         = data[contributor];
+            td.classList.remove("ga-loading");
+            if (row && row[field] !== undefined) {
+              td.textContent = row[field].toLocaleString();
+            }
+          });
+        })
+        .catch(function(err) {
+          console.warn("GA data fetch failed:", err);
+          gaCells.forEach(function(td) {
+            td.classList.remove("ga-loading");
+            td.textContent = "—";
+          });
         });
-      })
-      .catch(function(err) {
-        console.warn("GA data fetch failed:", err);
-        gaCells.forEach(function(td) {
-          td.classList.remove("ga-loading");
-          td.textContent = "—";
-        });
-      });
-  });
+    });
+  }
 </script>
 
 <div class="heading">
@@ -59,8 +63,9 @@
 
   <h2>Contributors</h2>
 
-  <%= render_async_section contributor_comparison_path({ hub_id: params[:hub_id] }.merge(date_opts)),
+  <%= render_async_section contributor_comparison_path({ hub_id: params[:hub_id] }.merge(date_opts).merge(page_opts)),
                            event_name: "contributor-comparison-loaded" do %>
+    <%= render "shared/loading", message: "Loading contributor data…" %>
     <table>
       <thead>
         <tr>

@@ -1,0 +1,17 @@
+<%# Prev/next nav. Locals: total (row count across all pages),
+    page_url (lambda: page number -> URL). %>
+<% total_pages = (total.to_i / PaginationHelper::PAGE_SIZE.to_f).ceil %>
+<% if total_pages > 1 %>
+  <nav class="pagination" aria-label="Pagination">
+    <% if current_page > 1 %>
+      <%# Clamp so Previous works from past-the-end URLs. %>
+      <%= link_to "← Previous", page_url.call([current_page - 1, total_pages].min) %>
+    <% end %>
+    <span class="pagination-status">
+      Page <%= number_with_delimiter(current_page) %> of <%= number_with_delimiter(total_pages) %>
+    </span>
+    <% if current_page < total_pages %>
+      <%= link_to "Next →", page_url.call(current_page + 1) %>
+    <% end %>
+  </nav>
+<% end %>

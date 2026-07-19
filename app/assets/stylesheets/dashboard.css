@@ -13,8 +13,48 @@ body, button, input, label, select, textarea {
   display: none;
 }
 
+/* LOADING STATES */
+
+/* Placeholder shown while an async section loads. */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 0;
+  color: #515354;
+  font-size: 0.95em;
+}
+
+.loading-indicator .spinner {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e9dec8;
+  border-top-color: #2c7da0;
+  border-radius: 50%;
+  animation: dashboard-spin 0.8s linear infinite;
+}
+
+/* Cells still waiting on the async GA fetch */
 .ga-loading {
-  color: #666;
+  color: #999;
+  animation: dashboard-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes dashboard-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dashboard-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-indicator .spinner,
+  .ga-loading {
+    animation: none;
+  }
 }
 
 .clear {
@@ -436,6 +476,20 @@ form.comparison legend {
   display: inline-block;
   float: left;
   margin-bottom: 10px;
+}
+
+/* Count line below the floated column pickers */
+.comparison-count {
+  clear: both;
+  margin-bottom: 10px;
+}
+
+nav.pagination {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  clear: both;
+  margin: 15px 0;
 }
 
 footer {

@@ -21,6 +21,7 @@ class WebsiteSearchTerms
   def initialize
     @start_date = nil
     @end_date = nil
+    @page = nil
   end
 
   def start_date=(start_date)
@@ -31,6 +32,11 @@ class WebsiteSearchTerms
     @end_date = end_date
   end
 
+  # 1-based page for #response; CSV exports are unaffected.
+  def page=(page)
+    @page = page
+  end
+
   ##
   # Lazy load single-page response.
   # Return nil if response fails.
@@ -38,7 +44,7 @@ class WebsiteSearchTerms
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+    @response ||= Rails.cache.fetch("#{cache_key}:page#{@page}", expires_in: 2.hours) do
       search_terms_builder.response
     end
   rescue => e
@@ -95,6 +101,7 @@ class WebsiteSearchTerms
       builder.metrics = %w(ga:searchUniques)
       builder.dimensions = %w(ga:searchKeyword)
       builder.sort = %w(-ga:searchUniques) # Descending
+      builder.page = @page
     end
   end
 

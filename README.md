@@ -18,6 +18,7 @@ A Rails application that aggregates analytics data from multiple sources to prov
   - [Pages and Routes](#pages-and-routes)
   - [User and Permission Model](#user-and-permission-model)
   - [Date Range Handling](#date-range-handling)
+  - [Table Pagination](#table-pagination)
   - [Async Rendering](#async-rendering)
   - [Data Builders and Presenters](#data-builders-and-presenters)
 - [Wikimedia Cache System](#wikimedia-cache-system)
@@ -231,6 +232,12 @@ All data views support a `start_date` / `end_date` URL parameter pair in `YYYY-M
 When no params are provided, the date range defaults to all-time data. The `DateSetter` concern (included by all controllers) parses and validates these params, clamping them to the configured `min_date` and the current date.
 
 Links between pages preserve the selected date range.
+
+---
+
+### Table Pagination
+
+Large tables — website events, search terms, the contributors list, and the contributor comparison — paginate at 50 rows (`PaginationHelper::PAGE_SIZE`) via a `page` URL parameter, with previous/next controls below each table. GA4-backed tables fetch one page per request via the GA4 `offset`/`limit` parameters; contributor tables slice the S3-cached list in memory. CSV downloads always export the complete dataset.
 
 ---
 

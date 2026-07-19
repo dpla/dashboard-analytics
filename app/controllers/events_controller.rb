@@ -6,6 +6,7 @@ class EventsController < ApplicationController
   # View helpers
   include DataMenuHelper
   include DateHelper
+  include PaginationHelper
 
   def show
     assign_start_and_end_dates
@@ -57,6 +58,7 @@ class EventsController < ApplicationController
         builder.start_date = @start_date
         builder.end_date = @end_date
         builder.event_name = website_event_names[params[:event_id]]
+        builder.page = current_page
       end
 
     @events = WebsiteEventsPresenter.new(events)

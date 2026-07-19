@@ -44,8 +44,14 @@ class WebsiteEventsPresenter  < GaResponsePresenter
       csv << attributes
 
       multi_page_response.each do |response|
+        # Look up names per export page; item_contributor_lookup only covers
+        # the displayed page.
+        lookup = DplaApiResponseBuilder.new
+          .data_providers_for_items(response.rows.filter_map { |row| id(row) })
+
         response.rows.each do |row|
-          csv << [title(row), id(row), contributor(row), count(row)]
+          name = lookup[id(row)] || row[columns.index("ga:eventAction")]
+          csv << [title(row), id(row), name, count(row)]
         end
       end
     end
