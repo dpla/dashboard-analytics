@@ -19,6 +19,7 @@
   <div class="data-content">
 
     <%= render_async_section hub_sections_path(route_id(@hub.name), date_opts) do %>
+      <%= render "shared/loading", message: "Loading metrics…" %>
       <%= render partial: "shared/hub_sections" %>
     <% end %>
 

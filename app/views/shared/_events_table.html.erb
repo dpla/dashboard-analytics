@@ -5,11 +5,10 @@
     <%= find_tooltip(params[:event_id]) %>
   </div>
 
-  <% if @events.rows.count > 0 %>
+  <% if @events.total_results.to_i > 0 %>
 
   <div class="result-info">
-    Showing <%= @events.start_index %>-<%= @events.end_index %> of 
-    <%= @events.total_results %> items.
+    <%= page_window(@events.total_results, @events.rows.count, "items") %>
   </div>
 
   <div class="download">
@@ -45,6 +44,17 @@
     </tr>
     <% end %>
   </table>
+
+  <% page_url = ->(page) {
+       url_for({ controller: :events,
+                 action: :show,
+                 hub_id: route_id(params[:hub_id]),
+                 contributor_id: params[:contributor_id] && route_id(params[:contributor_id]),
+                 id: params[:event_id],
+                 page: page }.merge(date_opts))
+     } %>
+  <%= render "shared/pagination", total: @events.total_results, page_url: page_url %>
+
   <% else %>
     No activity to report from this time period.
   <% end %>

@@ -25,6 +25,7 @@ class WebsiteEvents
     @start_date = nil
     @end_date = nil
     @event_name = nil
+    @page = nil
   end
 
   def hub=(hub)
@@ -51,6 +52,11 @@ class WebsiteEvents
     @event_name
   end
 
+  # 1-based page for #response; CSV exports are unaffected.
+  def page=(page)
+    @page = page
+  end
+
   ##
   # Lazy load single-page response.
   # Return nil if response fails.
@@ -58,7 +64,7 @@ class WebsiteEvents
   # @return [Google::Apis::AnalyticsV3::GaData] | nil
   #
   def response
-    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+    @response ||= Rails.cache.fetch("#{cache_key}:page#{@page}", expires_in: 2.hours) do
       events_builder.response
     end
   rescue => e
@@ -100,6 +106,7 @@ class WebsiteEvents
       builder.dimensions = %w(ga:eventLabel ga:eventAction)
       builder.filters = filters
       builder.sort = %w(-ga:totalEvents) # Descending
+      builder.page = @page
     end
   end
 

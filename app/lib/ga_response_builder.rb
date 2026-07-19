@@ -70,6 +70,9 @@ class GaResponseBuilder
   # that slow queries fail fast and return a graceful error rather than a 504.
   GA4_READ_TIMEOUT_SEC = 25
 
+  # Max rows per GA4 report request; page size for full exports.
+  DEFAULT_PAGE_LIMIT = 10_000
+
   def initialize
     @analytics = Google::Apis::AnalyticsdataV1beta::AnalyticsDataService.new
     @analytics.client_options.read_timeout_sec = GA4_READ_TIMEOUT_SEC
@@ -80,6 +83,7 @@ class GaResponseBuilder
     @start_date = nil
     @end_date   = nil
     @offset     = 0
+    @limit      = DEFAULT_PAGE_LIMIT
   end
 
   # profile_id and segment are UA concepts — accepted for interface compatibility but ignored
@@ -87,6 +91,13 @@ class GaResponseBuilder
   def segment=(segment); end
 
   def start_index=(idx); @offset = [idx.to_i - 1, 0].max; end
+
+  # 1-based page; sets offset/limit to fetch a single page of rows.
+  def page=(page)
+    return unless page
+    @offset = (page - 1) * PaginationHelper::PAGE_SIZE
+    @limit  = PaginationHelper::PAGE_SIZE
+  end
   def start_date=(v); @start_date = v; end
   def end_date=(v); @end_date = v; end
   def metrics=(v); @metrics = Array(v); end
@@ -98,12 +109,12 @@ class GaResponseBuilder
     @analytics.authorization = GaAuthorizer.credentials
   end
 
-  def response
+  def response(offset: @offset, limit: @limit)
     return nil if @metrics.empty?
 
     retries = 0
     begin
-      result = @analytics.run_property_report(property_id, build_request(@offset))
+      result = @analytics.run_property_report(property_id, build_request(offset, limit))
       Ga4Response.new(result, @dimensions, @metrics)
     rescue Google::Apis::AuthorizationError
       retries += 1
@@ -119,12 +130,12 @@ class GaResponseBuilder
   def multi_page_response(max_pages: 10)
     results = []
     offset  = 0
-    limit   = 10_000
+    # Exports always use full-size pages, ignoring any display limit.
+    limit   = DEFAULT_PAGE_LIMIT
     page    = 0
 
     loop do
-      @offset = offset
-      resp = response
+      resp = response(offset: offset, limit: limit)
       break unless resp&.rows&.any?
       results << resp
       page += 1
@@ -148,14 +159,14 @@ class GaResponseBuilder
 
   attr_reader :analytics, :dimensions, :metrics, :offset
 
-  def build_request(offset)
+  def build_request(offset, limit = @limit)
     params = {
       metrics:             ga4_metric_names.map { |m| Google::Apis::AnalyticsdataV1beta::Metric.new(name: m) },
       dimensions:          ga4_dimension_names.map { |d| Google::Apis::AnalyticsdataV1beta::Dimension.new(name: d) },
       date_ranges:         [Google::Apis::AnalyticsdataV1beta::DateRange.new(start_date: @start_date, end_date: @end_date)],
       metric_aggregations: ['TOTAL'],
       keep_empty_rows:     false,
-      limit:               10_000,
+      limit:               limit,
       offset:              offset
     }
     # Only include optional collection fields when non-nil; passing nil for a
@@ -250,7 +261,6 @@ class GaResponseBuilder
   # UA GaData response, minimising changes to callers.
   class Ga4Response
     ColumnHeader = Struct.new(:name)
-    QueryStub    = Struct.new(:start_index)
     def initialize(ga4_response, dimension_names, metric_names)
       @response        = ga4_response
       @dimension_names = dimension_names
@@ -287,19 +297,9 @@ class GaResponseBuilder
       (@dimension_names + @metric_names).map { |n| ColumnHeader.new(n) }
     end
 
+    # Total matching rows, regardless of limit/offset.
     def total_results
       @response&.row_count || 0
-    end
-
-    # GA4 returns all rows at once; expose total as items_per_page so
-    # the "Showing X-Y of Z" pagination UI shows the full count.
-    def items_per_page
-      total_results
-    end
-
-    # Provides response.query.start_index = 1 for the pagination UI.
-    def query
-      QueryStub.new(1)
     end
 
     def row_count

@@ -25,13 +25,13 @@
 
         <% if params[:id] == "website" %>
 
-          <%= render_async_section website_search_terms_path(date_opts) do %>
-            <div>Loading...</div>
+          <%= render_async_section website_search_terms_path(date_opts.merge(page_opts)) do %>
+            <%= render "shared/loading", message: "Loading search terms…" %>
           <% end %>
 
         <% elsif params[:id] == "api" %>
            <%= render_async_section api_search_terms_path(date_opts) do %>
-            <div>Loading...</div>
+            <%= render "shared/loading", message: "Loading search terms…" %>
           <% end %>
 
         <% else %>

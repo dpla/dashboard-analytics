@@ -10,22 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_22_170610) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_03_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "wikimedia_cache", force: :cascade do |t|
-    t.string "hub", null: false
-    t.string "contributor", null: false, default: ""
-    t.string "month", null: false
-    t.integer "upload_count"
-    t.integer "page_views"
-    t.integer "files_used"
-    t.integer "pages_enhanced"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["hub", "contributor", "month"], name: "idx_wikimedia_cache_hub_contributor_month", unique: true
-  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -46,4 +33,25 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_22_170610) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "wikimedia_cache", force: :cascade do |t|
+    t.string "hub", null: false
+    t.string "contributor", default: "", null: false
+    t.string "month", null: false
+    t.integer "upload_count"
+    t.integer "page_views"
+    t.integer "files_used"
+    t.integer "pages_enhanced"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hub", "contributor", "month"], name: "index_wikimedia_cache_on_hub_and_contributor_and_month", unique: true
+  end
+
+  create_table "wikimedia_participants", force: :cascade do |t|
+    t.string "hub", null: false
+    t.string "contributor", null: false
+    t.boolean "participant", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hub", "contributor"], name: "index_wikimedia_participants_on_hub_and_contributor", unique: true
+  end
 end

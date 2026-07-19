@@ -8,6 +8,7 @@ class ContributorsController < ApplicationController
   include DateHelper
   include MetadataCompletenessHelper
   include TooltipsHelper
+  include PaginationHelper
 
   before_action :authorize_contributor_scope!, only: %i[
     sections
@@ -30,7 +31,7 @@ class ContributorsController < ApplicationController
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
     begin
-      @contributors_item_count = Hub.contributors_item_count(params[:hub_id])
+      @contributors_item_count = page_of_contributors(params[:hub_id])
     rescue => e
       Rails.logger.error(e)
       @contributors_item_count = []
@@ -307,6 +308,10 @@ class ContributorsController < ApplicationController
     contributors_item_count = Hub.contributors_item_count(hub_id)
     bws_item_count          = Hub.contributors_bws_item_count(hub_id)
 
+    # The HTML table shows one page of contributors; CSV exports all of them.
+    @total_contributors = contributors_item_count.count
+    contributors_item_count = paginate(contributors_item_count) unless request.format.csv?
+
     # For HTML the GA website columns load async via contributor_ga_data; pass nil
     # so the table renders immediately from fast S3/DB caches.
     # For CSV exports, prefetch GA data so the download is complete.
@@ -385,7 +390,7 @@ class ContributorsController < ApplicationController
     overview_data = website_overview.parse_data
     events_data   = website_events.parse_data
 
-    result = Hub.contributors_item_count(hub_id).each_with_object({}) do |c, hash|
+    result = page_of_contributors(hub_id).each_with_object({}) do |c, hash|
       contributor = c["term"]
       ga_key      = contributor[0, GaResponseBuilder::GA4_EVENT_NAME_MAX_LENGTH]
       ov          = overview_data[ga_key] || {}
@@ -405,6 +410,11 @@ class ContributorsController < ApplicationController
   end
 
   private
+
+  # One page of the hub's contributors
+  def page_of_contributors(hub_id)
+    paginate(Hub.contributors_item_count(hub_id))
+  end
 
   def authorize_contributor_scope!
     return render_not_found unless Hub.exists?(params[:hub_id])
