@@ -8,12 +8,12 @@ google_analytics:
   tracking_id: <%= ENV["TRACKING_ID"] %>
 
 dpla_api:
-  # include trailing backslash
-  base_uri: api.dp.la/v2/
+  # include trailing slash
+  base_uri: https://api.dp.la/v2/
   key: <%= ENV["DPLA_API_KEY"] %>
 
 dpla:
-  # include trailing backslash
+  # include trailing slash
   base_uri: https://dp.la/
 
 s3:
