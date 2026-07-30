@@ -127,7 +127,7 @@ hub-stats/
   item_data_providers.json  ← item ID → contributor name (cumulative)
 ```
 
-[`scripts/generate_hub_stats.py`](scripts/generate_hub_stats.py) builds all three from Elasticsearch and GA4. Run it on the ingest EC2 after each monthly index rebuild, on day 5 of the month or later. The Rails readers (`HubStats`, `ItemDataProviders`) cache each file for 24 hours and alert through Sentry when a file is missing or more than 45 days old.
+`generate_hub_stats.py`, in the [dpla/ingestion3](https://github.com/dpla/ingestion3) repo, builds all three from Elasticsearch and GA4. It runs on the ingest EC2 after each monthly index rebuild, on day 5 of the month or later (GA4 revises the just-ended month for about 72 hours). The Rails readers (`HubStats`, `ItemDataProviders`) cache each file for 24 hours and alert through Sentry when a file is missing or more than 45 days old.
 
 `WarmComparisonCacheJob` pre-warms the GA4 response cache for all hubs. Run it monthly as a one-off ECS task: `bundle exec rails cache:warm` with `LOG_LEVEL=info` and `GA4_READ_TIMEOUT_SEC=120` in the container overrides (`perform_later` will not work; the default async adapter dies with the process).
 

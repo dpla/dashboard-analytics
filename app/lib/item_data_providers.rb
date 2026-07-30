@@ -5,7 +5,7 @@ class ItemDataProviders
 
   ##
   # dataProvider (institution) names for DPLA item IDs, from the S3 cache
-  # the monthly rebuild writes (generate_hub_stats.py). Empty until the
+  # ingestion3's monthly generate_hub_stats.py writes. Empty until the
   # first run. Whole mapping sits in Rails.cache (64MB memory store in
   # production); past ~200k ids, shard the S3 file rather than raise the
   # store size.
