@@ -10,8 +10,10 @@ require 'digest'
 class GaPersistentCache
   # The version is the only invalidation: bump on query, page-size, or
   # JSON-shape changes; old objects are never read again. Safe: any month
-  # re-fetches from GA4.
-  PREFIX = "ga4-cache/v1/"
+  # re-fetches from GA4. GaCacheable#cache_key carries the same version, so
+  # a bump also skips Rails.cache entries written under the old schema.
+  SCHEMA_VERSION = "v1"
+  PREFIX = "ga4-cache/#{SCHEMA_VERSION}/"
 
   # GA4 adjusts recent data for ~72h; don't store the just-completed month
   # until this many days in. One day of margin: Date.current is UTC, the

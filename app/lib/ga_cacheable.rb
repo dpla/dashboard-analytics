@@ -22,9 +22,12 @@ module GaCacheable
 
   private
 
+  # Carries the S3 schema version so a bump invalidates Rails.cache too.
+  # Matters once the store outlives a deploy (see production.rb cache_store).
   def cache_key
     [
       "ga",
+      GaPersistentCache::SCHEMA_VERSION,
       self.class.name.underscore,
       @hub,
       @contributor,

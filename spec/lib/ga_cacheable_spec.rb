@@ -57,6 +57,21 @@ describe GaCacheable do
     end
   end
 
+  describe 'schema version' do
+    # Guards a store that outlives a deploy: bumping the S3 schema must not
+    # leave Rails.cache serving the old shape.
+    it 'reads a new Rails entry after a version bump' do
+      allow(GaPersistentCache).to receive(:cacheable?).and_return(false)
+      allow(GaPersistentCache).to receive(:fetch) { |_key, _date, &blk| blk.call }
+
+      expect(host.send(:fetch_cached) { :v1 }).to eq :v1
+      expect(host.send(:fetch_cached) { :never_called }).to eq :v1
+
+      stub_const('GaPersistentCache::SCHEMA_VERSION', 'v2')
+      expect(host.send(:fetch_cached) { :v2 }).to eq :v2
+    end
+  end
+
   describe '#prefetch' do
     it 'writes to Rails.cache and the permanent store' do
       expect(GaPersistentCache).to receive(:write)
