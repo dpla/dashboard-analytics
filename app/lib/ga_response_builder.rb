@@ -74,10 +74,25 @@ class GaResponseBuilder
   # Max rows per GA4 report request; page size for full exports.
   DEFAULT_PAGE_LIMIT = 10_000
 
+  # Only a positive integer overrides the default.
+  # Blank or misspelled GA4_READ_TIMEOUT_SEC would otherwise
+  # read as 0 and time out every GA4 call at once,
+  # with nothing pointing back at the env var.
+  def self.read_timeout_sec
+    raw = ENV["GA4_READ_TIMEOUT_SEC"]
+    seconds = Integer(raw.to_s, 10, exception: false)
+    return seconds if seconds&.positive?
+
+    if raw.present?
+      Rails.logger.warn("GA4_READ_TIMEOUT_SEC=#{raw.inspect} is not a positive " \
+                        "integer; using #{GA4_READ_TIMEOUT_SEC}s")
+    end
+    GA4_READ_TIMEOUT_SEC
+  end
+
   def initialize
     @analytics = Google::Apis::AnalyticsdataV1beta::AnalyticsDataService.new
-    @analytics.client_options.read_timeout_sec =
-      ENV.fetch("GA4_READ_TIMEOUT_SEC", GA4_READ_TIMEOUT_SEC).to_i
+    @analytics.client_options.read_timeout_sec = self.class.read_timeout_sec
     @metrics    = []
     @dimensions = []
     @filters    = []

@@ -2,6 +2,36 @@ require 'rails_helper'
 
 describe GaResponseBuilder do
 
+  describe '.read_timeout_sec' do
+    def set_env(value)
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("GA4_READ_TIMEOUT_SEC").and_return(value)
+    end
+
+    it 'uses the default when the env var is unset' do
+      set_env(nil)
+      expect(described_class.read_timeout_sec).to eq described_class::GA4_READ_TIMEOUT_SEC
+    end
+
+    it 'uses a positive integer override' do
+      set_env("120")
+      expect(described_class.read_timeout_sec).to eq 120
+    end
+
+    it 'falls back to the default for blank, non-numeric, and non-positive values' do
+      ["", "  ", "abc", "0", "-5", "12.5"].each do |value|
+        set_env(value)
+        expect(described_class.read_timeout_sec).to eq described_class::GA4_READ_TIMEOUT_SEC
+      end
+    end
+
+    it 'reaches the GA client as the read timeout' do
+      set_env("")
+      expect(described_class.new.analytics.client_options.read_timeout_sec)
+        .to eq described_class::GA4_READ_TIMEOUT_SEC
+    end
+  end
+
   describe 'pagination parameters' do
     let(:builder) do
       described_class.new.tap do |b|
