@@ -25,22 +25,23 @@ module DateHelper
   end
 
   ##
-  # @return [Array<Date>] the first day of every available month
+  # @return [Array<Date>] the first day of every month in the display
+  #   window (see DataWindow)
   def available_months
-    first_date = min_data_date
-    last_date = Date.today.beginning_of_month
+    first_date = DataWindow.min_date
+    last_date = DataWindow.max_date.beginning_of_month
     dates = [first_date]
-
-    loop do
-      break if dates.last == last_date
-      dates.push(dates.last.next_month.beginning_of_month)
-    end
-
+    dates.push(dates.last.next_month) while dates.last < last_date
     dates
   end
 
   def website_data_start_date
-    min_data_date
+    DataWindow.min_date
+  end
+
+  # Date-menu note, e.g. "Jun 2026" (the menu's "%b %Y" format).
+  def data_available_through
+    DataWindow.max_date.strftime("%b %Y")
   end
 
   def api_data_for_date_range?
@@ -65,9 +66,4 @@ module DateHelper
     end
   end
 
-  private
-
-  def min_data_date
-    Date.new(Settings.min_date.year, Settings.min_date.month)
-  end
 end

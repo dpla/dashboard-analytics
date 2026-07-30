@@ -25,10 +25,7 @@ class EventsController < ApplicationController
   end
 
   def website_event_names
-    { "view_item" => "View Item",
-      "view_exhibit" => "View Exhibition Item",
-      "view_pss" => "View Primary Source",
-      "click_through" => "Click Through" }
+    WebsiteEvents::NAMES_BY_ID
   end
 
   def api_events

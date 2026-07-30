@@ -20,6 +20,17 @@ RSpec.describe "Contributor management", :type => :request do
                                admin: false,
                                hub: "bar") }
 
+  # Hub lookups stubbed so the suite runs without AWS credentials.
+  before do
+    allow(HubStats).to receive(:fetch).and_return(
+      "hubs" => {
+        "foo" => { "item_count" => 1, "contributors" => { "bat" => 1 } },
+        "bar" => { "item_count" => 1, "contributors" => { "bat" => 1 } }
+      }
+    )
+    allow(HubStats).to receive(:fetch_bws).and_return("hubs" => {})
+  end
+
   context "user not logged in" do
 
     it "redirects index to login page" do

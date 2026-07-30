@@ -2,23 +2,17 @@ require_relative 'boot'
 
 # This code runs before rails itself is loaded.
 
-# Regex to unescape JSON loaded from ENV var
-re = /\\\"/m
-subst = '"'
-# Load JSON from GOOGLE_ANALYTICS_KEY ENV var
-#   The GOOGLE_ANALYTICS_KEY value is defined in AWS secrets manager
-#   and value is read and set as an ENV var for the ECS container by Terraform
-#   which is the source of the ENV var being loaded here.
+# Production: service account JSON arrives in GOOGLE_ANALYTICS_KEY (Secrets
+# Manager via Terraform), escaped for the ECS container definition;
+# unescape and write the key file. No env var (local dev, tests): keep any
+# existing key file and boot. GA sections degrade instead of the app dying.
 ga_key = ENV["GOOGLE_ANALYTICS_KEY"]
-# The JSON needed to be escaped to be read/passed through to ECS container definition 
-# This regex unescapes the JSON with the regex
-result = ga_key.gsub(re, subst)
-# FIXME 
-#   This open call will create the file if it doesn't exist and should use the path
-#   defined by service_account_json_key key in ./config/settings.yml 
-#   Hard coding the path here can result in nil objects and break the app
-# Copy the google analtyics JSON to a local JSON file.
-File.open("./google-analytics-key.json", "w") {|f| f.write(result) }
+if ga_key && !ga_key.empty?
+  File.write("./google-analytics-key.json", ga_key.gsub(/\\\"/m, '"'))
+elsif ENV["RAILS_ENV"] == "production"
+  # Fail the deploy loudly; no pages with dead GA sections.
+  raise "GOOGLE_ANALYTICS_KEY is not set"
+end
 
 require 'rails/all'
 

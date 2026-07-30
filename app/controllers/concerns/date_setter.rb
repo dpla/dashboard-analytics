@@ -2,24 +2,27 @@ module DateSetter
   extend ActiveSupport::Concern
 
   def min_date
-    Date.new(Settings.min_date.year, Settings.min_date.month)
+    DataWindow.min_date
   end
 
+  # Last day of the last completed month (see DataWindow).
   def max_date
-    Date.current
+    DataWindow.max_date
   end
 
+  # Also the fallback for out-of-range params: a current-month date clamps
+  # to the last completed month.
   def default_start_date
-    Date.current.beginning_of_month
+    max_date.beginning_of_month
   end
 
   def default_end_date
-    Date.current
+    max_date
   end
 
   ##
-  # Set @start_date and @end_date to span all available history (min_date → today).
-  # Use this for sections that always display all-time totals regardless of URL params.
+  # Set @start_date/@end_date to all available history (min_date through
+  # the last completed month). For sections that always show all-time totals.
   #
   def assign_all_time_dates
     @start_date = min_date
@@ -45,22 +48,20 @@ module DateSetter
   # This assigns values to @start_date and @end_date using params[:start_date]
   # and params[:end_date], both of which are expected to be in the format
   # "YYYY-MM"
-  # The default start date is the beginning of the current month.
-  # The default end date is today.
+  # Both dates default to the last completed month.
   # DateSetter has access to controller params and instance variables.
   #
   def assign_start_and_end_dates
     start_year = parse_year(params[:start_date])
     start_month = parse_month(params[:start_date])
     @start_date = start_of_month(start_year, start_month)
-    @end_date = default_end_date
 
     if params[:end_date].present?
       end_year = parse_year(params[:end_date])
       end_month = parse_month(params[:end_date])
       @end_date = end_of_month(end_year, end_month)
     else
-      @end_date = end_of_start_month(@start_date)
+      @end_date = end_of_month(@start_date.year, @start_date.month)
     end
 
     @end_date = default_end_date if @end_date < @start_date
@@ -108,23 +109,6 @@ module DateSetter
     begin
       # will raise exception if params are missing or invalid
       end_date = Date.new(year, month).end_of_month
-      raise ArgumentError if end_date > max_date
-      end_date
-    rescue
-      default_end_date
-    end
-  end
-
-  ##
-  # Given the first day of a month, get the last day of that same month.
-  # If the end of the given month is after the current date,
-  # return default end date.
-  #
-  # @param Date
-  # @return Date
-  def end_of_start_month(start_date)
-    begin
-      end_date = start_date.end_of_month
       raise ArgumentError if end_date > max_date
       end_date
     rescue

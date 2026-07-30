@@ -68,6 +68,7 @@ class GaResponseBuilder
 
   # GA4 API read timeout. Chosen to be well under the ALB's 60s idle timeout so
   # that slow queries fail fast and return a graceful error rather than a 504.
+  # No ALB for background jobs; the warm job sets GA4_READ_TIMEOUT_SEC higher.
   GA4_READ_TIMEOUT_SEC = 25
 
   # Max rows per GA4 report request; page size for full exports.
@@ -75,7 +76,8 @@ class GaResponseBuilder
 
   def initialize
     @analytics = Google::Apis::AnalyticsdataV1beta::AnalyticsDataService.new
-    @analytics.client_options.read_timeout_sec = GA4_READ_TIMEOUT_SEC
+    @analytics.client_options.read_timeout_sec =
+      ENV.fetch("GA4_READ_TIMEOUT_SEC", GA4_READ_TIMEOUT_SEC).to_i
     @metrics    = []
     @dimensions = []
     @filters    = []

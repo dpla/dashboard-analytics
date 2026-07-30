@@ -1,0 +1,85 @@
+require 'rails_helper'
+
+describe GaCacheable do
+  let(:host_class) do
+    Class.new do
+      include GaCacheable
+
+      def self.name
+        'FakeGaWrapper'
+      end
+
+      def initialize(end_date)
+        @hub = 'Some Hub'
+        @end_date = end_date
+      end
+    end
+  end
+  let(:completed_month) { Date.new(2026, 6, 30) }
+  let(:host) { host_class.new(completed_month) }
+
+  before do
+    allow(Date).to receive(:current).and_return(Date.new(2026, 7, 15))
+    Rails.cache.clear
+  end
+
+  describe '#fetch_cached' do
+    it 'delegates to the permanent store with the key and end date' do
+      expect(GaPersistentCache).to receive(:fetch)
+        .with(a_string_including('fake_ga_wrapper'), completed_month).and_return(:cached)
+      expect(host.send(:fetch_cached) { :live }).to eq :cached
+    end
+
+    it 'appends the suffix to the cache key' do
+      expect(GaPersistentCache).to receive(:fetch)
+        .with(a_string_ending_with(':page1'), completed_month).and_return(:cached)
+      host.send(:fetch_cached, 'page1') { :live }
+    end
+
+    it 'skips Rails.cache when memory is false and S3 serves the response' do
+      allow(GaPersistentCache).to receive(:fetch).and_return(:cached)
+      expect(Rails.cache).not_to receive(:fetch)
+      expect(host.send(:fetch_cached, 'multi', memory: false) { :live }).to eq :cached
+    end
+
+    it 'keeps a short-lived copy when the permanent store declines the result' do
+      allow(GaPersistentCache).to receive(:fetch) { |_key, _date, &blk| blk.call }
+      expect(Rails.cache).to receive(:fetch)
+        .with(anything, expires_in: GaCacheable::CACHE_TTL).and_call_original
+      expect(host.send(:fetch_cached, 'multi', memory: false) { :live }).to eq :live
+    end
+
+    it 'falls back to a short-lived memory entry while the range is settling' do
+      settling_host = host_class.new(Date.new(2026, 7, 10))
+      expect(Rails.cache).to receive(:fetch)
+        .with(anything, expires_in: GaCacheable::CACHE_TTL).and_call_original
+      expect(settling_host.send(:fetch_cached, 'multi', memory: false) { :live }).to eq :live
+    end
+  end
+
+  describe '#prefetch' do
+    it 'writes to Rails.cache and the permanent store' do
+      expect(GaPersistentCache).to receive(:write)
+        .with(a_string_including('fake_ga_wrapper'), :response, completed_month)
+      expect(Rails.cache).to receive(:write)
+        .with(a_string_including('fake_ga_wrapper'), :response,
+              expires_in: GaCacheable::CACHE_TTL)
+      host.prefetch(:response)
+      expect(host.instance_variable_get(:@response)).to eq :response
+    end
+
+    it 'holds the compact stored form, without expiry, when one was stored' do
+      allow(GaPersistentCache).to receive(:write).and_return(:compact)
+      expect(Rails.cache).to receive(:write).with(anything, :compact, expires_in: nil)
+      host.prefetch(:response)
+      expect(host.instance_variable_get(:@response)).to eq :compact
+    end
+
+    it 'ignores nil responses instead of caching them' do
+      expect(Rails.cache).not_to receive(:write)
+      expect(GaPersistentCache).not_to receive(:write)
+      host.prefetch(nil)
+      expect(host.instance_variable_get(:@response)).to be_nil
+    end
+  end
+end

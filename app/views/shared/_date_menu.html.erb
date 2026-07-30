@@ -9,6 +9,11 @@
     <%= submit_tag 'Refresh', name: nil %>
   <% end %>
 
+  <p class="date-range-note">
+    Analytics data is available through <%= data_available_through %>.
+    Data updates in the first week of each month.
+  </p>
+
   <% if date_range_active? %>
     <p class="date-range-note">
       Showing <%= @start_date.strftime("%b %Y") %> &ndash; <%= @end_date.strftime("%b %Y") %>.
