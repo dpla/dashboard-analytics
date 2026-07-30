@@ -48,7 +48,8 @@ module DateSetter
   # This assigns values to @start_date and @end_date using params[:start_date]
   # and params[:end_date], both of which are expected to be in the format
   # "YYYY-MM"
-  # Both dates default to the last completed month.
+  # With a start date but no end date, @end_date is the end of the start month.
+  # With neither, both dates fall back to the last completed month.
   # DateSetter has access to controller params and instance variables.
   #
   def assign_start_and_end_dates
