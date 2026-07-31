@@ -78,6 +78,10 @@ class WarmComparisonCacheJob < ApplicationJob
     rescue StandardError => e
       e
     end
+    errors.drop(1).each do |e|
+      Rails.logger.error("WarmComparisonCacheJob: also failed warming #{hub_name}: #{e.message}")
+      Sentry.capture_exception(e)
+    end
     raise errors.first if errors.any?
 
     event_failures
