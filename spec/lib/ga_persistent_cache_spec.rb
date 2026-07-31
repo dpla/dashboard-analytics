@@ -120,6 +120,20 @@ describe GaPersistentCache do
       expect(described_class.fetch(key, end_date) { nil }).to be_nil
     end
 
+    # An empty export must store and read back as a hit, not read as a miss
+    # that re-runs the GA4 export on every request.
+    it 'round-trips an empty multi-page response' do
+      written = nil
+      allow(SThreeResponseBuilder).to receive(:put) { |_k, body| written = body }
+
+      expect(described_class.fetch(key, end_date) { [] }).to eq []
+      expect(written).to eq '[]'
+
+      allow(SThreeResponseBuilder).to receive(:response)
+        .and_return(double(body: StringIO.new(written)))
+      expect(described_class.fetch(key, end_date) { raise 'block should not run' }).to eq []
+    end
+
     it 'does not store a truncated multi-page response' do
       truncated_page = double(
         column_headers: [GaResponseBuilder::Ga4Response::ColumnHeader.new('ga:eventLabel')],
