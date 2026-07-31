@@ -267,7 +267,7 @@ Hub and contributor overview pages use the [`render_async`](https://github.com/r
 
 - The page structure renders immediately
 - All metric sections are fetched in one background request via concurrent threads
-- Slow sections (e.g., GA4 calls) don't block faster ones (e.g., item counts from the DPLA API)
+- Slow sections (e.g., GA4 calls) don't block faster ones (e.g., item counts from the S3-cached hub stats)
 - Individual data fetches can fail without taking down the whole page
 
 ---
