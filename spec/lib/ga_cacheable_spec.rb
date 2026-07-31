@@ -25,15 +25,38 @@ describe GaCacheable do
 
   describe '#fetch_cached' do
     it 'delegates to the permanent store with the key and end date' do
-      expect(GaPersistentCache).to receive(:fetch)
-        .with(a_string_including('fake_ga_wrapper'), completed_month).and_return(:cached)
+      expect(GaPersistentCache).to receive(:fetch_with_status)
+        .with(a_string_including('fake_ga_wrapper'), completed_month)
+        .and_return([:cached, true])
       expect(host.send(:fetch_cached) { :live }).to eq :cached
     end
 
     it 'appends the suffix to the cache key' do
-      expect(GaPersistentCache).to receive(:fetch)
-        .with(a_string_ending_with(':page1'), completed_month).and_return(:cached)
+      expect(GaPersistentCache).to receive(:fetch_with_status)
+        .with(a_string_ending_with(':page1'), completed_month).and_return([:cached, true])
       host.send(:fetch_cached, 'page1') { :live }
+    end
+
+    it 'keeps an entry the permanent store holds without expiry' do
+      allow(GaPersistentCache).to receive(:fetch_with_status).and_return([:cached, true])
+      expect(Rails.cache).to receive(:write).with(anything, :cached, expires_in: nil)
+      host.send(:fetch_cached) { :live }
+    end
+
+    it 'expires an entry the permanent store declined' do
+      # A truncated export or a failed S3 write must not be pinned in memory:
+      # a later max_pages increase has to take effect.
+      allow(GaPersistentCache).to receive(:fetch_with_status).and_return([:live, false])
+      expect(Rails.cache).to receive(:write)
+        .with(anything, :live, expires_in: GaCacheable::CACHE_TTL)
+      expect(host.send(:fetch_cached) { :live }).to eq :live
+    end
+
+    it 'serves a memory hit without touching the permanent store' do
+      allow(GaPersistentCache).to receive(:fetch_with_status).and_return([:cached, true])
+      host.send(:fetch_cached) { :live }
+      expect(GaPersistentCache).not_to receive(:fetch_with_status)
+      expect(host.send(:fetch_cached) { :live }).to eq :cached
     end
 
     it 'skips Rails.cache when memory is false and S3 serves the response' do
@@ -51,8 +74,8 @@ describe GaCacheable do
 
     it 'falls back to a short-lived memory entry while the range is settling' do
       settling_host = host_class.new(Date.new(2026, 7, 10))
-      expect(Rails.cache).to receive(:fetch)
-        .with(anything, expires_in: GaCacheable::CACHE_TTL).and_call_original
+      expect(Rails.cache).to receive(:write)
+        .with(anything, :live, expires_in: GaCacheable::CACHE_TTL).and_call_original
       expect(settling_host.send(:fetch_cached, 'multi', memory: false) { :live }).to eq :live
     end
   end

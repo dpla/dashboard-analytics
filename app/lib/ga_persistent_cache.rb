@@ -38,14 +38,26 @@ class GaPersistentCache
   # @param end_date [Date, nil] end of the response's date range
   # @yieldreturn [GaResponseBuilder::Ga4Response, Array, nil]
   #
-  def self.fetch(key, end_date)
-    return yield unless cacheable?(end_date)
+  def self.fetch(key, end_date, &block)
+    fetch_with_status(key, end_date, &block).first
+  end
+
+  ##
+  # .fetch, plus whether S3 is holding what came back. A response the store
+  # declined (nil, truncated, failed write) returns false, so callers can
+  # give it a short life instead of keeping it for good.
+  #
+  # @return [Array(Object, Boolean)] [response, persisted]
+  #
+  def self.fetch_with_status(key, end_date)
+    return [yield, false] unless cacheable?(end_date)
 
     if (cached = read(key))
-      cached
+      [cached, true]
     else
       response = yield
-      write(key, response, end_date) || response
+      stored = write(key, response, end_date)
+      stored ? [stored, true] : [response, false]
     end
   end
 

@@ -39,8 +39,8 @@ module GaCacheable
 
   ##
   # Rails.cache over the permanent S3 store (GaPersistentCache); the block
-  # (live GA4) is the last resort. Permanent entries: no Rails.cache
-  # expiry. Others: CACHE_TTL.
+  # (live GA4) is the last resort. Entries S3 holds get no Rails.cache
+  # expiry. Everything else: CACHE_TTL.
   #
   # @param suffix [String, nil] appended to cache_key, e.g. "page2" or "multi"
   # @param memory [Boolean] false keeps large payloads (multi-page exports)
@@ -51,9 +51,15 @@ module GaCacheable
     permanent = GaPersistentCache.cacheable?(@end_date)
 
     if memory || !permanent
-      Rails.cache.fetch(key, expires_in: permanent ? nil : CACHE_TTL) do
-        GaPersistentCache.fetch(key, @end_date, &block)
-      end
+      cached = Rails.cache.read(key)
+      return cached unless cached.nil?
+
+      # Read then write, not Rails.cache.fetch: the expiry turns on whether
+      # S3 took the response, which the block only settles once it has run.
+      # A truncated export kept for good would outlive a max_pages increase.
+      response, persisted = GaPersistentCache.fetch_with_status(key, @end_date, &block)
+      Rails.cache.write(key, response, expires_in: persisted ? nil : CACHE_TTL)
+      response
     else
       GaPersistentCache.fetch(key, @end_date) do
         # S3 missed or declined (e.g. truncated export): short-lived copy so
