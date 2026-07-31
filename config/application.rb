@@ -8,7 +8,8 @@ require_relative 'boot'
 # existing key file and boot. GA sections degrade instead of the app dying.
 ga_key = ENV["GOOGLE_ANALYTICS_KEY"]
 if ga_key && !ga_key.empty?
-  File.write("./google-analytics-key.json", ga_key.gsub(/\\\"/m, '"'))
+  File.write(File.expand_path("../google-analytics-key.json", __dir__),
+             ga_key.gsub(/\\\"/m, '"'))
 elsif ENV["RAILS_ENV"] == "production"
   # Fail the deploy loudly; no pages with dead GA sections.
   raise "GOOGLE_ANALYTICS_KEY is not set"
