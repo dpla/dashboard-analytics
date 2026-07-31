@@ -49,6 +49,9 @@ class SThreeResponseBuilder
     return cached if cached
 
     data = JSON.parse(response(key).body.read)
+    # Valid JSON that isn't an object ([], null) would cache for 24h and
+    # raise in every caller that string-indexes it.
+    raise TypeError, "expected Hash, got #{data.class}" unless data.is_a?(Hash)
     warn_if_stale(key, data)
     Rails.cache.write(cache_key, data, expires_in: 24.hours)
     data

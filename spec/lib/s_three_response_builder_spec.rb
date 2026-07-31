@@ -31,6 +31,14 @@ describe SThreeResponseBuilder do
       expect(fetch).to eq default
     end
 
+    it 'treats valid JSON that is not an object as a failure' do
+      allow(described_class).to receive(:response)
+        .and_return(double(body: StringIO.new('[]')))
+      expect(Sentry).to receive(:capture_exception).with(an_instance_of(TypeError))
+      expect(Rails.cache).to receive(:write).with('test_json', default, expires_in: 5.minutes)
+      expect(fetch).to eq default
+    end
+
     it 'reports a stale file so a stopped generator is noticed' do
       old = { 'generated_at' => 60.days.ago.iso8601, 'hubs' => {} }
       allow(described_class).to receive(:response)
