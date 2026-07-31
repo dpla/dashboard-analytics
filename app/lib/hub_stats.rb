@@ -1,7 +1,7 @@
 class HubStats
   KEY     = "hub-stats/hub_stats.json"
   BWS_KEY = "hub-stats/hub_stats_bws.json"
-  EMPTY   = { "hubs" => {} }.freeze
+  EMPTY   = { "hubs" => {}.freeze }.freeze
 
   ##
   # @return [Hash] parsed hub_stats.json: { "generated_at" => ..., "hubs" => { name => { "item_count" => int, "contributors" => { name => count } } } }

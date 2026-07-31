@@ -1,7 +1,7 @@
 class ItemDataProviders
   KEY       = "hub-stats/item_data_providers.json"
   CACHE_KEY = "item_data_providers"
-  EMPTY     = { "items" => {} }.freeze
+  EMPTY     = { "items" => {}.freeze }.freeze
 
   ##
   # dataProvider (institution) names for DPLA item IDs, from the S3 cache
