@@ -100,6 +100,13 @@ describe GaPersistentCache do
       expect(JSON.parse(written).length).to eq 2
       expect(result.length).to eq 2
       expect(result.first.rows).to eq rows
+
+      # Read back through S3, not just write's return value.
+      allow(SThreeResponseBuilder).to receive(:response)
+        .and_return(double(body: StringIO.new(written)))
+      reread = described_class.fetch(key, end_date) { raise 'block should not run' }
+      expect(reread.length).to eq 2
+      expect(reread.map(&:rows)).to eq [rows, rows]
     end
 
     it 'falls through to the block when the read fails' do
