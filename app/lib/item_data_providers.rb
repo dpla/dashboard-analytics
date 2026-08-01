@@ -20,8 +20,20 @@ class ItemDataProviders
       return @items if @expires_at && now < @expires_at
 
       data, ttl = SThreeResponseBuilder.fetch_json(KEY, default: EMPTY)
-      @expires_at = now + ttl
-      @items = data["items"] || {}
+      @expires_at = now + ttl.to_f
+      @items = items_hash(data)
     end
   end
+
+  # fetch_json only checks the top level
+  def self.items_hash(data)
+    items = data["items"] || {}
+    return items if items.is_a?(Hash)
+
+    message = "ItemDataProviders: #{KEY} items is a #{items.class}, not a Hash"
+    Rails.logger.error(message)
+    Sentry.capture_message(message)
+    {}
+  end
+  private_class_method :items_hash
 end

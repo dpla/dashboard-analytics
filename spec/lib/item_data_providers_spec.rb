@@ -35,5 +35,13 @@ describe ItemDataProviders do
       allow(s3_object).to receive(:body).and_return(StringIO.new('not json'))
       expect(described_class.items).to eq({})
     end
+
+    it 'returns an empty hash and reports when items is not a Hash' do
+      allow(s3_object).to receive(:body)
+        .and_return(StringIO.new({ 'items' => [] }.to_json))
+      expect(Sentry).to receive(:capture_message)
+        .with(/items is a Array/)
+      expect(described_class.items).to eq({})
+    end
   end
 end
