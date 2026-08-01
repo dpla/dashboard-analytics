@@ -1,62 +1,104 @@
 class WarmComparisonCacheJob < ApplicationJob
   queue_as :default
 
-  # Intended to pre-warm GA4 and S3 caches for all hubs nightly so the
-  # first user of the day gets fast page loads instead of cold-cache latency.
+  # Pre-warms GA4 caches for all hubs so pages skip 20-30s GA4 calls.
+  # Responses land in the permanent S3 store, so one run warms every task;
+  # each range needs warming once.
   #
-  # NOTE: Currently limited by the production MemoryStore cache backend.
-  # MemoryStore is process-local, so cache writes made here are not visible
-  # to web worker ECS tasks. This job will become effective once the app
-  # is configured to use a shared cache backend (e.g. Redis/ElastiCache).
-  # See: config/environments/production.rb
-  #
-  # Schedule via AWS EventBridge rule targeting an ECS task, e.g.:
-  #   cron(0 5 * * ? *)   # 05:00 UTC daily
+  # Schedule monthly via EventBridge → ECS task, e.g.:
+  #   cron(0 5 5 * ? *)   # 05:00 UTC on the 5th
   #
   def perform
-    start_date = Date.new(2012, 1, 1)
-    end_date   = Date.today
+    end_date = DataWindow.max_date
+    unless GaPersistentCache.cacheable?(end_date)
+      Rails.logger.warn(
+        "WarmComparisonCacheJob: skipping, the just-completed month has not " \
+        "settled yet; run after day #{GaPersistentCache::SETTLING_DAYS} of the month."
+      )
+      return
+    end
 
-    Hub.all.each do |hub_name|
-      warm_hub(hub_name, start_date, end_date)
+    hubs = Hub.all
+    if hubs.empty?
+      message = "WarmComparisonCacheJob: no hubs found (hub_stats.json missing?); nothing warmed"
+      Rails.logger.error(message)
+      Sentry.capture_message(message)
+      return
+    end
+
+    failures = 0
+    hubs.each do |hub_name|
+      failures += warm_hub(hub_name, DataWindow.min_date, end_date)
     rescue => e
+      failures += 1
       Rails.logger.error("WarmComparisonCacheJob: failed warming #{hub_name}: #{e.message}")
       Sentry.capture_exception(e)
     end
+
+    summary = "WarmComparisonCacheJob: warmed #{hubs.size} hubs, #{failures} failures"
+    Rails.logger.info(summary)
+    Sentry.capture_message(summary) if failures.positive?
   end
 
   private
 
+  # Warm each class with the range its pages request: hub landing =
+  # all-time; contributor comparison = last completed month. Returns the
+  # count of event tables that failed.
   def warm_hub(hub_name, start_date, end_date)
     Rails.logger.info("WarmComparisonCacheJob: warming cache for #{hub_name}")
 
-    website_overview = WebsiteOverviewByContributor.build do |b|
-      b.hub        = hub_name
-      b.start_date = start_date
-      b.end_date   = end_date
+    sections = [
+      [WebsiteOverviewByContributor, end_date.beginning_of_month],
+      [WebsiteEventsByContributor,   end_date.beginning_of_month],
+      [WebsiteOverview,              start_date],
+      [WebsiteEventTotals,           start_date],
+    ].map do |klass, range_start|
+      klass.build do |b|
+        b.hub        = hub_name
+        b.start_date = range_start
+        b.end_date   = end_date
+      end
     end
 
-    website_events = WebsiteEventsByContributor.build do |b|
-      b.hub        = hub_name
-      b.start_date = start_date
-      b.end_date   = end_date
-    end
-
-    metadata_completeness = MetadataCompleteness.build do |b|
-      b.hub      = hub_name
-      b.end_date = end_date
-    end
-
-    Hub.contributors_item_count(hub_name)
-    Hub.contributors_bws_item_count(hub_name)
-
-    [
+    event_failures = 0
+    threads = [
       Thread.new {
-        batch = GaResponseBuilder.batch_responses([website_overview.ga_builder, website_events.ga_builder])
-        website_overview.prefetch(batch[0])
-        website_events.prefetch(batch[1])
+        # One batched GA4 call (batchRunReports max: 5 reports).
+        batch = GaResponseBuilder.batch_responses(sections.map(&:ga_builder))
+        sections.zip(batch).each { |section, response| section.prefetch(response) }
       },
-      Thread.new { metadata_completeness.contributor_csv },
-    ].map(&:value)
+      Thread.new { event_failures = warm_event_tables(hub_name, end_date) },
+    ]
+    # Wait on both threads before raising, so one failure can't orphan
+    # the other.
+    errors = threads.filter_map do |thread|
+      thread.value
+      nil
+    rescue StandardError => e
+      e
+    end
+    errors.drop(1).each do |e|
+      Rails.logger.error("WarmComparisonCacheJob: also failed warming #{hub_name}: #{e.message}")
+      Sentry.capture_exception(e)
+    end
+    raise errors.first if errors.any?
+
+    event_failures
+  end
+
+  # First page of each event table, default view (last completed month).
+  # Other ranges: stored on first user request. Counts nil responses;
+  # WebsiteEvents#response swallows errors.
+  def warm_event_tables(hub_name, end_date)
+    WebsiteEvents::NAMES_BY_ID.each_value.count do |event_name|
+      WebsiteEvents.build do |b|
+        b.hub        = hub_name
+        b.start_date = end_date.beginning_of_month
+        b.end_date   = end_date
+        b.event_name = event_name
+        b.page       = 1
+      end.response.nil?
+    end
   end
 end

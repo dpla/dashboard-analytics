@@ -64,7 +64,7 @@ class MetadataCompleteness
   # @return [Aws::S3::Types::GetObjectOutput, nil]
   #
   def sThree_response(file_name)
-    date = @end_date
+    date = walk_start_date
     response = nil
 
     while response.nil?
@@ -110,6 +110,15 @@ class MetadataCompleteness
     # response.body.read is instance of String
     # strip all \" from the body of the CSV to avoid parsing error
     CSV.new(response.body.read.gsub('\\"', ''), headers: true)
+  end
+
+  ##
+  # Files publish during the current month; @end_date caps at the last
+  # completed month (DataWindow). Ranges at the cap walk from the current
+  # month to find the newest file.
+  # @return Date
+  def walk_start_date
+    @end_date >= DataWindow.max_date ? Date.current : @end_date
   end
 
   ##

@@ -42,14 +42,16 @@ class WebsiteOverview
     @end_date = end_date
   end
 
+  # Memoized builder for the warm job's batched GA4 calls.
+  def ga_builder
+    @ga_builder ||= website_overview_builder
+  end
+
   ##
-  # Lazy load single-page response.
-  # Returns nil on error (see #error? and #error_message for diagnosis).
-  #
-  # @return [GaResponseBuilder::Ga4Response, nil]
+  # Cached single-page response; nil on error (see #error?).
   #
   def response
-    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+    @response ||= fetch_cached do
       website_overview_builder.response
     end
   rescue => e

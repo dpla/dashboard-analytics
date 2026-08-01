@@ -40,16 +40,6 @@ class WebsiteEventsByContributor
     @ga_builder ||= events_by_contributor_builder
   end
 
-  # Inject a pre-fetched response (e.g. from a batch call) to skip
-  # the individual GA4 API call when response is next accessed.
-  # Writes to Rails.cache for within-process reuse. Note: with MemoryStore
-  # this is not visible to other ECS tasks — a shared cache (e.g. Redis)
-  # is required for cross-process warming.
-  def prefetch(ga4_response)
-    Rails.cache.write(cache_key, ga4_response, expires_in: 2.hours)
-    @response = ga4_response
-  end
-
   def parse_data
     return Hash.new unless response.present? && response.rows.present?
     # Create Hash of data
@@ -70,13 +60,10 @@ class WebsiteEventsByContributor
   end
 
   ##
-  # Lazy load single-page response.
-  # Return nil if response fails.
-  #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
+  # Cached single-page response; nil on error.
   #
   def response
-    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+    @response ||= fetch_cached do
       events_by_contributor_builder.response
     end
   rescue => e

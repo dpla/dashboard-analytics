@@ -131,6 +131,7 @@ RSpec.describe "Table pagination", type: :request do
       allow(WebsiteEvents).to receive(:build)
         .and_return(double(response: page, event_name: "View Item",
                            multi_page_response: []))
+      allow(ItemDataProviders).to receive(:items).and_return({})
       allow_any_instance_of(DplaApiResponseBuilder)
         .to receive(:data_providers_for_items).and_return({})
     end

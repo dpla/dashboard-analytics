@@ -18,8 +18,8 @@ class WebsiteEventsPresenter  < GaResponsePresenter
     @ga_response.event_name == "Click Through" ? "Click throughs" : "Views"
   end
 
-  def contributor(row)
-    item_contributor_lookup[id(row)] || row[columns.index("ga:eventAction")]
+  def contributor(row, lookup = item_contributor_lookup)
+    lookup[id(row)] || row[columns.index("ga:eventAction")]
   end
 
   def id(row)
@@ -46,12 +46,10 @@ class WebsiteEventsPresenter  < GaResponsePresenter
       multi_page_response.each do |response|
         # Look up names per export page; item_contributor_lookup only covers
         # the displayed page.
-        lookup = DplaApiResponseBuilder.new
-          .data_providers_for_items(response.rows.filter_map { |row| id(row) })
+        lookup = contributor_lookup(response.rows)
 
         response.rows.each do |row|
-          name = lookup[id(row)] || row[columns.index("ga:eventAction")]
-          csv << [title(row), id(row), name, count(row)]
+          csv << [title(row), id(row), contributor(row, lookup), count(row)]
         end
       end
     end
@@ -59,13 +57,27 @@ class WebsiteEventsPresenter  < GaResponsePresenter
 
   private
 
-  # Batch-fetches full dataProvider names from the DPLA item API for all
-  # items on the current page, keyed by item ID. Falls back to the GA4
-  # event name (truncated to 40 chars) when an item is not found.
+  # dataProvider names for the given rows, keyed by item ID, from the S3
+  # cache; callers fall back to eventAction (40-char truncated) for the
+  # rest.
+  # event_label is only queryable from Jul 18, 2025 (registration date;
+  # retention doesn't limit Data API reports), so the rebuild can never
+  # cover older months.
+  def contributor_lookup(page_rows)
+    item_ids = page_rows.filter_map { |row| id(row) }.uniq
+    resolved = data_providers.slice(*item_ids)
+    missing = item_ids - resolved.keys
+    return resolved if missing.empty?
+
+    resolved.merge(DplaApiResponseBuilder.new.data_providers_for_items(missing))
+  end
+
+  # Memoized: a CSV export reads the mapping once, not per page.
+  def data_providers
+    @data_providers ||= ItemDataProviders.items
+  end
+
   def item_contributor_lookup
-    @item_contributor_lookup ||= begin
-      item_ids = rows.filter_map { |row| id(row) }
-      DplaApiResponseBuilder.new.data_providers_for_items(item_ids)
-    end
+    @item_contributor_lookup ||= contributor_lookup(rows)
   end
 end

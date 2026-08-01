@@ -38,7 +38,7 @@ module ApplicationHelper
 
   def date_opts
     # Pass through whatever params are in the current request so date range
-    # selections (including the current month) are preserved across navigation.
+    # selections are preserved across navigation.
     # Return {} when no params are set so all-time links stay clean.
     return {} unless date_range_active?
 

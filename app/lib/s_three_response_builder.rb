@@ -22,6 +22,77 @@ class SThreeResponseBuilder
     self.client.list_objects({ bucket: self.bucket, prefix: prefix })
   end
 
+  ##
+  # Write an object. Task role needs s3:PutObject.
+  #
+  # @param key [String] S3 key (i.e. filepath)
+  # @param body [String] object content
+  #
+  def self.put(key, body)
+    self.client.put_object({ bucket: self.bucket, key: key, body: body })
+  end
+
+  ##
+  # fetch_json, held in Rails.cache for the TTL it returns.
+  #
+  # Not for big payloads — Rails.cache Marshals on every read. See
+  # ItemDataProviders.
+  #
+  # @param key [String] S3 key
+  # @param cache_key [String] Rails.cache key
+  # @param default [Hash] value to return and cache on failure
+  #
+  # @return [Hash] parsed JSON
+  #
+  def self.cached_json(key, cache_key:, default:)
+    cached = Rails.cache.read(cache_key)
+    return cached if cached
+
+    data, ttl = fetch_json(key, default: default)
+    Rails.cache.write(cache_key, data, expires_in: ttl)
+    data
+  end
+
+  ##
+  # Fetch and parse a JSON file from S3. Never raises; returns +default+ on
+  # a missing or broken file, so pages degrade instead of erroring.
+  #
+  # @param key [String] S3 key
+  # @param default [Hash] value to return on failure
+  #
+  # @return [Array(Hash, ActiveSupport::Duration)] parsed JSON and its TTL
+  #
+  def self.fetch_json(key, default:)
+    data = JSON.parse(response(key).body.read)
+    # [] or null would raise in every caller that string-indexes it.
+    raise TypeError, "expected Hash, got #{data.class}" unless data.is_a?(Hash)
+    warn_if_stale(key, data)
+    [data, 24.hours]
+  rescue Aws::S3::Errors::NoSuchKey
+    message = "SThreeResponseBuilder: #{key} not found in S3 (not yet generated)"
+    Rails.logger.warn(message)
+    Sentry.capture_message(message)
+    [default, 24.hours]
+  rescue StandardError => e
+    Rails.logger.error("SThreeResponseBuilder: failed to load #{key}: #{e.class}: #{e.message}")
+    Sentry.capture_exception(e)
+    # Short life so a transient S3 error can't empty the site for a day.
+    [default, 5.minutes]
+  end
+
+  # The monthly generator is the only writer; a stopped one silently serves
+  # stale data, so make that loud. At most one alert per cache period per task.
+  STALE_AFTER = 45.days
+
+  def self.warn_if_stale(key, data)
+    generated_at = Time.iso8601(data["generated_at"].to_s) rescue nil
+    return unless generated_at && generated_at < STALE_AFTER.ago
+
+    message = "SThreeResponseBuilder: #{key} is stale (generated_at #{generated_at.to_date})"
+    Rails.logger.error(message)
+    Sentry.capture_message(message)
+  end
+
   private
 
   def self.client

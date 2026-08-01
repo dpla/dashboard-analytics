@@ -38,13 +38,10 @@ class WebsiteSearchTerms
   end
 
   ##
-  # Lazy load single-page response.
-  # Return nil if response fails.
-  #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
+  # Cached single-page response; nil on error.
   #
   def response
-    @response ||= Rails.cache.fetch("#{cache_key}:page#{@page}", expires_in: 2.hours) do
+    @response ||= fetch_cached("page#{@page}") do
       search_terms_builder.response
     end
   rescue => e
@@ -53,13 +50,10 @@ class WebsiteSearchTerms
   end
 
   ##
-  # Lazy load multi-page response.
-  # Return empty array if response fails.
-  #
-  # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
+  # Cached multi-page response for CSV export; empty array on error.
   #
   def multi_page_response
-    @multi_page_response ||= Rails.cache.fetch("#{cache_key}:multi", expires_in: 2.hours) do
+    @multi_page_response ||= fetch_cached("multi", memory: false) do
       search_terms_builder.multi_page_response
     end
   rescue => e
