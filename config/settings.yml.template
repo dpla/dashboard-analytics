@@ -24,6 +24,12 @@ min_date:
   month: 01
   year: 2018
 
+# Minimum date for which per-item event data is available; GA4 registered
+# the event_label dimension Jul 18, 2025
+events_min_date:
+  month: 07
+  year: 2025
+
 # Minimum date for which api usage data is available
 api_min_date:
   month: 05

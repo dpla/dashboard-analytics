@@ -65,4 +65,18 @@ class EventsController < ApplicationController
       format.csv { send_data @events.to_csv }
     end
   end
+
+  private
+
+  # Event tables have no rows before event_label (see DataWindow).
+  # Also floors api_events, harmless while ApiEvents#response is stubbed nil;
+  # revisit if API event tracking returns.
+  def min_date
+    DataWindow.events_min_date
+  end
+
+  # No dates in the URL: show the full window, not one month.
+  def default_start_date
+    min_date
+  end
 end
