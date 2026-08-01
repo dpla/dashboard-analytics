@@ -1,18 +1,27 @@
 class ItemDataProviders
-  KEY       = "hub-stats/item_data_providers.json"
-  CACHE_KEY = "item_data_providers"
-  EMPTY     = { "items" => {}.freeze }.freeze
+  KEY   = "hub-stats/item_data_providers.json"
+  EMPTY = { "items" => {}.freeze }.freeze
+
+  MUTEX = Mutex.new
 
   ##
-  # dataProvider (institution) names for DPLA item IDs, from the S3 cache
-  # ingestion3's monthly generate_hub_stats.py writes. Empty until the
-  # first run. Whole mapping sits in Rails.cache (64MB memory store in
-  # production); past ~200k ids, shard the S3 file rather than raise the
-  # store size.
+  # dataProvider names by DPLA item ID, from the S3 file
+  # generate_hub_stats.py writes monthly. Empty until the first run.
+  #
+  # In-process, not Rails.cache: MemoryStore Marshals on every read, and at
+  # ~516k ids that rebuilds the whole hash per request. Same memory either
+  # way. Shard by id prefix if it outgrows the process.
   #
   # @return [Hash<String, String>] { item_id => data_provider_name }
   #
   def self.items
-    SThreeResponseBuilder.cached_json(KEY, cache_key: CACHE_KEY, default: EMPTY)["items"] || {}
+    MUTEX.synchronize do
+      now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      return @items if @expires_at && now < @expires_at
+
+      data, ttl = SThreeResponseBuilder.fetch_json(KEY, default: EMPTY)
+      @expires_at = now + ttl
+      @items = data["items"] || {}
+    end
   end
 end

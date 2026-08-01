@@ -13,7 +13,7 @@ describe ItemDataProviders do
   let(:s3_object) { double(body: StringIO.new(json)) }
 
   before do
-    Rails.cache.delete(described_class::CACHE_KEY)
+    described_class.instance_variable_set(:@expires_at, nil)
     allow(SThreeResponseBuilder).to receive(:response)
       .with(described_class::KEY).and_return(s3_object)
   end

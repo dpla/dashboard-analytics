@@ -33,10 +33,10 @@ class SThreeResponseBuilder
   end
 
   ##
-  # Fetch and parse a JSON file from S3, cached 24h in Rails.cache.
-  # Missing key: returns +default+, cached 24h (not generated yet). Other
-  # failures: returns +default+, cached 5 minutes so a transient S3 error
-  # can't empty the site for a day. Pages degrade instead of erroring.
+  # fetch_json, held in Rails.cache for the TTL it returns.
+  #
+  # Not for big payloads — Rails.cache Marshals on every read. See
+  # ItemDataProviders.
   #
   # @param key [String] S3 key
   # @param cache_key [String] Rails.cache key
@@ -48,24 +48,36 @@ class SThreeResponseBuilder
     cached = Rails.cache.read(cache_key)
     return cached if cached
 
+    data, ttl = fetch_json(key, default: default)
+    Rails.cache.write(cache_key, data, expires_in: ttl)
+    data
+  end
+
+  ##
+  # Fetch and parse a JSON file from S3. Never raises; returns +default+ on
+  # a missing or broken file, so pages degrade instead of erroring.
+  #
+  # @param key [String] S3 key
+  # @param default [Hash] value to return on failure
+  #
+  # @return [Array(Hash, ActiveSupport::Duration)] parsed JSON and its TTL
+  #
+  def self.fetch_json(key, default:)
     data = JSON.parse(response(key).body.read)
-    # Valid JSON that isn't an object ([], null) would cache for 24h and
-    # raise in every caller that string-indexes it.
+    # [] or null would raise in every caller that string-indexes it.
     raise TypeError, "expected Hash, got #{data.class}" unless data.is_a?(Hash)
     warn_if_stale(key, data)
-    Rails.cache.write(cache_key, data, expires_in: 24.hours)
-    data
+    [data, 24.hours]
   rescue Aws::S3::Errors::NoSuchKey
     message = "SThreeResponseBuilder: #{key} not found in S3 (not yet generated)"
     Rails.logger.warn(message)
     Sentry.capture_message(message)
-    Rails.cache.write(cache_key, default, expires_in: 24.hours)
-    default
+    [default, 24.hours]
   rescue StandardError => e
     Rails.logger.error("SThreeResponseBuilder: failed to load #{key}: #{e.class}: #{e.message}")
     Sentry.capture_exception(e)
-    Rails.cache.write(cache_key, default, expires_in: 5.minutes)
-    default
+    # Short life so a transient S3 error can't empty the site for a day.
+    [default, 5.minutes]
   end
 
   # The monthly generator is the only writer; a stopped one silently serves
