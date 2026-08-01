@@ -69,6 +69,8 @@ class EventsController < ApplicationController
   private
 
   # Event tables have no rows before event_label (see DataWindow).
+  # Also floors api_events, harmless while ApiEvents#response is stubbed nil;
+  # revisit if API event tracking returns.
   def min_date
     DataWindow.events_min_date
   end
