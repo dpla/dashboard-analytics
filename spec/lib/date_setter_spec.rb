@@ -3,6 +3,9 @@ require 'rails_helper'
 describe DateSetter do
   let(:host_class) do
     Class.new do
+      # Stand in for the one controller method DateSetter calls on include.
+      def self.helper_method(*); end
+
       include DateSetter
       attr_accessor :params
 
@@ -43,6 +46,23 @@ describe DateSetter do
 
     it 'clamps a range entirely in the current month to the last completed month' do
       host.params = { start_date: '2026-07', end_date: '2026-07' }
+      expect(assigned_dates).to eq [Date.new(2026, 6, 1), Date.new(2026, 6, 30)]
+    end
+
+    it 'uses the full window when the host widens default_start_date' do
+      allow(host).to receive(:default_start_date).and_return(Date.new(2025, 7, 1))
+      expect(assigned_dates).to eq [Date.new(2025, 7, 1), Date.new(2026, 6, 30)]
+    end
+
+    it 'clamps a start date before min_date to the default start' do
+      allow(host).to receive(:min_date).and_return(Date.new(2025, 7, 1))
+      allow(host).to receive(:default_start_date).and_return(Date.new(2025, 7, 1))
+      host.params = { start_date: '2019-07', end_date: '2026-03' }
+      expect(assigned_dates).to eq [Date.new(2025, 7, 1), Date.new(2026, 3, 31)]
+    end
+
+    it 'keeps the one-month default when only an end date is given' do
+      host.params = { end_date: '2026-03' }
       expect(assigned_dates).to eq [Date.new(2026, 6, 1), Date.new(2026, 6, 30)]
     end
   end

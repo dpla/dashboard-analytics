@@ -87,18 +87,24 @@ class WarmComparisonCacheJob < ApplicationJob
     event_failures
   end
 
-  # First page of each event table, default view (last completed month).
+  # First page of each event table, for both landing ranges: the default
+  # full window (see EventsController#default_start_date) and the last
+  # completed month alone, which the date menu and old links request.
   # Other ranges: stored on first user request. Counts nil responses;
   # WebsiteEvents#response swallows errors.
   def warm_event_tables(hub_name, end_date)
-    WebsiteEvents::NAMES_BY_ID.each_value.count do |event_name|
-      WebsiteEvents.build do |b|
-        b.hub        = hub_name
-        b.start_date = end_date.beginning_of_month
-        b.end_date   = end_date
-        b.event_name = event_name
-        b.page       = 1
-      end.response.nil?
+    starts = [DataWindow.events_min_date, end_date.beginning_of_month].uniq
+
+    starts.sum do |start_date|
+      WebsiteEvents::NAMES_BY_ID.each_value.count do |event_name|
+        WebsiteEvents.build do |b|
+          b.hub        = hub_name
+          b.start_date = start_date
+          b.end_date   = end_date
+          b.event_name = event_name
+          b.page       = 1
+        end.response.nil?
+      end
     end
   end
 end

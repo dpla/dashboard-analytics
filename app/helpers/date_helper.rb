@@ -26,13 +26,15 @@ module DateHelper
 
   ##
   # @return [Array<Date>] the first day of every month in the display
-  #   window (see DataWindow)
+  #   window, min_date..max_date, which a controller may narrow
+  #   (see EventsController#min_date)
   def available_months
-    first_date = DataWindow.min_date
-    last_date = DataWindow.max_date.beginning_of_month
-    dates = [first_date]
-    dates.push(dates.last.next_month) while dates.last < last_date
-    dates
+    @available_months ||= begin
+      last_date = max_date.beginning_of_month
+      dates = [min_date]
+      dates.push(dates.last.next_month) while dates.last < last_date
+      dates
+    end
   end
 
   def website_data_start_date

@@ -1,6 +1,11 @@
 module DateSetter
   extend ActiveSupport::Concern
 
+  included do
+    # Date menu needs the bounds the controller clamps to.
+    helper_method :min_date, :max_date
+  end
+
   def min_date
     DataWindow.min_date
   end
@@ -49,7 +54,8 @@ module DateSetter
   # and params[:end_date], both of which are expected to be in the format
   # "YYYY-MM"
   # With a start date but no end date, @end_date is the end of the start month.
-  # With neither, both dates fall back to the last completed month.
+  # With neither, both fall back to the defaults, which a controller can
+  # widen via default_start_date (see EventsController).
   # DateSetter has access to controller params and instance variables.
   #
   def assign_start_and_end_dates
@@ -61,8 +67,10 @@ module DateSetter
       end_year = parse_year(params[:end_date])
       end_month = parse_month(params[:end_date])
       @end_date = end_of_month(end_year, end_month)
-    else
+    elsif params[:start_date].present?
       @end_date = end_of_month(@start_date.year, @start_date.month)
+    else
+      @end_date = default_end_date
     end
 
     @end_date = default_end_date if @end_date < @start_date
