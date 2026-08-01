@@ -28,6 +28,11 @@ describe WebsiteEventsPresenter do
       row = [nil]
       expect(presenter.title(row)).to be_nil
     end
+
+    it 'keeps a title containing the separator intact' do
+      row = ['some-id : Blueberry : Pie']
+      expect(presenter.title(row)).to eq 'Blueberry : Pie'
+    end
   end
 
   describe 'contributor resolution' do

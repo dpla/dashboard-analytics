@@ -14,12 +14,13 @@ class ApiEventsPresenter < GaResponsePresenter
     row[columns.index("ga:eventAction")]
   end
 
+  # Labels are "id : title". Split once; the title may contain " : ".
   def id(row)
-    row[columns.index("ga:eventLabel")].split(" : ").first rescue nil
+    row[columns.index("ga:eventLabel")].split(" : ", 2).first rescue nil
   end
 
   def title(row)
-    row[columns.index("ga:eventLabel")].split(" : ").last rescue nil
+    row[columns.index("ga:eventLabel")].split(" : ", 2).last rescue nil
   end
 
   def count(row)
