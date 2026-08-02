@@ -25,23 +25,22 @@ module DateHelper
   end
 
   ##
-  # @return [Array<Date>] the first day of every month in the display
-  #   window, min_date..max_date, which a controller may narrow
-  #   (see EventsController#min_date)
+  # @return [Array<Date>] first day of every month from picker_min_date
+  #   to max_date (narrowed by EventsController#min_date, GaDataFloor)
   def available_months
     @available_months ||= begin
       last_date = max_date.beginning_of_month
-      dates = [min_date]
+      dates = [picker_min_date]
       dates.push(dates.last.next_month) while dates.last < last_date
       dates
     end
   end
 
-  def website_data_start_date
-    DataWindow.min_date
+  # Date-menu bounds, e.g. "Jun 2026".
+  def data_available_from
+    picker_min_date.strftime("%b %Y")
   end
 
-  # Date-menu note, e.g. "Jun 2026" (the menu's "%b %Y" format).
   def data_available_through
     DataWindow.max_date.strftime("%b %Y")
   end

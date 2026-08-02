@@ -24,6 +24,12 @@ describe DateSetter do
     end
   end
 
+  describe '#picker_min_date' do
+    it 'defaults to min_date' do
+      expect(host.picker_min_date).to eq host.min_date
+    end
+  end
+
   describe '#assign_start_and_end_dates' do
     def assigned_dates
       host.assign_start_and_end_dates

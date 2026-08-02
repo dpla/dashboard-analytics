@@ -3,11 +3,16 @@ module DateSetter
 
   included do
     # Date menu needs the bounds the controller clamps to.
-    helper_method :min_date, :max_date
+    helper_method :min_date, :max_date, :picker_min_date
   end
 
   def min_date
     DataWindow.min_date
+  end
+
+  # Date-menu floor only; queries keep min_date. See GaDataFloor.
+  def picker_min_date
+    min_date
   end
 
   # Last day of the last completed month (see DataWindow).

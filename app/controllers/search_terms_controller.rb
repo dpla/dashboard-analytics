@@ -3,6 +3,8 @@
 class SearchTermsController < ApplicationController
   # Controller concerns
   include DateSetter
+  # Site-wide floor: no hub or contributor params.
+  include GaDataFloor
   # View helpers
   include DataMenuHelper
   include DateHelper

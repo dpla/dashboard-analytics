@@ -3,6 +3,7 @@
 class ContributorsController < ApplicationController
   # Controller concerns
   include DateSetter
+  include GaDataFloor
   # View helpers
   include DataMenuHelper
   include DateHelper
@@ -410,6 +411,30 @@ class ContributorsController < ApplicationController
   end
 
   private
+
+  helper_method :wikimedia_start_date
+
+  # First month with Wikimedia data; nil when none. Hub-level on index.
+  def wikimedia_start_date
+    return @wikimedia_start_date if defined?(@wikimedia_start_date)
+
+    hub_id      = params[:hub_id]
+    contributor = ga4_floor_contributor.to_s
+    key = "wikimedia_start_month:#{hub_id}:#{contributor}"
+    first_month = Rails.cache.fetch(key, expires_in: 24.hours) do
+      WikimediaCache.where(hub: hub_id, contributor: contributor).minimum(:month)
+    end
+    @wikimedia_start_date = first_month && Date.parse("#{first_month}-01")
+  end
+
+  def ga4_floor_contributor
+    params[:contributor_id] || params[:id]
+  end
+
+  # Wikimedia predates GA4 and shares this picker.
+  def earliest_data_month
+    [ga4_earliest_month, wikimedia_start_date].compact.min
+  end
 
   # One page of the hub's contributors
   def page_of_contributors(hub_id)

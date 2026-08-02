@@ -98,7 +98,8 @@ class GaPersistentCache
     response.first.total_results.to_i > fetched
   end
 
-  # First day of the earliest month still subject to change.
+  # First day of the earliest month still subject to change. Public for
+  # GaDataFloor.
   def self.settled_boundary
     (Date.current - SETTLING_DAYS).beginning_of_month
   end
@@ -140,7 +141,7 @@ class GaPersistentCache
     )
   end
 
-  private_class_method :read, :truncated?, :settled_boundary, :s3_key,
+  private_class_method :read, :truncated?, :s3_key,
                        :serialize, :serialize_response,
                        :deserialize, :deserialize_response
 
