@@ -22,15 +22,6 @@ class WebsiteEventsPresenter  < GaResponsePresenter
     lookup[id(row)] || row[columns.index("ga:eventAction")]
   end
 
-  # Labels are "id : title". Split once; the title may contain " : ".
-  def id(row)
-    event_label(row)&.split(" : ", 2)&.first&.strip
-  end
-
-  def title(row)
-    event_label(row)&.split(" : ", 2)&.last&.strip
-  end
-
   def count(row)
     row[columns.index("ga:totalEvents")]
   end

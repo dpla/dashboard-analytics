@@ -32,4 +32,14 @@ class GaResponsePresenter
     index = columns.index("ga:eventLabel")
     row[index] if index
   end
+
+  # Labels are "id : title". Split once; the title may contain " : ".
+  # GA has sent labels with embedded CRLF, hence the strip.
+  def id(row)
+    event_label(row)&.split(" : ", 2)&.first&.strip
+  end
+
+  def title(row)
+    event_label(row)&.split(" : ", 2)&.last&.strip
+  end
 end
