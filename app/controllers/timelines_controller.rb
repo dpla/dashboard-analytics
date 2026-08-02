@@ -3,6 +3,7 @@
 class TimelinesController < ApplicationController
   # Controller concerns
   include DateSetter
+  include GaDataFloor
   # View helpers
   include DataMenuHelper
   include DateHelper

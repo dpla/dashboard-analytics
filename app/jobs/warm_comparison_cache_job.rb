@@ -35,6 +35,13 @@ class WarmComparisonCacheJob < ApplicationJob
       Sentry.capture_exception(e)
     end
 
+    # Site-wide floor for the search-terms page.
+    site_months = WebsiteActivityMonths.build do |b|
+      b.start_date = DataWindow.min_date
+      b.end_date   = end_date
+    end
+    failures += 1 if site_months.response.nil?
+
     summary = "WarmComparisonCacheJob: warmed #{hubs.size} hubs, #{failures} failures"
     Rails.logger.info(summary)
     Sentry.capture_message(summary) if failures.positive?
@@ -48,11 +55,13 @@ class WarmComparisonCacheJob < ApplicationJob
   def warm_hub(hub_name, start_date, end_date)
     Rails.logger.info("WarmComparisonCacheJob: warming cache for #{hub_name}")
 
+    # Five entries: the batchRunReports cap.
     sections = [
       [WebsiteOverviewByContributor, end_date.beginning_of_month],
       [WebsiteEventsByContributor,   end_date.beginning_of_month],
       [WebsiteOverview,              start_date],
       [WebsiteEventTotals,           start_date],
+      [WebsiteActivityMonths,        start_date],
     ].map do |klass, range_start|
       klass.build do |b|
         b.hub        = hub_name

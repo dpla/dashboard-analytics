@@ -8,7 +8,12 @@ RSpec.describe "Table pagination", type: :request do
                             admin: true,
                             hub: "All") }
 
-  before(:each) { sign_in admin }
+  before(:each) do
+    sign_in admin
+    # Keeps renders off GA4 (date-menu floor lookup).
+    allow(WebsiteActivityMonths).to receive(:build)
+      .and_return(instance_double(WebsiteActivityMonths, earliest_month: nil))
+  end
 
   # Builds a Ga4Response from a stubbed GA4 report.
   def ga4_page(rows:, total:, dimensions:, metrics:)

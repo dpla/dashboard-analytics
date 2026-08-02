@@ -29,6 +29,9 @@ RSpec.describe "Contributor management", :type => :request do
       }
     )
     allow(HubStats).to receive(:fetch_bws).and_return("hubs" => {})
+    # Keeps renders off GA4 (date-menu floor lookup).
+    allow(WebsiteActivityMonths).to receive(:build)
+      .and_return(instance_double(WebsiteActivityMonths, earliest_month: nil))
   end
 
   context "user not logged in" do
