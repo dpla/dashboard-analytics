@@ -14,14 +14,6 @@ class ApiEventsPresenter < GaResponsePresenter
     row[columns.index("ga:eventAction")]
   end
 
-  def id(row)
-    row[columns.index("ga:eventLabel")].split(" : ").first rescue nil
-  end
-
-  def title(row)
-    row[columns.index("ga:eventLabel")].split(" : ").last rescue nil
-  end
-
   def count(row)
     row[columns.index("ga:totalEvents")]
   end

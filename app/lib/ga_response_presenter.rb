@@ -26,4 +26,20 @@ class GaResponsePresenter
   def rows
     response && response.rows ? response.rows : []
   end
+
+  # nil when the row has no label or the report omits the column.
+  def event_label(row)
+    index = columns.index("ga:eventLabel")
+    row[index] if index
+  end
+
+  # Labels are "id : title". Split once; the title may contain " : ".
+  # GA has sent labels with embedded CRLF, hence the strip.
+  def id(row)
+    event_label(row)&.split(" : ", 2)&.first&.strip
+  end
+
+  def title(row)
+    event_label(row)&.split(" : ", 2)&.last&.strip
+  end
 end

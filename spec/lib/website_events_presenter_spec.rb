@@ -16,6 +16,11 @@ describe WebsiteEventsPresenter do
       row = [nil]
       expect(presenter.id(row)).to be_nil
     end
+
+    it 'returns nil when the label column is missing' do
+      allow(column_header).to receive(:name).and_return('ga:other')
+      expect(presenter.id(['some-id : Title'])).to be_nil
+    end
   end
 
   describe '#title' do
@@ -27,6 +32,11 @@ describe WebsiteEventsPresenter do
     it 'returns nil when label is nil' do
       row = [nil]
       expect(presenter.title(row)).to be_nil
+    end
+
+    it 'keeps a title containing the separator intact' do
+      row = ['some-id : Blueberry : Pie']
+      expect(presenter.title(row)).to eq 'Blueberry : Pie'
     end
   end
 
