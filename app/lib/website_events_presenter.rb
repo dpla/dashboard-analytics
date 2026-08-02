@@ -24,13 +24,11 @@ class WebsiteEventsPresenter  < GaResponsePresenter
 
   # Labels are "id : title". Split once; the title may contain " : ".
   def id(row)
-    label_index = columns.index("ga:eventLabel")
-    row[label_index]&.split(" : ", 2)&.first&.strip if label_index
+    event_label(row)&.split(" : ", 2)&.first&.strip
   end
 
   def title(row)
-    label_index = columns.index("ga:eventLabel")
-    row[label_index]&.split(" : ", 2)&.last&.strip if label_index
+    event_label(row)&.split(" : ", 2)&.last&.strip
   end
 
   def count(row)
