@@ -16,6 +16,11 @@ describe ApiEventsPresenter do
       row = [nil]
       expect(presenter.id(row)).to be_nil
     end
+
+    it 'returns nil when the label column is missing' do
+      allow(column_header).to receive(:name).and_return('ga:other')
+      expect(presenter.id(['some-id : Title'])).to be_nil
+    end
   end
 
   describe '#title' do
