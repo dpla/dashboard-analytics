@@ -32,7 +32,7 @@ gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'sprockets', '~> 3.7.2'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ffi', '>= 1.9.24'
-gem 'nokogiri', '>= 1.18.9', '< 1.19'  # 1.19+ requires Ruby >= 3.2; app runs 3.1.2
+gem 'nokogiri', '>= 1.18.9', '< 1.20'  # 1.19+ requires Ruby >= 3.2; app runs 3.1.2
 gem 'loofah', '>= 2.19.1'
 gem 'rack', '>= 2.2.23'
 gem 'globalid', '>= 1.0.1'
