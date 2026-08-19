@@ -56,4 +56,12 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include Devise::Test::IntegrationHelpers, type: :request
+
+  # The data menu and event tables query the live DPLA API
+  config.before(:each, type: :request) do
+    allow_any_instance_of(DplaApiResponseBuilder)
+      .to receive(:curated_breakdown).and_return("stub-exhibition" => 1)
+    allow_any_instance_of(DplaApiResponseBuilder)
+      .to receive(:curated_memberships_for_items).and_return({})
+  end
 end

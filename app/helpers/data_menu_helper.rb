@@ -8,30 +8,6 @@ module DataMenuHelper
     link_to("Overview", path, html_opts(path))
   end
 
-  def render_website_timelines_link(target)
-    path = target.is_a?(Hub) ?
-      hub_timeline_path(route_id(target.name), 'website', date_opts) :
-      hub_contributor_timeline_path(route_id(target.hub.name), route_id(target.name), 'website', date_opts)
-
-    link_to("DPLA website use timelines", path, html_opts(path))
-  end
-
-  def render_api_timelines_link(target)
-    path = target.is_a?(Hub) ?
-      hub_timeline_path(route_id(target.name), 'api', date_opts) :
-      hub_contributor_timeline_path(route_id(target.hub.name), route_id(target.name), 'api', date_opts)
-
-    link_to("API use timelines", path, html_opts(path))
-  end
-
-  def render_locations_link(target)
-    path = target.is_a?(Hub) ?
-      hub_locations_path(route_id(target.name), date_opts) :
-      hub_contributor_locations_path(route_id(target.hub.name), route_id(target.name), date_opts)
-
-    link_to("DPLA website user locations", path, html_opts(path))
-  end
-
   def render_view_item_link(target)
     path = target.is_a?(Hub) ?
       hub_event_path(route_id(target.name), 'view_item', date_opts) :
@@ -41,6 +17,10 @@ module DataMenuHelper
   end
 
   def render_view_exhibit_link(target)
+    unless curated_participant?(target, :exhibitions)
+      return disabled_menu_item("Exhibition views", "No items in DPLA exhibitions")
+    end
+
     path = target.is_a?(Hub) ?
       hub_event_path(route_id(target.name), 'view_exhibit', date_opts) :
       hub_contributor_event_path(route_id(target.hub.name), route_id(target.name), 'view_exhibit', date_opts)
@@ -49,6 +29,10 @@ module DataMenuHelper
   end
 
   def render_view_pss_link(target)
+    unless curated_participant?(target, :primary_source_sets)
+      return disabled_menu_item("Primary source set views", "No items in DPLA primary source sets")
+    end
+
     path = target.is_a?(Hub) ?
       hub_event_path(route_id(target.name), 'view_pss', date_opts) :
       hub_contributor_event_path(route_id(target.hub.name), route_id(target.name), 'view_pss', date_opts)
@@ -64,30 +48,26 @@ module DataMenuHelper
     link_to("DPLA website click throughs", path, html_opts(path))
   end
 
-  def render_view_api_link(target)
-    path = target.is_a?(Hub) ?
-      hub_event_path(route_id(target.name), 'view_api', date_opts) :
-      hub_contributor_event_path(route_id(target.hub.name), route_id(target.name), 'view_api', date_opts)
-
-    link_to("API item views", path, html_opts(path))
-  end
-
-  def render_website_terms_link
-    path = search_term_path('website', date_opts)
-    link_to("Website", path, html_opts(path))
-  end
-
-  def render_api_terms_link
-    path = search_term_path('api', date_opts)
-    link_to("API", path, html_opts(path))
-  end
-
   def render_wikimedia_readiness_link(target)
+    unless wikimedia_participant?(target)
+      return disabled_menu_item("Wikimedia readiness", "Not a Wikimedia pipeline participant")
+    end
+
     path = target.is_a?(Hub) ?
       hub_wikimedia_preparations_path(route_id(target.name), date_opts) :
       hub_contributor_wikimedia_preparations_path(route_id(target.hub.name), route_id(target.name), date_opts)
 
     link_to("Wikimedia readiness", path, html_opts(path))
+  end
+
+  def wikimedia_participant?(target)
+    target.is_a?(Hub) ?
+      WikimediaParticipant.hub_participant?(target.name) :
+      WikimediaParticipant.participant?(target.hub.name, target.name)
+  end
+
+  def disabled_menu_item(label, title)
+    content_tag(:span, label, class: "disabled", title: title)
   end
 
   ##

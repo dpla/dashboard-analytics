@@ -42,4 +42,11 @@ class GaResponsePresenter
   def title(row)
     event_label(row)&.split(" : ", 2)&.last&.strip
   end
+
+  # Overridden where a table shows curated content.
+  def membership_kind; end
+
+  def memberships(_row)
+    []
+  end
 end
