@@ -139,6 +139,15 @@ describe DplaApiResponseBuilder do
       expect(builder.curated_memberships(:exhibitions, 'HathiTrust')).to eq({})
     end
 
+    it 'discards earlier pages when a later page fails' do
+      ok = double(code: 200,
+                  body: { 'docs' => [{ 'id' => 'aaa', 'exhibitions' => 'activism' }],
+                          'count' => 99 }.to_json)
+      failed = double(code: 500)
+      allow(described_class).to receive(:get).and_return(ok, failed)
+      expect(builder.curated_memberships(:exhibitions, 'HathiTrust')).to eq({})
+    end
+
     it 'is empty when the request raises' do
       allow(described_class).to receive(:get).and_raise(Net::OpenTimeout)
       expect(builder.curated_memberships(:exhibitions, 'HathiTrust')).to eq({})

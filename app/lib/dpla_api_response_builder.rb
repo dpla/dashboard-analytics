@@ -109,7 +109,11 @@ class DplaApiResponseBuilder
       query['dataProvider.name'] = %("#{contributor.delete('"')}") if contributor
 
       res = self.class.get('/items', query: query, timeout: CURATED_TIMEOUT_SECONDS)
-      break unless res.code == 200
+      unless res.code == 200
+        Rails.logger.warn(
+          "DplaApiResponseBuilder#curated_memberships: page #{page} returned #{res.code}")
+        return {}
+      end
 
       body = JSON.parse(res.body)
       docs = body['docs'] || []
@@ -123,7 +127,7 @@ class DplaApiResponseBuilder
     result
   rescue StandardError => e
     Rails.logger.warn("DplaApiResponseBuilder#curated_memberships: #{e.class}: #{e.message}")
-    result
+    {}
   end
 
   private
