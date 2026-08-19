@@ -29,12 +29,12 @@
     <% if pages > 5 %>
       <% action, carried = pagination_form_target(page_url) %>
       <%= form_tag(action, method: :get, class: "pagination-jump") do %>
+        <%# No ids: start_date and end_date would collide with the date menu. %>
         <% carried.each do |name, value| %>
           <%= hidden_field_tag name, value, id: nil %>
         <% end %>
         <%= label_tag :page, "Go to page" %>
-        <%= number_field_tag :page, page, min: 1, max: pages, id: nil,
-                             "aria-label": "Page number, 1 to #{pages}" %>
+        <%= number_field_tag :page, page, min: 1, max: pages %>
         <%= submit_tag "Go", name: nil %>
       <% end %>
     <% end %>
