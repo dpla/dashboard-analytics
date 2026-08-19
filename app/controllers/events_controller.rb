@@ -4,6 +4,7 @@ class EventsController < ApplicationController
   # Controller concerns
   include DateSetter
   # View helpers
+  include CsvFilenameHelper
   include DataMenuHelper
   include DateHelper
   include PaginationHelper
@@ -42,7 +43,7 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: "shared/events_table" }
-      format.csv { send_data @events.to_csv }
+      format.csv { send_data @events.to_csv, filename: events_csv_filename }
     end
   end
 
@@ -62,11 +63,16 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: "shared/events_table" }
-      format.csv { send_data @events.to_csv }
+      format.csv { send_data @events.to_csv, filename: events_csv_filename }
     end
   end
 
   private
+
+  def events_csv_filename
+    csv_filename(params[:hub_id], params[:contributor_id],
+                 @events.label, csv_date_range)
+  end
 
   # Event tables have no rows before event_label (see DataWindow).
   # Also floors api_events, harmless while ApiEvents#response is stubbed nil;

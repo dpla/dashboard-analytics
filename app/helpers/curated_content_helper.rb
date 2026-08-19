@@ -8,7 +8,7 @@ module CuratedContentHelper
   ##
   # Which exhibitions or primary source sets hold the institution's items,
   # as { slug => item count }
-  # nil when the API call failed
+  # nil when the API call failed.
   #
   # @param target [Hub|Contributor]
   # @param kind [Symbol] :exhibitions or :primary_source_sets
@@ -25,8 +25,8 @@ module CuratedContentHelper
     end
   end
 
-  # Fails open: an API failure counts as participation, so links never
-  # wrongly disable.
+  # Fails open: an API failure counts as participation,
+  # so links never wrongly disable.
   def curated_participant?(target, kind)
     breakdown = curated_breakdown_for(target, kind)
     breakdown.nil? || breakdown.any?

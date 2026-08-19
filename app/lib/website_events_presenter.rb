@@ -51,6 +51,7 @@ class WebsiteEventsPresenter  < GaResponsePresenter
   # @return [CSV]
   def to_csv
     attributes = ["Item", "Item ID", "Contributor", label]
+    attributes << membership_column if membership_kind
 
     CSV.generate(headers: true) do |csv|
       csv << attributes
@@ -61,10 +62,16 @@ class WebsiteEventsPresenter  < GaResponsePresenter
         lookup = contributor_lookup(response.rows)
 
         response.rows.each do |row|
-          csv << [title(row), id(row), contributor(row, lookup), count(row)]
+          line = [title(row), id(row), contributor(row, lookup), count(row)]
+          line << memberships(row).join("; ") if membership_kind
+          csv << line
         end
       end
     end
+  end
+
+  def membership_column
+    membership_kind == :exhibitions ? "Exhibitions" : "Primary source sets"
   end
 
   private
@@ -93,9 +100,10 @@ class WebsiteEventsPresenter  < GaResponsePresenter
     @item_contributor_lookup ||= contributor_lookup(rows)
   end
 
-  # One lookup for the whole displayed page.
+  # One lookup for the institution.
+  # Serves the displayed page and a full CSV export alike.
   def membership_lookup
-    @membership_lookup ||= DplaApiResponseBuilder.new.curated_memberships_for_items(
-      membership_kind, rows.filter_map { |row| id(row) })
+    @membership_lookup ||= DplaApiResponseBuilder.new.curated_memberships(
+      membership_kind, @ga_response.hub, @ga_response.contributor)
   end
 end

@@ -93,7 +93,7 @@ The GA4 integration lives in `app/lib/ga_response_builder.rb`. Each metric secti
 The DPLA API (`api.dp.la/v2/`) is used for two things: resolving contributor names for item IDs not yet in the S3 cache (`ItemDataProviders`), and live lookups of which DPLA exhibitions and primary source sets hold an institution's items. The index stamps `exhibitions` and `primarySourceSets` slugs onto items (added to the ingestion pipeline in August 2026); the dashboard reads them two ways:
 
 - `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" and "Primary source set views" when nothing is there. Results are memoized per kind, hub, and contributor, so the menu's two checks cost one call each. 3-second timeout, no retries (to avoid excessive API calls).
-- `DplaApiResponseBuilder#curated_memberships_for_items` resolves the items on each page of the exhibition and source set views tables (`id=a OR b ...&fields=id,exhibitions`). Each row shows which exhibition or set holds the item, linked by slug. The API caps each field parameter at 200 characters, so the OR list holds five IDs per request (ten requests for a full 50-row table page).
+- `DplaApiResponseBuilder#curated_memberships` fetches every curated item an institution holds (`exhibitions=?*&provider.name="..."&fields=id,exhibitions&page_size=500`). The exhibition and source set views tables use it to name the exhibition or set holding each item, linked by slug in the table and as a trailing column in the CSV export. Asking per institution rather than per item keeps this to one request whatever the table's size, which matters because a CSV export covers every page, not just the displayed 50 rows.
 
 Hub and contributor item counts, and the contributor lists used throughout the dashboard, come from `hub_stats.json` in S3 (see below).
 
@@ -262,7 +262,9 @@ Links between pages preserve the selected date range.
 
 ### Table Pagination
 
-Large tables — website events, search terms, the contributors list, and the contributor comparison — paginate at 50 rows (`PaginationHelper::PAGE_SIZE`) via a `page` URL parameter, with previous/next controls below each table. GA4-backed tables fetch one page per request via the GA4 `offset`/`limit` parameters; contributor tables slice the S3-cached list in memory. CSV downloads always export the complete dataset.
+Large tables — website events, search terms, the contributors list, and the contributor comparison — paginate at 50 rows (`PaginationHelper::PAGE_SIZE`) via a `page` URL parameter. The controls below each table give previous/next, numbered pages around the current one with the first and last always reachable, and a "Go to page" box once a table runs past five pages. GA4-backed tables fetch one page per request via the GA4 `offset`/`limit` parameters; contributor tables slice the S3-cached list in memory.
+
+CSV downloads always export the complete dataset, named for the hub, contributor, table, and date range (e.g. `HathiTrust_Exhibition-views_2025-07_2026-07.csv`) so a folder of exports stays readable.
 
 ---
 
