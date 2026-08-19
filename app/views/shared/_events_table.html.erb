@@ -2,7 +2,7 @@
   <h2><%= @events.label %></h2>
 
   <div class="description-text">
-    <%= find_tooltip(params[:event_id]) %>
+    <%= find_event_page_description(params[:event_id]) %>
   </div>
 
   <% if @events.total_results.to_i > 0 %>
@@ -36,6 +36,16 @@
         <a href="<%= "#{Settings.dpla.base_uri}item/#{@events.id(row)}" %>">
           <%= @events.title(row) %>
         </a>
+        <% slugs = @events.memberships(row) %>
+        <% if slugs.any? %>
+          <div class="curated-membership">
+            In <%= curated_noun(@events.membership_kind, slugs.size) %>
+            <%= safe_join(slugs.map { |slug|
+                  link_to(slug, curated_page_url(@events.membership_kind, slug),
+                          target: "_blank", rel: "noopener")
+                }, ", ") %>
+          </div>
+        <% end %>
       </td>
       <% unless @contributor %>
       <td><%= @events.contributor(row) %></td>

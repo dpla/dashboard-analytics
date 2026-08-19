@@ -6,37 +6,28 @@
 <main>
   <div class="clear"/>
 
-  <div class="data-menu">
-    <ul>
-      <li><%= render_website_terms_link %></li>
-      <li><%= render_api_terms_link %></li>
-    </ul>
-  </div>
+  <div class="item-table">
 
-  <div class="data-content">
-    <div class="item-table">
+    <h2><%= scope_label %></h2>
 
-        <h2><%= scope_label %></h2>
-
-        <div class="description-text">
-          Top search terms across the DPLA <%= scope_label %> for all hubs and contributors.
-          Equivalent to "search terms" in Google Analytics.
-        </div>
-
-        <% if params[:id] == "website" %>
-
-          <%= render_async_section website_search_terms_path(date_opts.merge(page_opts)) do %>
-            <%= render "shared/loading", message: "Loading search terms…" %>
-          <% end %>
-
-        <% elsif params[:id] == "api" %>
-           <%= render_async_section api_search_terms_path(date_opts) do %>
-            <%= render "shared/loading", message: "Loading search terms…" %>
-          <% end %>
-
-        <% else %>
-          The ID in the URI, "<%= params[:id] %>", is not recognized.
-        <% end %>
+    <div class="description-text">
+      Top search terms across the DPLA <%= scope_label %> for all hubs and contributors.
+      Equivalent to "search terms" in Google Analytics.
     </div>
+
+    <% if params[:id] == "website" %>
+
+      <%= render_async_section website_search_terms_path(date_opts.merge(page_opts)) do %>
+        <%= render "shared/loading", message: "Loading search terms…" %>
+      <% end %>
+
+    <% elsif params[:id] == "api" %>
+      <%= render_async_section api_search_terms_path(date_opts) do %>
+        <%= render "shared/loading", message: "Loading search terms…" %>
+      <% end %>
+
+    <% else %>
+      The ID in the URI, "<%= params[:id] %>", is not recognized.
+    <% end %>
   </div>
 </main>

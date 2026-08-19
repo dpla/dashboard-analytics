@@ -2,6 +2,11 @@ require 'csv'
 
 class WebsiteEventsPresenter  < GaResponsePresenter
 
+  MEMBERSHIP_KINDS = {
+    "View Exhibition Item" => :exhibitions,
+    "View Primary Source" => :primary_source_sets,
+  }.freeze
+
   def label
     dict = {
       "View Item" => "Digital library catalog views",
@@ -24,6 +29,21 @@ class WebsiteEventsPresenter  < GaResponsePresenter
 
   def count(row)
     row[columns.index("ga:totalEvents")]
+  end
+
+  # nil unless this table shows curated content.
+  def membership_kind
+    MEMBERSHIP_KINDS[@ga_response.event_name]
+  end
+
+  ##
+  # Curated-content slugs for the row's item, e.g. ["erie-canal"].
+  # Empty for other tables, which never hit the API.
+  #
+  def memberships(row)
+    return [] unless membership_kind
+
+    membership_lookup[id(row)] || []
   end
 
   ##
@@ -71,5 +91,11 @@ class WebsiteEventsPresenter  < GaResponsePresenter
 
   def item_contributor_lookup
     @item_contributor_lookup ||= contributor_lookup(rows)
+  end
+
+  # One lookup for the whole displayed page.
+  def membership_lookup
+    @membership_lookup ||= DplaApiResponseBuilder.new.curated_memberships_for_items(
+      membership_kind, rows.filter_map { |row| id(row) })
   end
 end

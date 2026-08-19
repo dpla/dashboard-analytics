@@ -90,7 +90,12 @@ The GA4 integration lives in `app/lib/ga_response_builder.rb`. Each metric secti
 
 ### DPLA API
 
-The DPLA API (`api.dp.la/v2/`) is used only to resolve contributor names for item IDs not yet in the S3 cache (`ItemDataProviders`). Hub and contributor item counts, and the contributor lists used throughout the dashboard, come from `hub_stats.json` in S3 (see below).
+The DPLA API (`api.dp.la/v2/`) is used for two things: resolving contributor names for item IDs not yet in the S3 cache (`ItemDataProviders`), and live lookups of which DPLA exhibitions and primary source sets hold an institution's items. The index stamps `exhibitions` and `primarySourceSets` slugs onto items (added to the ingestion pipeline in August 2026); the dashboard reads them two ways:
+
+- `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" and "Primary source set views" when nothing is there. One memoized call per page render, 3-second timeout, no retries (to avoid excessive API calls).
+- `DplaApiResponseBuilder#curated_memberships_for_items` resolves the items on each page of the exhibition and source set views tables (`id=a OR b ...&fields=id,exhibitions`). Each row shows which exhibition or set holds the item, linked by slug. The API caps each field parameter at 200 characters, so the OR list holds five IDs per request (ten requests for a full 50-row table page).
+
+Hub and contributor item counts, and the contributor lists used throughout the dashboard, come from `hub_stats.json` in S3 (see below).
 
 The source of truth for which hubs and contributors exist, and their Wikidata IDs, is a separate JSON file maintained by the ingestion team: [`institutions_v2.json`](https://raw.githubusercontent.com/dpla/ingestion3/main/src/main/resources/wiki/institutions_v2.json). This file is used by the Wikimedia cache builder but not directly by the API-based item count queries.
 

@@ -19,12 +19,12 @@ module TooltipsHelper
   end
 
   def view_exhibition_tooltip
-    "One of your items was viewed within a curated DPLA exhibition.
+    "A user viewed one of your items in a DPLA exhibition.
     Comparable to \"pageview\" in Google Analytics."
   end
 
   def view_primary_source_set_tooltip
-    "One of your items was viewed within a curated DPLA primary source set.
+    "A user viewed one of your items in a DPLA primary source set.
     Comparable to \"pageview\" in Google Analytics."
   end
 
@@ -137,6 +137,32 @@ module TooltipsHelper
 
   def wikimedia_views_total_tooltip
     "All-time total page views of Wikimedia pages featuring files uploaded from your collection."
+  end
+
+  # Fuller copy for the table pages; the short forms above stay as tooltips.
+
+  def view_exhibition_description
+    "Views of your items on DPLA exhibition pages. Each row is one of your
+    items; the count is how many times visitors viewed it in an exhibition. Comparable to \"pageview\" in
+    Google Analytics."
+  end
+
+  def view_primary_source_set_description
+    "Views of your items on DPLA primary source set pages. Each source in a
+    set has its own page featuring one item; the count is how many times
+    visitors viewed your item's page.
+    Comparable to \"pageview\" in Google Analytics."
+  end
+
+  def find_event_page_description(key)
+    case key
+    when "view_exhibit"
+      view_exhibition_description
+    when "view_pss"
+      view_primary_source_set_description
+    else
+      find_tooltip(key)
+    end
   end
 
   def find_tooltip(key)

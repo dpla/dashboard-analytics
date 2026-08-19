@@ -32,6 +32,89 @@ class DplaApiResponseBuilder
     result
   end
 
+  # Fields the DPLA index stamps onto items in curated content.
+  CURATED_FIELDS = {
+    exhibitions: 'exhibitions',
+    primary_source_sets: 'primarySourceSets',
+  }.freeze
+
+  # Covers all 32 exhibitions and 142 source sets.
+  CURATED_FACET_SIZE = 200
+
+  # The API caps each parameter at 200 characters,
+  # which fits five 32-character IDs.
+  CURATED_ID_BATCH = 5
+
+  # Runs during page render, so one short attempt and no retries.
+  CURATED_TIMEOUT_SECONDS = 3
+
+  ##
+  # Which exhibitions or primary source sets hold an institution's items.
+  #
+  # @param kind [Symbol] :exhibitions or :primary_source_sets
+  # @param hub [String] provider name
+  # @param contributor [String, nil] dataProvider name
+  # @return [Hash<String, Integer>, nil] { slug => item count }; {} when
+  #   there are none, nil when the request failed so callers can fail open.
+  #
+  def curated_breakdown(kind, hub, contributor = nil)
+    field = CURATED_FIELDS.fetch(kind)
+    query = {
+      'facets' => field,
+      'facet_size' => CURATED_FACET_SIZE,
+      'provider.name' => %("#{hub.delete('"')}"),
+      'page_size' => 0,
+      'api_key' => api_key,
+    }
+    query['dataProvider.name'] = %("#{contributor.delete('"')}") if contributor
+
+    res = self.class.get('/items', query: query, timeout: CURATED_TIMEOUT_SECONDS)
+    return nil unless res.code == 200
+
+    terms = JSON.parse(res.body).dig('facets', field, 'terms') || []
+    terms.to_h { |term| [term['term'], term['count'].to_i] }
+  rescue StandardError => e
+    Rails.logger.warn("DplaApiResponseBuilder#curated_breakdown: #{e.class}: #{e.message}")
+    nil
+  end
+
+  ##
+  # Which curated content holds each of the given items. Uses the search
+  # endpoint rather than the multi-ID path endpoint, which errors on some
+  # mixes of IDs no longer in the index.
+  #
+  # @param kind [Symbol] :exhibitions or :primary_source_sets
+  # @param ids [Array<String>] DPLA item hex IDs
+  # @return [Hash<String, Array<String>>] { item_id => [slug, ...] }; items
+  #   with no membership are omitted, and {} on failure — the annotation is
+  #   optional, so callers carry on without it.
+  #
+  def curated_memberships_for_items(kind, ids)
+    result = {}
+    field = CURATED_FIELDS.fetch(kind)
+
+    ids.filter_map { |id| id&.strip.presence }.uniq.each_slice(CURATED_ID_BATCH) do |batch|
+      query = {
+        'id' => batch.join(' OR '),
+        'fields' => "id,#{field}",
+        'page_size' => batch.size,
+        'api_key' => api_key,
+      }
+      res = self.class.get('/items', query: query, timeout: CURATED_TIMEOUT_SECONDS)
+      next unless res.code == 200
+
+      (JSON.parse(res.body)['docs'] || []).each do |doc|
+        # `fields` returns a lone membership as a bare string, not an array.
+        slugs = Array(doc[field]).map(&:to_s).reject(&:empty?)
+        result[doc['id']] = slugs if doc['id'] && slugs.any?
+      end
+    end
+    result
+  rescue StandardError => e
+    Rails.logger.warn("DplaApiResponseBuilder#curated_memberships_for_items: #{e.class}: #{e.message}")
+    result
+  end
+
   private
 
   def api_key

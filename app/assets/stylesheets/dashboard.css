@@ -186,6 +186,21 @@ nav .divider {
   background-color: #d7ebf4
 }
 
+.data-menu span.disabled {
+  color: #a3a5a6;
+  border-bottom: 1px solid #e9dec8;
+  display: block;
+  padding: 10px;
+  cursor: default;
+}
+
+.item-table .curated-membership {
+  font-size: 0.85em;
+  color: #767879;
+  margin-top: 2px;
+  padding-left: 4px;
+}
+
 .alert-banner {
   clear: both;
   background-color: #fef9ec;

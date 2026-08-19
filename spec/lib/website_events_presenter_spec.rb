@@ -86,4 +86,37 @@ describe WebsiteEventsPresenter do
       end
     end
   end
+
+  describe 'curated content membership' do
+    let(:column_header) { [double(name: 'ga:eventLabel')] }
+    let(:row) { ['abc123 : Some Title'] }
+    let(:ga_data) { double(column_headers: column_header, rows: [row], total_results: 1) }
+    let(:ga_response) do
+      double(response: ga_data, multi_page_response: [], event_name: event_name)
+    end
+
+    context 'on an exhibition views table' do
+      let(:event_name) { 'View Exhibition Item' }
+
+      it 'resolves slugs for the row through one batched lookup' do
+        api = instance_double(DplaApiResponseBuilder)
+        allow(DplaApiResponseBuilder).to receive(:new).and_return(api)
+        allow(api).to receive(:curated_memberships_for_items)
+          .with(:exhibitions, ['abc123'])
+          .and_return('abc123' => ['erie-canal'])
+        expect(presenter.membership_kind).to eq :exhibitions
+        expect(presenter.memberships(row)).to eq ['erie-canal']
+      end
+    end
+
+    context 'on a table that is not curated content' do
+      let(:event_name) { 'View Item' }
+
+      it 'is empty and never calls the API' do
+        expect(DplaApiResponseBuilder).not_to receive(:new)
+        expect(presenter.membership_kind).to be_nil
+        expect(presenter.memberships(row)).to eq []
+      end
+    end
+  end
 end
