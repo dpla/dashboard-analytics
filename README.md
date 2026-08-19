@@ -262,7 +262,9 @@ Links between pages preserve the selected date range.
 
 ### Table Pagination
 
-Large tables — website events, search terms, the contributors list, and the contributor comparison — paginate at 50 rows (`PaginationHelper::PAGE_SIZE`) via a `page` URL parameter, with previous/next controls below each table. GA4-backed tables fetch one page per request via the GA4 `offset`/`limit` parameters; contributor tables slice the S3-cached list in memory. CSV downloads always export the complete dataset.
+Large tables — website events, search terms, the contributors list, and the contributor comparison — paginate at 50 rows (`PaginationHelper::PAGE_SIZE`) via a `page` URL parameter. The controls below each table give previous/next, numbered pages around the current one with the first and last always reachable, and a "Go to page" box once a table runs past five pages. GA4-backed tables fetch one page per request via the GA4 `offset`/`limit` parameters; contributor tables slice the S3-cached list in memory.
+
+CSV downloads always export the complete dataset, named for the hub, contributor, table, and date range (e.g. `HathiTrust_Exhibition-views_2025-07_2026-07.csv`) so a folder of exports stays readable.
 
 ---
 
