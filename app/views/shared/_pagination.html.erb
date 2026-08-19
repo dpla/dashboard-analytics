@@ -1,17 +1,42 @@
-<%# Prev/next nav. Locals: total (row count across all pages),
-    page_url (lambda: page number -> URL). %>
-<% total_pages = (total.to_i / PaginationHelper::PAGE_SIZE.to_f).ceil %>
-<% if total_pages > 1 %>
+<%# Page nav.
+    Locals: total (rows across all pages), page_url (page number -> URL). %>
+<% pages = total_pages(total) %>
+<% if pages > 1 %>
+  <% page = current_page.clamp(1, pages) %>
   <nav class="pagination" aria-label="Pagination">
-    <% if current_page > 1 %>
-      <%# Clamp so Previous works from past-the-end URLs. %>
-      <%= link_to "← Previous", page_url.call([current_page - 1, total_pages].min) %>
+    <%# Clamp so Previous works from past-the-end URLs. %>
+    <% if page > 1 %>
+      <%= link_to "← Previous", page_url.call(page - 1), class: "pagination-step" %>
     <% end %>
-    <span class="pagination-status">
-      Page <%= number_with_delimiter(current_page) %> of <%= number_with_delimiter(total_pages) %>
+
+    <span class="pagination-pages">
+      <% page_links(pages, page).each do |number| %>
+        <% if number.nil? %>
+          <span class="pagination-gap">…</span>
+        <% elsif number == page %>
+          <span class="pagination-current" aria-current="page"><%= number %></span>
+        <% else %>
+          <%= link_to number, page_url.call(number),
+                      "aria-label": "Page #{number}" %>
+        <% end %>
+      <% end %>
     </span>
-    <% if current_page < total_pages %>
-      <%= link_to "Next →", page_url.call(current_page + 1) %>
+
+    <% if page < pages %>
+      <%= link_to "Next →", page_url.call(page + 1), class: "pagination-step" %>
+    <% end %>
+
+    <% if pages > 5 %>
+      <% action, carried = pagination_form_target(page_url) %>
+      <%= form_tag(action, method: :get, class: "pagination-jump") do %>
+        <% carried.each do |name, value| %>
+          <%= hidden_field_tag name, value, id: nil %>
+        <% end %>
+        <%= label_tag :page, "Go to page" %>
+        <%= number_field_tag :page, page, min: 1, max: pages, id: nil,
+                             "aria-label": "Page number, 1 to #{pages}" %>
+        <%= submit_tag "Go", name: nil %>
+      <% end %>
     <% end %>
   </nav>
 <% end %>

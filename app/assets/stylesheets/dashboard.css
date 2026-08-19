@@ -502,9 +502,68 @@ form.comparison legend {
 nav.pagination {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 8px 20px;
   clear: both;
   margin: 15px 0;
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-pages a,
+.pagination-current,
+.pagination-gap {
+  min-width: 30px;
+  padding: 4px 6px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination-pages a {
+  border: 1px solid #2c7da0;
+  border-radius: 3px;
+  color: #2c7da0;
+}
+
+.pagination-pages a:hover {
+  background-color: #d7ebf4;
+  text-decoration: none;
+}
+
+.pagination-current {
+  border: 1px solid #2c7da0;
+  border-radius: 3px;
+  background-color: #2c7da0;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination-step {
+  color: #2c7da0;
+}
+
+.pagination-gap {
+  min-width: 0;
+  color: #767879;
+}
+
+.pagination-jump {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-jump input[type="number"] {
+  width: 5em;
+  padding: 3px;
+}
+
+.pagination-jump input[type="submit"] {
+  margin-bottom: 0;
 }
 
 footer {

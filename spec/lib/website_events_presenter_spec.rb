@@ -92,19 +92,22 @@ describe WebsiteEventsPresenter do
     let(:row) { ['abc123 : Some Title'] }
     let(:ga_data) { double(column_headers: column_header, rows: [row], total_results: 1) }
     let(:ga_response) do
-      double(response: ga_data, multi_page_response: [], event_name: event_name)
+      double(response: ga_data, multi_page_response: [], event_name: event_name,
+             hub: 'HathiTrust', contributor: nil)
     end
 
     context 'on an exhibition views table' do
       let(:event_name) { 'View Exhibition Item' }
 
-      it 'resolves slugs for the row through one batched lookup' do
+      it 'resolves slugs through one lookup scoped to the institution' do
         api = instance_double(DplaApiResponseBuilder)
         allow(DplaApiResponseBuilder).to receive(:new).and_return(api)
-        allow(api).to receive(:curated_memberships_for_items)
-          .with(:exhibitions, ['abc123'])
+        expect(api).to receive(:curated_memberships)
+          .with(:exhibitions, 'HathiTrust', nil)
+          .once
           .and_return('abc123' => ['erie-canal'])
         expect(presenter.membership_kind).to eq :exhibitions
+        expect(presenter.memberships(row)).to eq ['erie-canal']
         expect(presenter.memberships(row)).to eq ['erie-canal']
       end
     end
@@ -116,6 +119,44 @@ describe WebsiteEventsPresenter do
         expect(DplaApiResponseBuilder).not_to receive(:new)
         expect(presenter.membership_kind).to be_nil
         expect(presenter.memberships(row)).to eq []
+      end
+    end
+
+    describe '#to_csv' do
+      let(:column_header) do
+        [double(name: 'ga:eventLabel'), double(name: 'ga:eventAction'),
+         double(name: 'ga:totalEvents')]
+      end
+      let(:row) { ['abc123 : Some Title', 'Some Institution', '42'] }
+      let(:ga_response) do
+        double(response: ga_data, multi_page_response: [ga_data],
+               event_name: event_name, hub: 'HathiTrust', contributor: nil)
+      end
+
+      context 'on an exhibition views table' do
+        let(:event_name) { 'View Exhibition Item' }
+
+        it 'adds a column naming the exhibitions holding the item' do
+          allow(ItemDataProviders).to receive(:items).and_return({})
+          api = instance_double(DplaApiResponseBuilder)
+          allow(DplaApiResponseBuilder).to receive(:new).and_return(api)
+          allow(api).to receive(:data_providers_for_items).and_return({})
+          allow(api).to receive(:curated_memberships)
+            .and_return('abc123' => %w[erie-canal activism])
+
+          csv = presenter.to_csv
+          expect(csv).to include "Exhibitions"
+          expect(csv).to include "erie-canal; activism"
+        end
+      end
+
+      context 'on a table that is not curated content' do
+        let(:event_name) { 'View Item' }
+
+        it 'adds no membership column' do
+          allow(ItemDataProviders).to receive(:items).and_return({})
+          expect(presenter.to_csv).not_to include "Exhibitions"
+        end
       end
     end
   end

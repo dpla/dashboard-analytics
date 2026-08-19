@@ -6,6 +6,7 @@ class SearchTermsController < ApplicationController
   # Site-wide floor: no hub or contributor params.
   include GaDataFloor
   # View helpers
+  include CsvFilenameHelper
   include DataMenuHelper
   include DateHelper
   include SearchTermsHelper
@@ -26,7 +27,10 @@ class SearchTermsController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: "shared/search_terms_table", locals: { scope: "website" } }
-      format.csv { send_data @search_terms.to_csv }
+      format.csv do
+        send_data @search_terms.to_csv,
+                  filename: csv_filename("DPLA website search terms", csv_date_range)
+      end
     end
   end
 
@@ -40,7 +44,10 @@ class SearchTermsController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: "shared/search_terms_table", locals: { scope: "api" } }
-      format.csv { send_data @search_terms.to_csv }
+      format.csv do
+        send_data @search_terms.to_csv,
+                  filename: csv_filename("DPLA API search terms", csv_date_range)
+      end
     end
   end
 end

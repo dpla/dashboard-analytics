@@ -5,6 +5,7 @@ class ContributorsController < ApplicationController
   include DateSetter
   include GaDataFloor
   # View helpers
+  include CsvFilenameHelper
   include DataMenuHelper
   include DateHelper
   include MetadataCompletenessHelper
@@ -354,7 +355,11 @@ class ContributorsController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: "shared/contributor_comparison" }
-      format.csv { send_data @contributor_comparison.to_csv }
+      format.csv do
+        send_data @contributor_comparison.to_csv,
+                  filename: csv_filename(params[:hub_id], "contributor comparison",
+                                         csv_date_range)
+      end
     end
   end
 

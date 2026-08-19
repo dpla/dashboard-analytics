@@ -40,8 +40,16 @@ class WebsiteEvents
     @hub = hub
   end
 
+  def hub
+    @hub
+  end
+
   def contributor=(contributor)
     @contributor = contributor
+  end
+
+  def contributor
+    @contributor
   end
 
   def start_date=(start_date)

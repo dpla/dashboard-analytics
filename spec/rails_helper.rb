@@ -62,6 +62,6 @@ RSpec.configure do |config|
     allow_any_instance_of(DplaApiResponseBuilder)
       .to receive(:curated_breakdown).and_return("stub-exhibition" => 1)
     allow_any_instance_of(DplaApiResponseBuilder)
-      .to receive(:curated_memberships_for_items).and_return({})
+      .to receive(:curated_memberships).and_return({})
   end
 end
