@@ -92,7 +92,7 @@ The GA4 integration lives in `app/lib/ga_response_builder.rb`. Each metric secti
 
 The DPLA API (`api.dp.la/v2/`) is used for two things: resolving contributor names for item IDs not yet in the S3 cache (`ItemDataProviders`), and live lookups of which DPLA exhibitions and primary source sets hold an institution's items. The index stamps `exhibitions` and `primarySourceSets` slugs onto items (added to the ingestion pipeline in August 2026); the dashboard reads them two ways:
 
-- `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" and "Primary source set views" when nothing is there. One memoized call per page render, 3-second timeout, no retries (to avoid excessive API calls).
+- `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" and "Primary source set views" when nothing is there. Results are memoized per kind, hub, and contributor, so the menu's two checks cost one call each. 3-second timeout, no retries (to avoid excessive API calls).
 - `DplaApiResponseBuilder#curated_memberships_for_items` resolves the items on each page of the exhibition and source set views tables (`id=a OR b ...&fields=id,exhibitions`). Each row shows which exhibition or set holds the item, linked by slug. The API caps each field parameter at 200 characters, so the OR list holds five IDs per request (ten requests for a full 50-row table page).
 
 Hub and contributor item counts, and the contributor lists used throughout the dashboard, come from `hub_stats.json` in S3 (see below).
