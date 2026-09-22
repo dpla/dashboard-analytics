@@ -41,7 +41,7 @@ gem 'webrick', '>= 1.8.2'
 gem 'net-imap', '>= 0.3.9'
 gem 'faraday', '>= 2.14.1'
 gem 'bcrypt', '~> 3.1', '>= 3.1.22'
-gem 'json', '~> 2.19', '>= 2.19.2'
+gem 'json', '~> 2.19'
 gem 'sentry-ruby', '~> 5.22'
 gem 'sentry-rails', '~> 5.22'
 
