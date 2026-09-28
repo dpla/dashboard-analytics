@@ -67,15 +67,21 @@ Website analytics come from the GA4 Reporting API (v1 beta) using a Google servi
 
 **Auth:** A JSON service account key file is provided to the application either as a local file (`google-analytics-key.json` at the repo root) or via the `GOOGLE_ANALYTICS_KEY` environment variable (used in production; when set, it overwrites the local file at boot). The key grants read-only access to the GA4 property.
 
-**History limits:** The `event_category` and `event_label` custom dimensions are queryable only from their registration date (Jul 18, 2025). Item IDs for events before that date can never be collected from GA4, which is why the DPLA API fallback for contributor names is permanent, not transitional.
+**Two event shapes.** dp.la has sent item events to GA4 in two different shapes over time. In the legacy shape, the event name is the contributing institution (GA4 truncates it to 40 characters), `event_category` is `"View Item : {hub}"`, and `event_label` is `"{item id} : {title}"`. Since September 2026, the frontend also sends a newer shape with fixed event names (`item_view`, `click_through`, `exhibition_item_view`, `primary_source_view`) and separate parameters for `partner`, `contributor`, `dpla_id`, and `item_title`.
+
+GA4 only reports a custom dimension for data collected after you register it. We registered the new dimensions on Sep 11, 2026, so `new_dimensions_date` in `settings.yml` is Sep 12, 2026, the first full day with data. The dashboard reads days before that date using the legacy shape and days from that date on using the new shape. When a date range crosses the switch, it runs one query per shape and merges the results. `GaEventSchema` defines the two shapes, and each GA class (`WebsiteOverview`, `WebsiteEventTotals`, `WebsiteEvents`, the by-contributor classes, and `WebsiteActivityMonths`) merges its own results.
+
+This has two side effects. First, sessions and users are summed across the switch, so a visitor who was active on both sides is counted twice. Second, a per-item table that crosses the switch has to export both shapes in full and page the merged rows in the app instead of letting GA4 page them. The legacy half never changes, so it is cached once and reused.
+
+The frontend keeps sending the legacy shape until someone turns off its `GA_LEGACY_EVENTS` flag. Leave the flag on until this app is deployed with the switch date in place. The legacy dimensions only go back to Jul 18, 2025, so GA4 has no item IDs for anything earlier. That is why the DPLA API fallback for contributor names is permanent rather than temporary.
 
 **What is tracked:**
 
 | Section | GA4 dimension used |
 |---|---|
-| Website overview | Sessions, users, events filtered by `customEvent:event_category` |
+| Website overview | Sessions, users, events for the hub: `customEvent:event_category` (legacy) or `eventName` and `customEvent:partner` (current) |
 | Website timelines | Monthly sessions over time |
-| Website events | Event name and count breakdowns |
+| Website events | Per-item counts: `customEvent:event_label` (legacy) or `customEvent:dpla_id` and `customEvent:item_title` (current) |
 | Website search terms | `searchTerm` dimension on search events |
 | Locations | `region` dimension on sessions |
 
@@ -92,7 +98,7 @@ The GA4 integration lives in `app/lib/ga_response_builder.rb`. Each metric secti
 
 The DPLA API (`api.dp.la/v2/`) is used for two things: resolving contributor names for item IDs not yet in the S3 cache (`ItemDataProviders`), and live lookups of which DPLA exhibitions and primary source sets hold an institution's items. The index stamps `exhibitions` and `primarySourceSets` slugs onto items (added to the ingestion pipeline in August 2026); the dashboard reads them two ways:
 
-- `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" and "Primary source set views" when nothing is there. Results are memoized per kind, hub, and contributor, so the menu's two checks cost one call each. 3-second timeout, no retries (to avoid excessive API calls).
+- `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" when nothing is there (the "Primary source set views" link reads `pss_sources.json` instead, see below). Results are memoized per kind, hub, and contributor. 3-second timeout, no retries (to avoid excessive API calls).
 - `DplaApiResponseBuilder#curated_memberships` fetches every curated item an institution holds (`exhibitions=?*&provider.name="..."&fields=id,exhibitions&page_size=500`). The exhibition and source set views tables use it to name the exhibition or set holding each item, linked by slug in the table and as a trailing column in the CSV export. Asking per institution rather than per item keeps this to one request whatever the table's size, which matters because a CSV export covers every page, not just the displayed 50 rows.
 
 Hub and contributor item counts, and the contributor lists used throughout the dashboard, come from `hub_stats.json` in S3 (see below).
@@ -123,16 +129,19 @@ The S3 bucket name is configured in `settings.yml` (`s3.bucket`). The applicatio
 
 ### AWS S3 — Hub Stats and Item Data Providers
 
-Three JSON files under `hub-stats/` drive item counts, contributor lists, and item-to-contributor name lookups:
+Four JSON files under `hub-stats/` drive item counts, contributor lists, item-to-contributor name lookups, and source set attribution:
 
 ```text
 hub-stats/
   hub_stats.json            ← per-hub item counts and contributor counts
   hub_stats_bws.json        ← same, filtered to BWS-tagged items
   item_data_providers.json  ← item ID → contributor name (cumulative)
+  pss_sources.json          ← source set page → item, hub, contributor
 ```
 
-`generate_hub_stats.py`, in the [dpla/ingestion3](https://github.com/dpla/ingestion3) repo, builds all three from Elasticsearch and GA4. It runs on the ingest EC2 after each monthly index rebuild, on day 5 of the month or later (GA4 revises the just-ended month for about 72 hours). The Rails readers (`HubStats`, `ItemDataProviders`) cache each file for 24 hours and alert through Sentry when a file is missing or more than 45 days old.
+`generate_hub_stats.py`, in the [dpla/ingestion3](https://github.com/dpla/ingestion3) repo, builds the first three from Elasticsearch and GA4. It runs on the ingest EC2 after each monthly index rebuild, on day 5 of the month or later (GA4 revises the just-ended month for about 72 hours). The Rails readers (`HubStats`, `ItemDataProviders`) cache each file for 24 hours and alert through Sentry when a file is missing or more than 45 days old.
+
+`pss_sources.json` works differently. Source set view events in GA4 can't be attributed to a hub: the PSS API doesn't give the frontend a provider or item ID for most sources, so nearly every event is recorded as `View Primary Source : Unknown partner`. Page views of `/primary-source-sets/{set}/sources/{id}` are recorded correctly, though, so `PssEvents` counts those instead and uses this file to map each page to its item, hub, and contributor. Because `pagePath` is a standard dimension rather than a custom one, this data goes back to April 2023 instead of stopping at the July 2025 floor for events. That is why there is a separate `pss_min_date` setting. The `pss_sources.py` script in ingestion3 builds the file from [dpla/pss-json](https://github.com/dpla/pss-json) and the DPLA API; re-run it whenever the sets change. About half of the sources point to items that are no longer in the index. Those keep an entry with no hub, and the table skips them.
 
 `WarmComparisonCacheJob` pre-warms the GA4 response cache for all hubs. Run it monthly as a one-off ECS task: `bundle exec rails cache:warm` with `LOG_LEVEL=info` and `GA4_READ_TIMEOUT_SEC=120` in the container overrides (`perform_later` will not work; the default async adapter dies with the process).
 
@@ -292,6 +301,7 @@ Data fetching is organized into a library of plain Ruby classes in `app/lib/`. T
 | Class | Source | Purpose |
 |---|---|---|
 | `GaResponseBuilder` | GA4 API | Base class; all GA4 builders subclass this |
+| `GaEventSchema` | — | The two GA4 event shapes, and which one a day uses |
 | `WebsiteOverview` | GA4 | Sessions, users, events for a hub/contributor |
 | `WebsiteEvents` | GA4 | Event name/count breakdown |
 | `WebsiteSearchTerms` | GA4 | Top search terms |

@@ -59,14 +59,15 @@ class SThreeResponseBuilder
   #
   # @param key [String] S3 key
   # @param default [Hash] value to return on failure
+  # @param stale_after [Duration, nil] nil for a file with no schedule
   #
   # @return [Array(Hash, ActiveSupport::Duration)] parsed JSON and its TTL
   #
-  def self.fetch_json(key, default:)
+  def self.fetch_json(key, default:, stale_after: STALE_AFTER)
     data = JSON.parse(response(key).body.read)
     # [] or null would raise in every caller that string-indexes it.
     raise TypeError, "expected Hash, got #{data.class}" unless data.is_a?(Hash)
-    warn_if_stale(key, data)
+    warn_if_stale(key, data, stale_after)
     [data, 24.hours]
   rescue Aws::S3::Errors::NoSuchKey
     message = "SThreeResponseBuilder: #{key} not found in S3 (not yet generated)"
@@ -84,9 +85,11 @@ class SThreeResponseBuilder
   # stale data, so make that loud. At most one alert per cache period per task.
   STALE_AFTER = 45.days
 
-  def self.warn_if_stale(key, data)
+  def self.warn_if_stale(key, data, stale_after = STALE_AFTER)
+    return unless stale_after
+
     generated_at = Time.iso8601(data["generated_at"].to_s) rescue nil
-    return unless generated_at && generated_at < STALE_AFTER.ago
+    return unless generated_at && generated_at < stale_after.ago
 
     message = "SThreeResponseBuilder: #{key} is stale (generated_at #{generated_at.to_date})"
     Rails.logger.error(message)

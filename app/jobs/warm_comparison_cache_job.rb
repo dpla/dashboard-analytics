@@ -42,6 +42,8 @@ class WarmComparisonCacheJob < ApplicationJob
     end
     failures += 1 if site_months.response.nil?
 
+    failures += warm_source_set_views(end_date)
+
     summary = "WarmComparisonCacheJob: warmed #{hubs.size} hubs, #{failures} failures"
     Rails.logger.info(summary)
     Sentry.capture_message(summary) if failures.positive?
@@ -49,13 +51,22 @@ class WarmComparisonCacheJob < ApplicationJob
 
   private
 
-  # Warm each class with the range its pages request: hub landing =
-  # all-time; contributor comparison = last completed month. Returns the
-  # count of event tables that failed.
+  # Source set views, same two ranges as the event tables.
+  # One site-wide report serves every hub (see PssEvents#cache_key_parts).
+  def warm_source_set_views(end_date)
+    landing_starts(DataWindow.pss_min_date, end_date).count do |start_date|
+      PssEvents.build do |b|
+        b.start_date = start_date
+        b.end_date   = end_date
+      end.response.nil?
+    end
+  end
+
+  # Each section gets the range its page asks for: all-time for the hub
+  # landing, last completed month for the contributor comparison.
   def warm_hub(hub_name, start_date, end_date)
     Rails.logger.info("WarmComparisonCacheJob: warming cache for #{hub_name}")
 
-    # Five entries: the batchRunReports cap.
     sections = [
       [WebsiteOverviewByContributor, end_date.beginning_of_month],
       [WebsiteEventsByContributor,   end_date.beginning_of_month],
@@ -73,9 +84,14 @@ class WarmComparisonCacheJob < ApplicationJob
     event_failures = 0
     threads = [
       Thread.new {
-        # One batched GA4 call (batchRunReports max: 5 reports).
-        batch = GaResponseBuilder.batch_responses(sections.map(&:ga_builder))
-        sections.zip(batch).each { |section, response| section.prefetch(response) }
+        # One batched report per era per section (see GaEventSchema).
+        reports = sections.flat_map do |section|
+          section.ga_builders.map { |era, builder| [section, era, builder] }
+        end
+        responses = GaResponseBuilder.batch_responses(reports.map(&:last))
+        reports.zip(responses).each do |(section, era, _builder), response|
+          section.prefetch(era, response)
+        end
       },
       Thread.new { event_failures = warm_event_tables(hub_name, end_date) },
     ]
@@ -96,16 +112,17 @@ class WarmComparisonCacheJob < ApplicationJob
     event_failures
   end
 
-  # First page of each event table, for both landing ranges: the default
-  # full window (see EventsController#default_start_date) and the last
-  # completed month alone, which the date menu and old links request.
-  # Other ranges: stored on first user request. Counts nil responses;
-  # WebsiteEvents#response swallows errors.
-  def warm_event_tables(hub_name, end_date)
-    starts = [DataWindow.events_min_date, end_date.beginning_of_month].uniq
+  # The two ranges landing pages ask for: the full window (see
+  # EventsController#default_start_date) and the last completed month.
+  def landing_starts(min_date, end_date)
+    [min_date, end_date.beginning_of_month].uniq
+  end
 
-    starts.sum do |start_date|
-      WebsiteEvents::NAMES_BY_ID.each_value.count do |event_name|
+  # First page of each event table, for both landing ranges.
+  # Counts nil responses, since WebsiteEvents#response swallows errors.
+  def warm_event_tables(hub_name, end_date)
+    landing_starts(DataWindow.events_min_date, end_date).sum do |start_date|
+      WebsiteEvents::NAMES_BY_ID.except(PssEvents::EVENT_ID).each_value.count do |event_name|
         WebsiteEvents.build do |b|
           b.hub        = hub_name
           b.start_date = start_date

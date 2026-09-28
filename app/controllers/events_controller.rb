@@ -50,16 +50,7 @@ class EventsController < ApplicationController
   def website_events
     assign_start_and_end_dates
 
-    events = WebsiteEvents.build do |builder|
-        builder.hub = params[:hub_id]
-        builder.contributor = params[:contributor_id] #may be nil
-        builder.start_date = @start_date
-        builder.end_date = @end_date
-        builder.event_name = website_event_names[params[:event_id]]
-        builder.page = current_page
-      end
-
-    @events = WebsiteEventsPresenter.new(events)
+    @events = events_presenter
 
     respond_to do |format|
       format.html { render partial: "shared/events_table" }
@@ -69,16 +60,41 @@ class EventsController < ApplicationController
 
   private
 
+  # Source set views come from page views (see PssEvents).
+  def pss_table?
+    event_id == PssEvents::EVENT_ID
+  end
+
+  # The events page sends :id. Its table and CSV requests send :event_id.
+  def event_id
+    params[:event_id] || params[:id]
+  end
+
+  def events_presenter
+    source, presenter = pss_table? ?
+      [PssEvents, PssEventsPresenter] : [WebsiteEvents, WebsiteEventsPresenter]
+
+    events = source.build do |builder|
+      builder.hub = params[:hub_id]
+      builder.contributor = params[:contributor_id] #may be nil
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+      builder.event_name = website_event_names[event_id] unless pss_table?
+      builder.page = current_page
+    end
+
+    presenter.new(events)
+  end
+
   def events_csv_filename
     csv_filename(params[:hub_id], params[:contributor_id],
                  @events.label, csv_date_range)
   end
 
   # Event tables have no rows before event_label (see DataWindow).
-  # Also floors api_events, harmless while ApiEvents#response is stubbed nil;
-  # revisit if API event tracking returns.
+  # Also floors api_events, which is fine while ApiEvents#response is nil.
   def min_date
-    DataWindow.events_min_date
+    pss_table? ? DataWindow.pss_min_date : DataWindow.events_min_date
   end
 
   # No dates in the URL: show the full window, not one month.

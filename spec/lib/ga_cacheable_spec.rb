@@ -96,28 +96,58 @@ describe GaCacheable do
   end
 
   describe '#prefetch' do
-    it 'writes to Rails.cache and the permanent store' do
+    let(:era) { GaEventSchema::Era.new(GaEventSchema::Legacy, Date.new(2026, 1, 1), completed_month) }
+
+    it 'writes to Rails.cache and the permanent store under the era' do
       expect(GaPersistentCache).to receive(:write)
-        .with(a_string_including('fake_ga_wrapper'), :response, completed_month)
+        .with(a_string_including('fake_ga_wrapper', '2026-01-01', '2026-06-30'),
+              :response, completed_month)
       expect(Rails.cache).to receive(:write)
         .with(a_string_including('fake_ga_wrapper'), :response,
               expires_in: GaCacheable::CACHE_TTL)
-      host.prefetch(:response)
-      expect(host.instance_variable_get(:@response)).to eq :response
+      host.prefetch(era, :response)
     end
 
     it 'holds the compact stored form, without expiry, when one was stored' do
       allow(GaPersistentCache).to receive(:write).and_return(:compact)
       expect(Rails.cache).to receive(:write).with(anything, :compact, expires_in: nil)
-      host.prefetch(:response)
-      expect(host.instance_variable_get(:@response)).to eq :compact
+      host.prefetch(era, :response)
     end
 
     it 'ignores nil responses instead of caching them' do
       expect(Rails.cache).not_to receive(:write)
       expect(GaPersistentCache).not_to receive(:write)
-      host.prefetch(nil)
-      expect(host.instance_variable_get(:@response)).to be_nil
+      host.prefetch(era, nil)
+    end
+  end
+
+  describe '#cache_key' do
+    it 'ends with the range, so an era keys apart from the whole' do
+      whole = host.send(:cache_key)
+      era = GaEventSchema::Era.new(GaEventSchema::Legacy, Date.new(2026, 5, 1), Date.new(2026, 5, 31))
+      expect(whole).to end_with(':2026-06-30')
+      expect(host.send(:cache_key, era)).to end_with(':2026-05-01:2026-05-31')
+      expect(host.send(:cache_key, era)).not_to eq whole
+    end
+  end
+
+  describe '#fetch_eras' do
+    before do
+      allow(host).to receive(:eras).and_return([
+        GaEventSchema::Era.new(GaEventSchema::Legacy, Date.new(2026, 1, 1), Date.new(2026, 3, 31)),
+        GaEventSchema::Era.new(GaEventSchema::Current, Date.new(2026, 4, 1), Date.new(2026, 6, 30)),
+      ])
+    end
+
+    it 'yields each era and returns the results in order' do
+      results = host.send(:fetch_eras) { |era| era.schema.name }
+      expect(results).to eq %w[GaEventSchema::Legacy GaEventSchema::Current]
+    end
+
+    it 'raises an era failure to the caller' do
+      expect {
+        host.send(:fetch_eras) { |era| raise 'GA4 is down' if era.schema == GaEventSchema::Current; :ok }
+      }.to raise_error('GA4 is down')
     end
   end
 end

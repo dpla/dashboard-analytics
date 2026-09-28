@@ -42,38 +42,30 @@ class WebsiteEventTotals
     @end_date = end_date
   end
 
-  # Memoized builder for the warm job's batched GA4 calls.
-  def ga_builder
-    @ga_builder ||= event_overview_builder
-  end
-
   def view_events
     item_events + exhibit_events + pss_events
   end
 
   def item_events
-    parse_response['View Item'].to_i rescue 0
+    parse_response['View Item'].to_i
   end
 
   def exhibit_events
-    parse_response['View Exhibition Item'].to_i rescue 0
+    parse_response['View Exhibition Item'].to_i
   end
 
   def pss_events
-    parse_response['View Primary Source'].to_i rescue 0
+    parse_response['View Primary Source'].to_i
   end
 
   def click_throughs
-    parse_response['Click Through'] || 0
+    parse_response['Click Through'].to_i
   end
 
-  ##
-  # Cached single-page response; nil on error (see #error?).
-  #
+  # Counts by event name, summed across eras. nil on error (see #error?).
+  # Source set views come from page views instead (see PssEvents).
   def response
-    @response ||= fetch_cached do
-      event_overview_builder.response
-    end
+    @response ||= merge(era_responses, source_set_views)
   rescue => e
     Rails.logger.error(e)
     record_ga_error(e)
@@ -82,37 +74,45 @@ class WebsiteEventTotals
 
   private
 
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
-  def event_overview_builder
-    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
-    filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
-
+  def builder_for(era)
     GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date.iso8601
-      builder.end_date = @end_date.iso8601
+      builder.start_date = era.start_date.iso8601
+      builder.end_date = era.end_date.iso8601
       builder.metrics = %w(ga:totalEvents)
-      builder.dimensions = %w(ga:eventCategory)
-      builder.filters = filters
+      builder.dimensions = [era.schema::EVENT_DIMENSION]
+      builder.filters = era.schema.hub_filters(@hub, @contributor)
     end
   end
 
+  # Returns 0 on error. The view shows nothing when the count is 0.
+  def source_set_views
+    PssEvents.build do |builder|
+      builder.hub = @hub
+      builder.contributor = @contributor
+      builder.start_date = @start_date
+      builder.end_date = @end_date
+    end.total_views
+  rescue => e
+    Rails.logger.error(e)
+    0
+  end
+
+  # Rows of [event name, count], one row per name.
+  def merge(responses, source_set_views)
+    counts = Hash.new(0)
+    eras.zip(responses) do |era, response|
+      response.rows.to_a.each do |value, count|
+        name = era.schema.event_name(value)
+        counts[name] += count.to_i if name
+      end
+    end
+    counts['View Primary Source'] = source_set_views
+    build_response(%w(ga:eventCategory ga:totalEvents),
+                   counts.map { |name, count| [name, count.to_s] })
+  end
+
+  # { "View Item" => 12, ... }. Empty hash on error.
   def parse_response
-    if response.present? && response.rows.present?
-      response.rows.collect{ |row| 
-        # Create human-readable key-value pairs
-        # Example: change "Click Through : ArtStor" to "Click Through"
-        [row[0].split(' : ')[0], row[1]]
-      }.to_h
-    else
-      Hash.new
-    end
-  end
-
-  def profile_id
-    Settings.google_analytics.frontend_profile_id
+    (response&.rows || []).to_h { |name, count| [name, count.to_i] }
   end
 end

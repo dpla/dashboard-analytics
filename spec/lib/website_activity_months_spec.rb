@@ -32,4 +32,21 @@ describe WebsiteActivityMonths do
       expect(activity.earliest_month).to eq Date.new(2025, 7, 1)
     end
   end
+
+  describe '#response' do
+    before do
+      stub_ga_cache_passthrough
+      stub_new_dimensions_date(Date.new(2026, 5, 12))
+      allow_any_instance_of(described_class).to receive(:builder_for) do |_activity, era|
+        rows = era.schema == GaEventSchema::Legacy ?
+          [%w[202504 3], %w[202505 4]] : [%w[202505 6], %w[202506 1]]
+        double(response: cached_response(%w[yearMonth ga:totalEvents], rows))
+      end
+    end
+
+    it 'joins both shapes by month, earliest first' do
+      expect(activity.response.rows).to eq [%w[202504 3], %w[202505 10], %w[202506 1]]
+      expect(activity.earliest_month).to eq Date.new(2025, 4, 1)
+    end
+  end
 end

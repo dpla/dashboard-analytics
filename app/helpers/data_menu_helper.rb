@@ -29,13 +29,15 @@ module DataMenuHelper
   end
 
   def render_view_pss_link(target)
-    unless curated_participant?(target, :primary_source_sets)
+    hub, contributor = target_names(target)
+
+    unless PssSources.participant?(hub, contributor)
       return disabled_menu_item("Primary source set views", "No items in DPLA primary source sets")
     end
 
-    path = target.is_a?(Hub) ?
-      hub_event_path(route_id(target.name), 'view_pss', date_opts) :
-      hub_contributor_event_path(route_id(target.hub.name), route_id(target.name), 'view_pss', date_opts)
+    path = contributor ?
+      hub_contributor_event_path(route_id(hub), route_id(contributor), 'view_pss', date_opts) :
+      hub_event_path(route_id(hub), 'view_pss', date_opts)
 
     link_to("Primary source set views", path, html_opts(path))
   end

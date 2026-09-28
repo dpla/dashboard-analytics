@@ -14,8 +14,7 @@ module CuratedContentHelper
   # @param kind [Symbol] :exhibitions or :primary_source_sets
   #
   def curated_breakdown_for(target, kind)
-    hub, contributor = target.is_a?(Hub) ?
-      [target.name, nil] : [target.hub.name, target.name]
+    hub, contributor = target_names(target)
 
     @curated_breakdowns ||= {}
     key = [kind, hub, contributor]
@@ -30,6 +29,11 @@ module CuratedContentHelper
   def curated_participant?(target, kind)
     breakdown = curated_breakdown_for(target, kind)
     breakdown.nil? || breakdown.any?
+  end
+
+  # [hub name, contributor name]. The contributor is nil for a Hub.
+  def target_names(target)
+    target.is_a?(Hub) ? [target.name, nil] : [target.hub.name, target.name]
   end
 
   def curated_page_url(kind, slug)

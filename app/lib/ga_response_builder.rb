@@ -32,12 +32,15 @@ class GaResponseBuilder
     builder
   end
 
-  # Send multiple GA4 report requests in a single HTTP call.
-  # Takes an array of already-built GaResponseBuilder instances and
-  # returns an array of Ga4Response objects in the same order.
-  def self.batch_responses(builders)
-    return [] if builders.empty?
+  # The most reports batchRunReports takes in one call.
+  BATCH_LIMIT = 5
 
+  # One Ga4Response per builder, in the same order.
+  def self.batch_responses(builders)
+    builders.each_slice(BATCH_LIMIT).flat_map { |slice| run_batch(slice) }
+  end
+
+  def self.run_batch(builders)
     retries = 0
     service  = nil
     begin
@@ -65,6 +68,7 @@ class GaResponseBuilder
       raise
     end
   end
+  private_class_method :run_batch
 
   # GA4 API read timeout. Chosen to be well under the ALB's 60s idle timeout so
   # that slow queries fail fast and return a graceful error rather than a 504.
@@ -103,13 +107,9 @@ class GaResponseBuilder
     @limit      = DEFAULT_PAGE_LIMIT
   end
 
-  # profile_id and segment are UA concepts — accepted for interface compatibility but ignored
-  def profile_id=(profile_id); end
-  def segment=(segment); end
-
   def start_index=(idx); @offset = [idx.to_i - 1, 0].max; end
 
-  # 1-based page; sets offset/limit to fetch a single page of rows.
+  # 1-based page. nil leaves the offset and limit alone.
   def page=(page)
     return unless page
     @offset = (page - 1) * PaginationHelper::PAGE_SIZE
@@ -232,6 +232,8 @@ class GaResponseBuilder
       make_string_filter(field, value, 'EXACT')
     elsif (m = filter_str.match(/\A([^=!]+)=@(.+)\z/))
       make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'CONTAINS')
+    elsif (m = filter_str.match(/\A([^=!]+)=~(.+)\z/))
+      make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'FULL_REGEXP')
     elsif (m = filter_str.match(/\A([^=!]+)!@(.+)\z/))
       Google::Apis::AnalyticsdataV1beta::FilterExpression.new(
         not_expression: make_string_filter(GA4_DIMENSIONS[m[1]] || m[1], m[2], 'CONTAINS')
