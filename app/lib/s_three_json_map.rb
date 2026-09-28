@@ -3,18 +3,17 @@
 # held in the process for as long as fetch_json says.
 #
 module SThreeJsonMap
-  MUTEX = Mutex.new
-
   # A nil stale_after suits a file that nothing regenerates on a schedule.
   def s3_json_map(key, field, stale_after: SThreeResponseBuilder::STALE_AFTER)
     @s3_key = key
     @s3_field = field
     @s3_stale_after = stale_after
+    @s3_mutex = Mutex.new
   end
 
   # The map. Empty until the file exists in S3.
   def entries
-    MUTEX.synchronize do
+    @s3_mutex.synchronize do
       now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       return @entries if @expires_at && now < @expires_at
 
