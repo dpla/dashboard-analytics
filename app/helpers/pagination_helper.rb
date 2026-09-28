@@ -15,7 +15,14 @@ module PaginationHelper
 
   # The current page's slice of array
   def paginate(array)
-    array.slice(page_offset, PAGE_SIZE) || []
+    PaginationHelper.page_slice(array, current_page)
+  end
+
+  # A nil page means the whole array.
+  def self.page_slice(array, page)
+    return array unless page
+
+    array.slice((page - 1) * PAGE_SIZE, PAGE_SIZE) || []
   end
 
   # 0-based index of the first row on the current page.

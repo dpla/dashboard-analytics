@@ -32,14 +32,12 @@ class WebsiteSearchTerms
     @end_date = end_date
   end
 
-  # 1-based page for #response; CSV exports are unaffected.
+  # 1-based page for #response. CSV exports ignore it.
   def page=(page)
     @page = page
   end
 
-  ##
-  # Cached single-page response; nil on error.
-  #
+  # One cached page, or nil on error.
   def response
     @response ||= fetch_cached("page#{@page}") do
       search_terms_builder.response
@@ -49,9 +47,7 @@ class WebsiteSearchTerms
     nil
   end
 
-  ##
-  # Cached multi-page response for CSV export; empty array on error.
-  #
+  # Every page, for the CSV export. Empty array on error.
   def multi_page_response
     @multi_page_response ||= fetch_cached("multi", memory: false) do
       search_terms_builder.multi_page_response
@@ -79,17 +75,8 @@ class WebsiteSearchTerms
 
   private
 
-  def profile_id
-    Settings.google_analytics.frontend_profile_id
-  end
-
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
   def search_terms_builder
     GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
       builder.metrics = %w(ga:searchUniques)

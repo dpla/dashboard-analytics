@@ -2,6 +2,8 @@ class WebsiteOverview
   include GaErrorTracking
   include GaCacheable
 
+  METRICS = %w(ga:totalEvents ga:sessions ga:users).freeze
+
   ##
   # @return [WebsiteOverview]
   #
@@ -42,18 +44,10 @@ class WebsiteOverview
     @end_date = end_date
   end
 
-  # Memoized builder for the warm job's batched GA4 calls.
-  def ga_builder
-    @ga_builder ||= website_overview_builder
-  end
-
-  ##
-  # Cached single-page response; nil on error (see #error?).
-  #
+  # Cached totals, or nil on error (see #error?). The eras are summed, so
+  # sessions and users count a returning visitor once per era.
   def response
-    @response ||= fetch_cached do
-      website_overview_builder.response
-    end
+    @response ||= merge(era_responses)
   rescue => e
     Rails.logger.error(e)
     record_ga_error(e)
@@ -80,25 +74,19 @@ class WebsiteOverview
 
   private
 
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
-  def website_overview_builder
-    filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
-    filters.concat %W(ga:eventAction==#{@contributor}) if @contributor
-
+  def builder_for(era)
     GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date.iso8601
-      builder.end_date = @end_date.iso8601
-      builder.metrics = %w(ga:totalEvents ga:sessions ga:users)
-      builder.filters = filters
+      builder.start_date = era.start_date.iso8601
+      builder.end_date = era.end_date.iso8601
+      builder.metrics = METRICS
+      builder.filters = era.schema.hub_filters(@hub, @contributor)
     end
   end
 
-  def profile_id
-    Settings.google_analytics.frontend_profile_id
+  def merge(responses)
+    totals = METRICS.to_h do |metric|
+      [metric, responses.sum { |response| response.totals_for_all_results[metric].to_i }.to_s]
+    end
+    build_response(METRICS, [], totals: totals, total_results: 0)
   end
-
 end

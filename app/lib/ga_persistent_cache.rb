@@ -151,5 +151,11 @@ class GaPersistentCache
   CachedResponse = Struct.new(:column_headers, :rows,
                               :totals_for_all_results, :total_results) do
     alias_method :row_count, :total_results
+
+    # Build from plain column names.
+    def self.build(columns, rows, totals: {}, total_results: rows.size)
+      new(columns.map { |name| GaResponseBuilder::Ga4Response::ColumnHeader.new(name) },
+          rows, totals, total_results)
+    end
   end
 end

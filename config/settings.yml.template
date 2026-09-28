@@ -24,11 +24,24 @@ min_date:
   month: 01
   year: 2018
 
-# Minimum date for which per-item event data is available; GA4 registered
-# the event_label dimension Jul 18, 2025
+# First month with per-item event data. GA4 added event_label Jul 18, 2025.
 events_min_date:
   month: 07
   year: 2025
+
+# First month with source set data. These are page views, not events,
+# so they start before events_min_date.
+pss_min_date:
+  month: 04
+  year: 2023
+
+# First full day after the current GA4 dimensions were registered on
+# Sep 11, 2026. Cache keys carry dates, not the shape, so bump
+# GaPersistentCache::SCHEMA_VERSION if this date moves.
+new_dimensions_date:
+  year: 2026
+  month: 09
+  day: 12
 
 # Minimum date for which api usage data is available
 api_min_date:

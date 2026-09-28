@@ -32,6 +32,29 @@ describe GaResponseBuilder do
     end
   end
 
+  describe 'filters' do
+    def filter_for(expression)
+      builder = described_class.new.tap do |b|
+        b.metrics    = %w(screenPageViews)
+        b.dimensions = %w(pagePath)
+        b.filters    = [expression]
+      end
+      builder.build_request(0).dimension_filter.filter
+    end
+
+    it 'matches a regular expression with =~' do
+      filter = filter_for('pagePath=~^/primary-source-sets/[^/]+/sources/[0-9]+/?$')
+      expect(filter.field_name).to eq 'pagePath'
+      expect(filter.string_filter.match_type).to eq 'FULL_REGEXP'
+      expect(filter.string_filter.value)
+        .to eq '^/primary-source-sets/[^/]+/sources/[0-9]+/?$'
+    end
+
+    it 'still reads == as an exact match' do
+      expect(filter_for('pagePath==/about').string_filter.match_type).to eq 'EXACT'
+    end
+  end
+
   describe 'pagination parameters' do
     let(:builder) do
       described_class.new.tap do |b|

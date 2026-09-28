@@ -13,10 +13,20 @@ module DataWindow
     month_start(Settings.min_date)
   end
 
-  # First day of the earliest month with per-item event data. GA4 registered
-  # the event_label dimension Jul 18, 2025; earlier months return no rows.
+  # First day of the earliest month with per-item event data.
+  # GA4 registered event_label on Jul 18, 2025. Earlier months have no rows.
   def events_min_date
     month_start(Settings.events_min_date)
+  end
+
+  def pss_min_date
+    month_start(Settings.pss_min_date)
+  end
+
+  # First day the current GA4 event shape has data (see GaEventSchema).
+  def new_dimensions_date
+    date = Settings.new_dimensions_date
+    Date.new(date.year.to_i, date.month.to_i, date.day.to_i)
   end
 
   # Last day of the last completed month.

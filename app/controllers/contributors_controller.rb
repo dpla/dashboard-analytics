@@ -398,7 +398,7 @@ class ContributorsController < ApplicationController
 
     result = page_of_contributors(hub_id).each_with_object({}) do |c, hash|
       contributor = c["term"]
-      ga_key      = contributor[0, GaResponseBuilder::GA4_EVENT_NAME_MAX_LENGTH]
+      ga_key      = GaEventSchema.contributor_key(contributor)
       ov          = overview_data[ga_key] || {}
       ev          = events_data[ga_key]   || {}
       hash[contributor] = {
