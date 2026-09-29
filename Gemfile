@@ -25,6 +25,7 @@ gem 'jquery-rails', '~> 4.6.1'
 gem 'aws-sdk-rails', '~> 5.2.0'
 gem 'aws-sdk-core', '~> 3.257'
 gem 'aws-sdk-s3', '~> 1.232'
+gem 'aws-actionmailer-ses', '~> 1.2'
 gem 'render_async', '~> 2.1.11'
 gem 'coffee-rails', '~> 5.0'
 # Set versions of following gems to fix security vulnerabilities
