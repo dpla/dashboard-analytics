@@ -140,7 +140,7 @@ GEM
       deep_merge (~> 1.2, >= 1.2.1)
       ostruct
     connection_pool (2.5.5)
-    crass (1.0.7)
+    crass (1.0.8)
     csv (3.3.6)
     date (3.5.1)
     declarative (0.0.20)
