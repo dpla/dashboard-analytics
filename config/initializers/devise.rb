@@ -8,8 +8,7 @@ Devise.setup do |config|
   # confirmation, reset password and unlock tokens in the database.
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
-  # config.secret_key = '64a8b3903da2d72835b4d4fe3b4b2081c9badfc50e67538ad8a967503e37ac18a589654877c1207e3018f09f44d84c6b1f51ab676174b04830da9ee0476ad26a'
-  
+
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
   # config.parent_controller = 'DeviseController'
@@ -114,7 +113,6 @@ Devise.setup do |config|
   config.stretches = Rails.env.test? ? 1 : 11
 
   # Set up a pepper to generate the hashed password.
-  # config.pepper = 'd2d18e649f854a39e1d5b7eb986d668d19494684c0795102013c2eb8d741e02f4cce4b2b1f92a1a147502cae7e6125d42ffea00469e9299e2e1dc6e93e989abb'
 
   # Send a notification to the original email when the user's email is changed.
   # config.send_email_changed_notification = false
@@ -257,22 +255,6 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
-
-  # ==> Warden configuration
-  # Warden 1.2.9 raises "Invalid strategy <name>" for any Devise module included
-  # in the scope's strategy list that has no Warden::Strategies registration.
-  # :database_authenticatable and :rememberable are real Warden strategies;
-  # the others (:recoverable, :trackable, :validatable) are Devise-only modules
-  # that need no-op stubs so Warden can look them up without raising.
-  # Remove once Devise is upgraded to 5.x.
-  config.warden do |manager|
-    %i[recoverable trackable validatable].each do |strategy|
-      manager.strategies.add(strategy) do
-        def valid?; false; end
-        def authenticate!; pass; end
-      end unless Warden::Strategies[strategy]
-    end
-  end
 
   # ==> Mountable engine configurations
   # When using Devise inside an engine, let's call it `MyEngine`, and this engine
