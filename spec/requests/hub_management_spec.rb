@@ -65,6 +65,7 @@ RSpec.describe "Hub management", :type => :request do
 
     it "carries no GA access token or GA embed script" do
       get "/hubs/foo"
+      expect(response).to have_http_status(:ok)
       expect(response.body).not_to include("access-token", "google-analytics", "apis.google.com")
     end
   end
