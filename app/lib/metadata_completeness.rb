@@ -64,7 +64,7 @@ class MetadataCompleteness
   # @return [Aws::S3::Types::GetObjectOutput, nil]
   #
   def s3_response(file_name)
-    date = @end_date
+    date = walk_start_date
     response = nil
 
     while response.nil?
