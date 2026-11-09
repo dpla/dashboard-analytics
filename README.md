@@ -80,10 +80,8 @@ The frontend keeps sending the legacy shape until someone turns off its `GA_LEGA
 | Section | GA4 dimension used |
 |---|---|
 | Website overview | Sessions, users, events for the hub: `customEvent:event_category` (legacy) or `eventName` and `customEvent:partner` (current) |
-| Website timelines | Monthly sessions over time |
 | Website events | Per-item counts: `customEvent:event_label` (legacy) or `customEvent:dpla_id` and `customEvent:item_title` (current) |
 | Website search terms | `searchTerm` dimension on search events |
-| Locations | `region` dimension on sessions |
 
 **What is NOT tracked in GA4:**
 
@@ -181,17 +179,15 @@ All routes require a logged-in user.
 
 | Route | Description |
 |---|---|
-| `/hubs/:hub_id/timelines/website` | Month-by-month website session timeline |
-| `/hubs/:hub_id/timelines/api` | Month-by-month API usage timeline |
-| `/hubs/:hub_id/timelines/bws` | Month-by-month BWS usage timeline |
 | `/hubs/:hub_id/events/website` | Website event breakdown (HTML + CSV) |
 | `/hubs/:hub_id/events/api` | API event breakdown |
 | `/hubs/:hub_id/events/bws` | BWS event breakdown |
 | `/hubs/:hub_id/search_terms/website` | Top search terms (HTML + CSV) |
 | `/hubs/:hub_id/search_terms/api` | API search terms |
-| `/hubs/:hub_id/locations` | Geographic session distribution |
 | `/hubs/:hub_id/wikimedia_preparations` | Wikimedia Commons readiness metrics |
 | `/contributor_comparison` | Full contributor comparison export (HTML + CSV) |
+
+The website/API timelines and user locations pages were retired: they relied on the discontinued GA Embed API and put a GA access token in the page. Their old URLs (`/hubs/:hub_id(/contributors/:id)/timelines/:id` and `.../locations`) redirect to the matching overview, keeping the date range.
 
 **Async partial routes** — the hub and contributor overview pages load all expensive sections with a single async request to a `sections` endpoint, which fetches all data concurrently server-side and returns one combined HTML fragment:
 

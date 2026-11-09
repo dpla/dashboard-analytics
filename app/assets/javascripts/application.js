@@ -13,6 +13,5 @@
 //= require rails-ujs
 //= require jquery
 //= require turbo
-//= require google-analytics
 //= require jquery-tablesorter
 //= require tablesort

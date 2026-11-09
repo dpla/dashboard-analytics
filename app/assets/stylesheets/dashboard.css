@@ -383,12 +383,6 @@ table input[type="submit"] {
   transform: translateY(2px);
 }
 
-#us-map, #world-map {
-  display: inline-block;
-  width: 500px;
-  margin-bottom: 20px;
-}
-
 .data-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
