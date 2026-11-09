@@ -3,11 +3,14 @@
 class ContributorsController < ApplicationController
   # Controller concerns
   include DateSetter
+  include GaDataFloor
   # View helpers
+  include CsvFilenameHelper
   include DataMenuHelper
   include DateHelper
   include MetadataCompletenessHelper
   include TooltipsHelper
+  include PaginationHelper
 
   before_action :authorize_contributor_scope!, only: %i[
     sections
@@ -30,7 +33,7 @@ class ContributorsController < ApplicationController
     assign_start_and_end_dates
     @hub = Hub.new(params[:hub_id], @start_date, @end_date)
     begin
-      @contributors_item_count = Hub.contributors_item_count(params[:hub_id])
+      @contributors_item_count = page_of_contributors(params[:hub_id])
     rescue => e
       Rails.logger.error(e)
       @contributors_item_count = []
@@ -307,6 +310,10 @@ class ContributorsController < ApplicationController
     contributors_item_count = Hub.contributors_item_count(hub_id)
     bws_item_count          = Hub.contributors_bws_item_count(hub_id)
 
+    # The HTML table shows one page of contributors; CSV exports all of them.
+    @total_contributors = contributors_item_count.count
+    contributors_item_count = paginate(contributors_item_count) unless request.format.csv?
+
     # For HTML the GA website columns load async via contributor_ga_data; pass nil
     # so the table renders immediately from fast S3/DB caches.
     # For CSV exports, prefetch GA data so the download is complete.
@@ -348,7 +355,11 @@ class ContributorsController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: "shared/contributor_comparison" }
-      format.csv { send_data @contributor_comparison.to_csv }
+      format.csv do
+        send_data @contributor_comparison.to_csv,
+                  filename: csv_filename(params[:hub_id], "contributor comparison",
+                                         csv_date_range)
+      end
     end
   end
 
@@ -385,9 +396,9 @@ class ContributorsController < ApplicationController
     overview_data = website_overview.parse_data
     events_data   = website_events.parse_data
 
-    result = Hub.contributors_item_count(hub_id).each_with_object({}) do |c, hash|
+    result = page_of_contributors(hub_id).each_with_object({}) do |c, hash|
       contributor = c["term"]
-      ga_key      = contributor[0, GaResponseBuilder::GA4_EVENT_NAME_MAX_LENGTH]
+      ga_key      = GaEventSchema.contributor_key(contributor)
       ov          = overview_data[ga_key] || {}
       ev          = events_data[ga_key]   || {}
       hash[contributor] = {
@@ -405,6 +416,35 @@ class ContributorsController < ApplicationController
   end
 
   private
+
+  helper_method :wikimedia_start_date
+
+  # First month with Wikimedia data; nil when none. Hub-level on index.
+  def wikimedia_start_date
+    return @wikimedia_start_date if defined?(@wikimedia_start_date)
+
+    hub_id      = params[:hub_id]
+    contributor = ga4_floor_contributor.to_s
+    key = "wikimedia_start_month:#{hub_id}:#{contributor}"
+    first_month = Rails.cache.fetch(key, expires_in: 24.hours) do
+      WikimediaCache.where(hub: hub_id, contributor: contributor).minimum(:month)
+    end
+    @wikimedia_start_date = first_month && Date.parse("#{first_month}-01")
+  end
+
+  def ga4_floor_contributor
+    params[:contributor_id] || params[:id]
+  end
+
+  # Wikimedia predates GA4 and shares this picker.
+  def earliest_data_month
+    [ga4_earliest_month, wikimedia_start_date].compact.min
+  end
+
+  # One page of the hub's contributors
+  def page_of_contributors(hub_id)
+    paginate(Hub.contributors_item_count(hub_id))
+  end
 
   def authorize_contributor_scope!
     return render_not_found unless Hub.exists?(params[:hub_id])

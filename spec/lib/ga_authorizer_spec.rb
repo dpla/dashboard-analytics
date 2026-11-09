@@ -6,7 +6,7 @@ describe GaAuthorizer do
   let(:credentials) { double }
 
   before do
-    GaAuthorizer.class_variable_set :@@authorizer, credentials
+    GaAuthorizer.class_variable_set :@@credentials, credentials
   end
 
   it 'returns current access token' do
@@ -28,14 +28,14 @@ describe GaAuthorizer do
     GaAuthorizer.token
   end
 
-  it 'returns empty string if token cannot be fetched' do
-    allow(GaAuthorizer).to receive(:authorizer).and_raise(StandardError)
+  it 'returns nil if the token cannot be fetched' do
+    allow(GaAuthorizer).to receive(:credentials).and_raise(StandardError)
     expect(GaAuthorizer.token).to be_nil
   end
 
   after do
-    if GaAuthorizer.class_variable_defined? :@@authorizer
-      GaAuthorizer.remove_class_variable :@@authorizer
+    if GaAuthorizer.class_variable_defined? :@@credentials
+      GaAuthorizer.remove_class_variable :@@credentials
     end
   end
 end

@@ -2,95 +2,102 @@ require 'rails_helper'
 
 describe GaResponseBuilder do
 
-  let(:token) { "foo" }
-  let(:profile_id) { "ga:123" }
-  let(:start_date) { "2018-01-01" }
-  let(:end_date) { "2018-01-31" }
-  let(:metrics) { ["ga:totalEvents"] }
-  let(:dimensions) { ["ga:eventCategory"] }
-  let(:filters) { ["ga:eventCategory!@Browse"] }
-  let(:sort) { ["-ga:totalEvents"] }
-  let(:start_index) { 101 }
-  let(:segment) { "gaid::abc" }
+  describe '.read_timeout_sec' do
+    def set_env(value)
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("GA4_READ_TIMEOUT_SEC").and_return(value)
+    end
 
-  # Stub Google::Apis::AnalyticsV3::AnalyticsService
-  let(:analyticsService) { double }
+    it 'uses the default when the env var is unset' do
+      set_env(nil)
+      expect(described_class.read_timeout_sec).to eq described_class::GA4_READ_TIMEOUT_SEC
+    end
 
-  before do
-    allow(Google::Apis::AnalyticsV3::AnalyticsService).to receive(:new)
-      .and_return(analyticsService)
-    allow(analyticsService).to receive(:authorization=)
-    allow(analyticsService).to receive(:get_ga_data)
-    allow(GaAuthorizer).to receive(:token).and_return(token)
+    it 'uses a positive integer override' do
+      set_env("120")
+      expect(described_class.read_timeout_sec).to eq 120
+    end
+
+    it 'falls back to the default for blank, non-numeric, and non-positive values' do
+      ["", "  ", "abc", "0", "-5", "12.5"].each do |value|
+        set_env(value)
+        expect(described_class.read_timeout_sec).to eq described_class::GA4_READ_TIMEOUT_SEC
+      end
+    end
+
+    it 'reaches the GA client as the read timeout' do
+      set_env("")
+      expect(described_class.new.analytics.client_options.read_timeout_sec)
+        .to eq described_class::GA4_READ_TIMEOUT_SEC
+    end
   end
 
-  it 'authorizes analytics service on build' do
-    expect(analyticsService).to receive(:authorization=).with(token)
-    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
+  describe 'filters' do
+    def filter_for(expression)
+      builder = described_class.new.tap do |b|
+        b.metrics    = %w(screenPageViews)
+        b.dimensions = %w(pagePath)
+        b.filters    = [expression]
+      end
+      builder.build_request(0).dimension_filter.filter
+    end
+
+    it 'matches a regular expression with =~' do
+      filter = filter_for('pagePath=~^/primary-source-sets/[^/]+/sources/[0-9]+/?$')
+      expect(filter.field_name).to eq 'pagePath'
+      expect(filter.string_filter.match_type).to eq 'FULL_REGEXP'
+      expect(filter.string_filter.value)
+        .to eq '^/primary-source-sets/[^/]+/sources/[0-9]+/?$'
+    end
+
+    it 'still reads == as an exact match' do
+      expect(filter_for('pagePath==/about').string_filter.match_type).to eq 'EXACT'
+    end
   end
 
-  it 'builds response with given data' do
-    expect(analyticsService).to receive(:get_ga_data).with(
-      profile_id,
-      start_date,
-      end_date,
-      metrics.join(','),
-      dimensions: dimensions.join(','),
-      filters: filters.join(';'),
-      sort: sort,
-      start_index: start_index,
-      segment: segment)
+  describe 'pagination parameters' do
+    let(:builder) do
+      described_class.new.tap do |b|
+        b.metrics    = %w(ga:totalEvents)
+        b.dimensions = %w(ga:eventLabel)
+      end
+    end
 
-    GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = start_date
-      builder.end_date = end_date
-      builder.metrics = metrics
-      builder.dimensions = dimensions
-      builder.filters = filters
-      builder.sort = sort
-      builder.start_index = start_index
-      builder.segment = segment
-    end.response
-  end
+    it 'defaults to the full GA4 page limit and no offset' do
+      request = builder.build_request(builder.offset)
+      expect(request.limit).to eq described_class::DEFAULT_PAGE_LIMIT
+      expect(request.offset).to eq 0
+    end
 
-  it 'retries twice if server error' do
-    allow(analyticsService).to receive(:get_ga_data)
-      .and_raise(Google::Apis::ServerError, "oops")
-    expect(analyticsService).to receive(:get_ga_data).exactly(3).times
-    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
-      .response
-  end
+    it 'converts a 1-based start_index to a 0-based offset' do
+      builder.start_index = 51
+      expect(builder.offset).to eq 50
+    end
 
-  it 'retries once if authorization error' do
-    allow(analyticsService).to receive(:get_ga_data)
-      .and_raise(Google::Apis::AuthorizationError, "oops")
-    expect(analyticsService).to receive(:get_ga_data).exactly(2).times
-    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
-      .response
-  end
+    it 'clamps start_index below 1 to offset 0' do
+      builder.start_index = 0
+      expect(builder.offset).to eq 0
+    end
 
-  it 'reauthorizes if authorization error' do
-    allow(analyticsService).to receive(:get_ga_data)
-      .and_raise(Google::Apis::AuthorizationError, "oops")
-    expect(analyticsService).to receive(:authorization=).exactly(2).times
-    GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
-      .response
-  end
+    it 'sets offset and limit from a 1-based page number' do
+      builder.page = 3
+      request = builder.build_request(builder.offset)
+      expect(request.offset).to eq 2 * PaginationHelper::PAGE_SIZE
+      expect(request.limit).to eq PaginationHelper::PAGE_SIZE
+    end
 
-  it 'handles multi-page response' do
-    builder = GaResponseBuilder.build { |builder| builder.profile_id = profile_id }
+    it 'ignores a nil page' do
+      builder.page = nil
+      expect(builder.build_request(builder.offset).limit)
+        .to eq described_class::DEFAULT_PAGE_LIMIT
+    end
 
-    page_1 = double
-    allow(page_1).to receive(:next_link)
-      .and_return "https://googleapis.com?start-index=1001"
-
-    page_2 = double
-    allow(page_2).to receive(:next_link).and_return(nil)
-
-    allow(builder).to receive(:response).and_return(page_1, page_2)
-    
-    response = builder.multi_page_response
-    expect(response).to eq [page_1, page_2]
+    it 'requests full-size pages for multi-page exports regardless of display page' do
+      builder.page = 2
+      allow(builder).to receive(:response).and_return(nil)
+      builder.multi_page_response
+      expect(builder).to have_received(:response)
+        .with(offset: 0, limit: described_class::DEFAULT_PAGE_LIMIT)
+    end
   end
 end

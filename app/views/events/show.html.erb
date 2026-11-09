@@ -24,7 +24,7 @@
         <%= render_async_section api_events_path({ hub_id: params[:hub_id],
                                                   contributor_id: params[:contributor_id],
                                                   event_id: params[:id] }.merge(date_opts)) do %>
-          <div>Loading...</div>
+          <%= render "shared/loading", message: "Loading results…" %>
         <% end %>
       <% else %>
         Data is not available for this date range.
@@ -33,8 +33,8 @@
     <% else %>
       <%= render_async_section website_events_path({ hub_id: params[:hub_id],
                                                     contributor_id: params[:contributor_id],
-                                                    event_id: params[:id] }.merge(date_opts)) do %>
-        <div>Loading...</div>
+                                                    event_id: params[:id] }.merge(date_opts).merge(page_opts)) do %>
+        <%= render "shared/loading", message: "Loading results…" %>
       <% end %>
     <% end %>
 

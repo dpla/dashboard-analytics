@@ -1,0 +1,42 @@
+<%# Page nav.
+    Locals: total (rows across all pages), page_url (page number -> URL). %>
+<% pages = total_pages(total) %>
+<% if pages > 1 %>
+  <% page = current_page.clamp(1, pages) %>
+  <nav class="pagination" aria-label="Pagination">
+    <%# Clamp so Previous works from past-the-end URLs. %>
+    <% if page > 1 %>
+      <%= link_to "← Previous", page_url.call(page - 1), class: "pagination-step" %>
+    <% end %>
+
+    <span class="pagination-pages">
+      <% page_links(pages, page).each do |number| %>
+        <% if number.nil? %>
+          <span class="pagination-gap">…</span>
+        <% elsif number == page %>
+          <span class="pagination-current" aria-current="page"><%= number %></span>
+        <% else %>
+          <%= link_to number, page_url.call(number),
+                      "aria-label": "Page #{number}" %>
+        <% end %>
+      <% end %>
+    </span>
+
+    <% if page < pages %>
+      <%= link_to "Next →", page_url.call(page + 1), class: "pagination-step" %>
+    <% end %>
+
+    <% if pages > 5 %>
+      <% action, carried = pagination_form_target(page_url) %>
+      <%= form_tag(action, method: :get, class: "pagination-jump") do %>
+        <%# No ids: start_date and end_date would collide with the date menu. %>
+        <% carried.each do |name, value| %>
+          <%= hidden_field_tag name, value, id: nil %>
+        <% end %>
+        <%= label_tag :page, "Go to page" %>
+        <%= number_field_tag :page, page, min: 1, max: pages %>
+        <%= submit_tag "Go", name: nil %>
+      <% end %>
+    <% end %>
+  </nav>
+<% end %>

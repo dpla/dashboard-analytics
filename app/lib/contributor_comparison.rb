@@ -93,9 +93,7 @@ class ContributorComparison
     @contributors_item_count.map do |c|
       contributor = c["term"]
       count = c["count"]
-      # GA4 truncates event names (contributor names) at ingestion — look up
-      # using the same prefix length so keys match the GA4 response rows.
-      ga_key = contributor[0, GaResponseBuilder::GA4_EVENT_NAME_MAX_LENGTH]
+      ga_key = GaEventSchema.contributor_key(contributor)
       f_use = frontend_use_by_contributor[ga_key] || {}
       f_events = frontend_events_by_contributor[ga_key] || {}
       b_count = { "ItemCount" => @bws_item_count[contributor] }

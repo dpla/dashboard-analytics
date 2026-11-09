@@ -35,21 +35,6 @@ class WebsiteEventsByContributor
     @end_date = end_date
   end
 
-  # Returns the configured GaResponseBuilder for use in batch requests.
-  def ga_builder
-    @ga_builder ||= events_by_contributor_builder
-  end
-
-  # Inject a pre-fetched response (e.g. from a batch call) to skip
-  # the individual GA4 API call when response is next accessed.
-  # Writes to Rails.cache for within-process reuse. Note: with MemoryStore
-  # this is not visible to other ECS tasks — a shared cache (e.g. Redis)
-  # is required for cross-process warming.
-  def prefetch(ga4_response)
-    Rails.cache.write(cache_key, ga4_response, expires_in: 2.hours)
-    @response = ga4_response
-  end
-
   def parse_data
     return Hash.new unless response.present? && response.rows.present?
     # Create Hash of data
@@ -57,7 +42,7 @@ class WebsiteEventsByContributor
     data = {}
 
     response.rows.each do |r|
-      event = r[0].split(" : ").first
+      event = r[0]
       contributor = r[1]
       count = r[2]&.to_i || 0
 
@@ -69,16 +54,10 @@ class WebsiteEventsByContributor
     data
   end
 
-  ##
-  # Lazy load single-page response.
-  # Return nil if response fails.
-  #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
-  #
+  # Cached rows of [event name, contributor, count], summed across
+  # eras. nil on error.
   def response
-    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
-      events_by_contributor_builder.response
-    end
+    @response ||= merge(era_responses)
   rescue => e
     Rails.logger.error(e)
     nil
@@ -86,22 +65,27 @@ class WebsiteEventsByContributor
 
   private
 
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
-  def events_by_contributor_builder
+  def builder_for(era)
     GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
-      builder.start_date = @start_date.iso8601
-      builder.end_date = @end_date.iso8601
+      builder.start_date = era.start_date.iso8601
+      builder.end_date = era.end_date.iso8601
       builder.metrics = %w(ga:totalEvents)
-      builder.dimensions = %w(ga:eventCategory ga:eventAction)
-      builder.filters = %W(ga:eventCategory=@#{@hub} ga:eventCategory!@Browse)
+      builder.dimensions = [era.schema::EVENT_DIMENSION, era.schema::CONTRIBUTOR_DIMENSION]
+      builder.filters = era.schema.hub_filters(@hub)
     end
   end
 
-  def profile_id
-    Settings.google_analytics.frontend_profile_id
+  def merge(responses)
+    counts = Hash.new(0)
+    eras.zip(responses) do |era, response|
+      response.rows.to_a.each do |value, contributor, count|
+        name = era.schema.event_name(value)
+        next unless name
+
+        counts[[name, GaEventSchema.contributor_key(contributor)]] += count.to_i
+      end
+    end
+    build_response(%w(ga:eventCategory ga:eventAction ga:totalEvents),
+                   counts.map { |(name, contributor), count| [name, contributor, count.to_s] })
   end
 end

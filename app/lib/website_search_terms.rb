@@ -21,6 +21,7 @@ class WebsiteSearchTerms
   def initialize
     @start_date = nil
     @end_date = nil
+    @page = nil
   end
 
   def start_date=(start_date)
@@ -31,14 +32,14 @@ class WebsiteSearchTerms
     @end_date = end_date
   end
 
-  ##
-  # Lazy load single-page response.
-  # Return nil if response fails.
-  #
-  # @return [Google::Apis::AnalyticsV3::GaData] | nil
-  #
+  # 1-based page for #response. CSV exports ignore it.
+  def page=(page)
+    @page = page
+  end
+
+  # One cached page, or nil on error.
   def response
-    @response ||= Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+    @response ||= fetch_cached("page#{@page}") do
       search_terms_builder.response
     end
   rescue => e
@@ -46,14 +47,9 @@ class WebsiteSearchTerms
     nil
   end
 
-  ##
-  # Lazy load multi-page response.
-  # Return empty array if response fails.
-  #
-  # @return [Array<Google::Apis::AnalyticsV3::GaData>] | empty array
-  #
+  # Every page, for the CSV export. Empty array on error.
   def multi_page_response
-    @multi_page_response ||= Rails.cache.fetch("#{cache_key}:multi", expires_in: 2.hours) do
+    @multi_page_response ||= fetch_cached("multi", memory: false) do
       search_terms_builder.multi_page_response
     end
   rescue => e
@@ -79,22 +75,14 @@ class WebsiteSearchTerms
 
   private
 
-  def profile_id
-    Settings.google_analytics.frontend_profile_id
-  end
-
-  ##
-  # @return GaResponseBuilder
-  # @throws exception if HTTP request fails
-  #
   def search_terms_builder
     GaResponseBuilder.build do |builder|
-      builder.profile_id = profile_id
       builder.start_date = @start_date.iso8601
       builder.end_date = @end_date.iso8601
       builder.metrics = %w(ga:searchUniques)
       builder.dimensions = %w(ga:searchKeyword)
       builder.sort = %w(-ga:searchUniques) # Descending
+      builder.page = @page
     end
   end
 

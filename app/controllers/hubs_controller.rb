@@ -3,6 +3,7 @@
 class HubsController < ApplicationController
   # Controller concerns
   include DateSetter
+  include GaDataFloor
   # View helpers
   include DataMenuHelper
   include DateHelper
@@ -28,11 +29,6 @@ class HubsController < ApplicationController
     assign_start_and_end_dates
     @hub = Hub.new(params[:id], @start_date, @end_date)
 
-    first_month = Rails.cache.fetch("wikimedia_start_month:#{params[:id]}", expires_in: 24.hours) do
-      WikimediaCache.where(hub: params[:id], contributor: "").minimum(:month)
-    end
-    @wikimedia_start_date = Date.parse("#{first_month}-01") if first_month
-
     # Pre-load S3-cached counts so the totals card renders on initial page load.
     @item_count        = Hub.item_count(params[:id])
     @contributor_count = Hub.contributor_count(params[:id])
@@ -50,11 +46,6 @@ class HubsController < ApplicationController
     all_start, all_end  = min_date, max_date
     sec_start, sec_end  = section_date_range
     end_date            = @end_date
-
-    first_month = Rails.cache.fetch("wikimedia_start_month:#{hub_id}", expires_in: 24.hours) do
-      WikimediaCache.where(hub: hub_id, contributor: "").minimum(:month)
-    end
-    @wikimedia_start_date = Date.parse("#{first_month}-01") if first_month
 
     @item_count        = Hub.item_count(hub_id)
     @contributor_count = Hub.contributors(hub_id).size
@@ -257,6 +248,28 @@ class HubsController < ApplicationController
   end
 
   private
+
+  helper_method :wikimedia_start_date
+
+  # First month with Wikimedia data; nil when none.
+  def wikimedia_start_date
+    return @wikimedia_start_date if defined?(@wikimedia_start_date)
+
+    hub_id = params[:hub_id] || params[:id]
+    first_month = Rails.cache.fetch("wikimedia_start_month:#{hub_id}", expires_in: 24.hours) do
+      WikimediaCache.where(hub: hub_id, contributor: "").minimum(:month)
+    end
+    @wikimedia_start_date = first_month && Date.parse("#{first_month}-01")
+  end
+
+  def ga4_floor_hub
+    params[:hub_id] || params[:id]
+  end
+
+  # Wikimedia predates GA4 and shares this picker.
+  def earliest_data_month
+    [ga4_earliest_month, wikimedia_start_date].compact.min
+  end
 
   def authorize_hub_scope!
     return render_not_found unless Hub.exists?(params[:hub_id])

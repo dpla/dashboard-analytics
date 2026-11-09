@@ -14,7 +14,7 @@
         <span class="tooltiptext"><%= website_use_tooltip %></span>
       </div>
 
-      <%= render partial: "shared/date_range_note", locals: { data_start_date: website_data_start_date } %>
+      <%= render partial: "shared/date_range_note", locals: { data_start_date: ga4_earliest_month } %>
 
       <%= render partial: "shared/frontend_use_metrics" %>
 
@@ -29,7 +29,7 @@
       <h2>Wikimedia Integration</h2>
     </div>
 
-    <%= render partial: "shared/date_range_note", locals: { data_start_date: @wikimedia_start_date } %>
+    <%= render partial: "shared/date_range_note", locals: { data_start_date: wikimedia_start_date } %>
 
     <%= render partial: "shared/wikimedia_overview" %>
 

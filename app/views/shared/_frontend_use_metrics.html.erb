@@ -138,7 +138,14 @@
         @website_overview.users.to_i == 0 &&
         @website_overview.sessions.to_i == 0 %>
     <tr>
-      <td colspan="2" class="no-data">No activity recorded for this period.</td>
+      <% if ga4_earliest_month && @end_date && @end_date < ga4_earliest_month %>
+        <td colspan="2" class="no-data">
+          No data is available for <%= @target&.name || params[:contributor_id] || params[:hub_id] %>
+          before <%= ga4_earliest_month.strftime("%B %Y") %>.
+        </td>
+      <% else %>
+        <td colspan="2" class="no-data">No activity recorded for this period.</td>
+      <% end %>
     </tr>
   <% end %>
 </table>

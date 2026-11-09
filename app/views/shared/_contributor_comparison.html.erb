@@ -132,9 +132,15 @@
                                 format: :csv }.merge(date_opts) %>
 </div>
 
+<% if @total_contributors.to_i > 0 %>
+  <div class="comparison-count">
+    <%= page_window(@total_contributors, @contributor_comparison.contributors.count, "contributors") %>
+  </div>
+<% end %>
+
 <div class="comparison-table-wrapper">
 <table id='comparison'
-       data-ga-url="<%= contributor_ga_data_path({ hub_id: route_id(params[:hub_id]) }.merge(date_opts)) %>">
+       data-ga-url="<%= contributor_ga_data_path({ hub_id: route_id(params[:hub_id]) }.merge(date_opts).merge(page_opts)) %>">
   <thead>
     <tr>
       <th>Contributor</th>
@@ -236,3 +242,7 @@
   </tbody>
 </table>
 </div>
+
+<%= render "shared/pagination",
+           total: @total_contributors,
+           page_url: ->(page) { hub_contributors_path(route_id(params[:hub_id]), date_opts.merge(page: page)) } %>

@@ -13,11 +13,13 @@ A Rails application that aggregates analytics data from multiple sources to prov
   - [Google Analytics 4 (GA4)](#google-analytics-4-ga4)
   - [DPLA API](#dpla-api)
   - [AWS S3 — Metadata Completeness](#aws-s3--metadata-completeness)
+  - [AWS S3 — Hub Stats and Item Data Providers](#aws-s3--hub-stats-and-item-data-providers)
   - [Wikimedia Commons Impact Metrics](#wikimedia-commons-impact-metrics)
 - [Application Structure](#application-structure)
   - [Pages and Routes](#pages-and-routes)
   - [User and Permission Model](#user-and-permission-model)
   - [Date Range Handling](#date-range-handling)
+  - [Table Pagination](#table-pagination)
   - [Async Rendering](#async-rendering)
   - [Data Builders and Presenters](#data-builders-and-presenters)
 - [Wikimedia Cache System](#wikimedia-cache-system)
@@ -61,17 +63,25 @@ Data is loaded asynchronously on each page so that slow API calls don't block th
 
 ### Google Analytics 4 (GA4)
 
-Website analytics are pulled live from the GA4 Reporting API (v1 beta) using a Google service account.
+Website analytics come from the GA4 Reporting API (v1 beta) using a Google service account. Only completed calendar months are displayed; their responses are stored in S3 (`GaPersistentCache`) after the first fetch and served from there, so GA4 is called live only for ranges not yet cached.
 
-**Auth:** A JSON service account key file is provided to the application either as a local file (`config/google-analytics-key.json`) or via the `GOOGLE_ANALYTICS_KEY` environment variable (used in production). The key grants read-only access to the GA4 property.
+**Auth:** A JSON service account key file is provided to the application either as a local file (`google-analytics-key.json` at the repo root) or via the `GOOGLE_ANALYTICS_KEY` environment variable (used in production; when set, it overwrites the local file at boot). The key grants read-only access to the GA4 property.
+
+**Two event shapes.** dp.la has sent item events to GA4 in two different shapes over time. In the legacy shape, the event name is the contributing institution (GA4 truncates it to 40 characters), `event_category` is `"View Item : {hub}"`, and `event_label` is `"{item id} : {title}"`. Since September 2026, the frontend also sends a newer shape with fixed event names (`item_view`, `click_through`, `exhibition_item_view`, `primary_source_view`) and separate parameters for `partner`, `contributor`, `dpla_id`, and `item_title`.
+
+GA4 only reports a custom dimension for data collected after you register it. We registered the new dimensions on Sep 11, 2026, so `new_dimensions_date` in `settings.yml` is Sep 12, 2026, the first full day with data. The dashboard reads days before that date using the legacy shape and days from that date on using the new shape. When a date range crosses the switch, it runs one query per shape and merges the results. `GaEventSchema` defines the two shapes, and each GA class (`WebsiteOverview`, `WebsiteEventTotals`, `WebsiteEvents`, the by-contributor classes, and `WebsiteActivityMonths`) merges its own results.
+
+This has two side effects. First, sessions and users are summed across the switch, so a visitor who was active on both sides is counted twice. Second, a per-item table that crosses the switch has to export both shapes in full and page the merged rows in the app instead of letting GA4 page them. The legacy half never changes, so it is cached once and reused.
+
+The frontend keeps sending the legacy shape until someone turns off its `GA_LEGACY_EVENTS` flag. Leave the flag on until this app is deployed with the switch date in place. The legacy dimensions only go back to Jul 18, 2025, so GA4 has no item IDs for anything earlier. That is why the DPLA API fallback for contributor names is permanent rather than temporary.
 
 **What is tracked:**
 
 | Section | GA4 dimension used |
 |---|---|
-| Website overview | Sessions, users, events filtered by `customEvent:content_partner` |
+| Website overview | Sessions, users, events for the hub: `customEvent:event_category` (legacy) or `eventName` and `customEvent:partner` (current) |
 | Website timelines | Monthly sessions over time |
-| Website events | Event name and count breakdowns |
+| Website events | Per-item counts: `customEvent:event_label` (legacy) or `customEvent:dpla_id` and `customEvent:item_title` (current) |
 | Website search terms | `searchTerm` dimension on search events |
 | Locations | `region` dimension on sessions |
 
@@ -86,7 +96,12 @@ The GA4 integration lives in `app/lib/ga_response_builder.rb`. Each metric secti
 
 ### DPLA API
 
-Hub and contributor item counts are fetched from the DPLA API (`api.dp.la/v2/`). The API is also used to enumerate which contributors belong to each hub, providing the list used throughout the dashboard.
+The DPLA API (`api.dp.la/v2/`) is used for two things: resolving contributor names for item IDs not yet in the S3 cache (`ItemDataProviders`), and live lookups of which DPLA exhibitions and primary source sets hold an institution's items. The index stamps `exhibitions` and `primarySourceSets` slugs onto items (added to the ingestion pipeline in August 2026); the dashboard reads them two ways:
+
+- `DplaApiResponseBuilder#curated_breakdown` facets per institution (`facets=exhibitions&provider.name="..."&page_size=0`). The data menu uses it to disable "Exhibition views" when nothing is there (the "Primary source set views" link reads `pss_sources.json` instead, see below). Results are memoized per kind, hub, and contributor. 3-second timeout, no retries (to avoid excessive API calls).
+- `DplaApiResponseBuilder#curated_memberships` fetches every curated item an institution holds (`exhibitions=?*&provider.name="..."&fields=id,exhibitions&page_size=500`). The exhibition and source set views tables use it to name the exhibition or set holding each item, linked by slug in the table and as a trailing column in the CSV export. Asking per institution rather than per item keeps this to one request whatever the table's size, which matters because a CSV export covers every page, not just the displayed 50 rows.
+
+Hub and contributor item counts, and the contributor lists used throughout the dashboard, come from `hub_stats.json` in S3 (see below).
 
 The source of truth for which hubs and contributors exist, and their Wikidata IDs, is a separate JSON file maintained by the ingestion team: [`institutions_v2.json`](https://raw.githubusercontent.com/dpla/ingestion3/main/src/main/resources/wiki/institutions_v2.json). This file is used by the Wikimedia cache builder but not directly by the API-based item count queries.
 
@@ -108,7 +123,27 @@ Monthly metadata completeness reports are stored as CSV files in an S3 bucket. E
 
 The application reads the CSV for the selected month (falling back to prior months if the current month's file isn't yet available). Parsing is handled by `MetadataCompleteness` and `MetadataCompletenessPresenter` in `app/lib/`.
 
-The S3 bucket name is configured in `settings.yml` (`s3.bucket`). The application uses the AWS SDK with the execution role's IAM permissions (no explicit key needed in production).
+The S3 bucket name is configured in `settings.yml` (`s3.bucket`). The application uses the AWS SDK with the task role's IAM permissions (no explicit key needed in production). The role needs `s3:GetObject` and `s3:ListBucket`, plus `s3:PutObject` for the GA4 response cache the app writes under `ga4-cache/`.
+
+---
+
+### AWS S3 — Hub Stats and Item Data Providers
+
+Four JSON files under `hub-stats/` drive item counts, contributor lists, item-to-contributor name lookups, and source set attribution:
+
+```text
+hub-stats/
+  hub_stats.json            ← per-hub item counts and contributor counts
+  hub_stats_bws.json        ← same, filtered to BWS-tagged items
+  item_data_providers.json  ← item ID → contributor name (cumulative)
+  pss_sources.json          ← source set page → item, hub, contributor
+```
+
+`generate_hub_stats.py`, in the [dpla/ingestion3](https://github.com/dpla/ingestion3) repo, builds the first three from Elasticsearch and GA4. It runs on the ingest EC2 after each monthly index rebuild, on day 5 of the month or later (GA4 revises the just-ended month for about 72 hours). The Rails readers (`HubStats`, `ItemDataProviders`) cache each file for 24 hours and alert through Sentry when a file is missing or more than 45 days old.
+
+`pss_sources.json` works differently. Source set view events in GA4 can't be attributed to a hub: the PSS API doesn't give the frontend a provider or item ID for most sources, so nearly every event is recorded as `View Primary Source : Unknown partner`. Page views of `/primary-source-sets/{set}/sources/{id}` are recorded correctly, though, so `PssEvents` counts those instead and uses this file to map each page to its item, hub, and contributor. Because `pagePath` is a standard dimension rather than a custom one, this data goes back to April 2023 instead of stopping at the July 2025 floor for events. That is why there is a separate `pss_min_date` setting. The `pss_sources.py` script in ingestion3 builds the file from [dpla/pss-json](https://github.com/dpla/pss-json) and the DPLA API; re-run it whenever the sets change. About half of the sources point to items that are no longer in the index. Those keep an entry with no hub, and the table skips them.
+
+`WarmComparisonCacheJob` pre-warms the GA4 response cache for all hubs. Run it monthly as a one-off ECS task: `bundle exec rails cache:warm` with `LOG_LEVEL=info` and `GA4_READ_TIMEOUT_SEC=120` in the container overrides (`perform_later` will not work; the default async adapter dies with the process).
 
 ---
 
@@ -228,9 +263,17 @@ All data views support a `start_date` / `end_date` URL parameter pair in `YYYY-M
 /hubs/Texas?start_date=2024-06&end_date=2024-06
 ```
 
-When no params are provided, the date range defaults to all-time data. The `DateSetter` concern (included by all controllers) parses and validates these params, clamping them to the configured `min_date` and the current date.
+When no params are provided, overview sections default to all-time data and tables default to the last completed month. The `DateSetter` concern (included by all controllers) parses and validates these params; dates outside the window from the configured `min_date` through the last completed month (`DataWindow.max_date`) fall back to the last completed month. The current month is never shown: a completed month's data no longer changes, which lets responses be cached for good.
 
 Links between pages preserve the selected date range.
+
+---
+
+### Table Pagination
+
+Large tables — website events, search terms, the contributors list, and the contributor comparison — paginate at 50 rows (`PaginationHelper::PAGE_SIZE`) via a `page` URL parameter. The controls below each table give previous/next, numbered pages around the current one with the first and last always reachable, and a "Go to page" box once a table runs past five pages. GA4-backed tables fetch one page per request via the GA4 `offset`/`limit` parameters; contributor tables slice the S3-cached list in memory.
+
+CSV downloads always export the complete dataset, named for the hub, contributor, table, and date range (e.g. `HathiTrust_Exhibition-views_2025-07_2026-07.csv`) so a folder of exports stays readable.
 
 ---
 
@@ -240,7 +283,7 @@ Hub and contributor overview pages use the [`render_async`](https://github.com/r
 
 - The page structure renders immediately
 - All metric sections are fetched in one background request via concurrent threads
-- Slow sections (e.g., GA4 calls) don't block faster ones (e.g., item counts from the DPLA API)
+- Slow sections (e.g., GA4 calls) don't block faster ones (e.g., item counts from the S3-cached hub stats)
 - Individual data fetches can fail without taking down the whole page
 
 ---
@@ -258,13 +301,18 @@ Data fetching is organized into a library of plain Ruby classes in `app/lib/`. T
 | Class | Source | Purpose |
 |---|---|---|
 | `GaResponseBuilder` | GA4 API | Base class; all GA4 builders subclass this |
+| `GaEventSchema` | — | The two GA4 event shapes, and which one a day uses |
 | `WebsiteOverview` | GA4 | Sessions, users, events for a hub/contributor |
 | `WebsiteEvents` | GA4 | Event name/count breakdown |
 | `WebsiteSearchTerms` | GA4 | Top search terms |
 | `ApiOverview` | — | Stub — API data not available in GA4 |
 | `BwsOverview` | — | Stub — BWS data not available in GA4 |
-| `DplaApiResponseBuilder` | DPLA API | Item counts and contributor lists |
-| `SThreeResponseBuilder` | AWS S3 | Metadata completeness CSVs |
+| `DplaApiResponseBuilder` | DPLA API | Contributor names for items not yet in the S3 cache |
+| `SThreeResponseBuilder` | AWS S3 | S3 reads/writes and cached JSON fetches |
+| `HubStats` | S3 JSON | Hub item counts and contributor lists |
+| `ItemDataProviders` | S3 JSON | Item ID to contributor name lookups |
+| `GaPersistentCache` | AWS S3 | Permanent store for completed-month GA4 responses |
+| `DataWindow` | — | Display window: min date through last completed month |
 | `MetadataCompleteness` | S3 CSVs | Parses field-level completeness data |
 | `WikimediaCacheBuilder` | Wikidata + CIM API | Populates the PostgreSQL Wikimedia cache tables |
 | `WikimediaAnalyticsPresenter` | PostgreSQL cache | Formats Wikimedia metrics for display |
@@ -490,7 +538,7 @@ cp config/database.yml.template config/database.yml
 
 ```yaml
 google_analytics:
-  service_account_json_key: ./config/google-analytics-key.json
+  service_account_json_key: ./google-analytics-key.json
   property_id: "1234567890"            # GA4 property ID (numeric)
   tracking_id: "G-XXXXXXXXXX"          # GA4 measurement ID
 dpla_api:
@@ -505,7 +553,7 @@ min_date:
 
 **3. Google Analytics service account key:**
 
-Download the JSON service account key from the Google Cloud console and save it as `config/google-analytics-key.json`. See `config/google-analytics-key.json.template` for the expected format.
+Download the JSON service account key from the Google Cloud console and save it as `google-analytics-key.json` at the repo root (the path set in `settings.yml`). Setting the `GOOGLE_ANALYTICS_KEY` environment variable to the JSON also works; when set, it overwrites the file at boot.
 
 ### First-Time Setup
 
@@ -577,10 +625,6 @@ API usage metrics (sections labeled "API" across all hub and contributor pages) 
 
 The Black Women's Suffrage (BWS) digital exhibit at [blackwomenssuffrage.dp.la](https://blackwomenssuffrage.dp.la) ran Universal Analytics, which stopped collecting data in July 2023. The site has not been migrated to GA4, so all BWS analytics sections show zero values. BWS analytics will require a GA4 property to be set up for the BWS site and its ID configured in dashboard settings.
 
-### Missing Data — Primary Source Sets
-
-Primary Source Set (PSS) page view data is not tracked in the dashboard. The PSS pages on dp.la fire GA4 analytics events, but no PSS-specific query or metric section exists in the dashboard.
-
 ### Wikimedia Cache — No Scheduled Rebuild
 
 The Wikimedia cache must currently be rebuilt manually each month via the admin UI button. A scheduled GitHub Actions workflow to trigger the rebuild automatically on the 8th of each month has not yet been implemented. See [Scheduled Automatic Rebuild](#scheduled-automatic-rebuild) for the planned approach.
@@ -589,9 +633,9 @@ The Wikimedia cache must currently be rebuilt manually each month via the admin 
 
 Metadata completeness CSVs are generated as part of the monthly ingestion cycle and typically aren't available until the cycle completes. If a hub's CSV for the current month isn't in S3 yet, the dashboard silently falls back to the most recent available month.
 
-### Contributor Comparison — Potential Timeouts
+### Contributor Comparison — Cold-Range Latency
 
-The contributor comparison page (`/contributor_comparison`) makes parallel GA4 API calls for every contributor in a hub. For hubs with many contributors, this can be slow and may time out under heavy load. The page includes a CSV export option for offline analysis.
+The contributor comparison page makes two GA4 API calls per hub (overview and events, broken down by contributor). The default range (last completed month) is pre-warmed monthly by `WarmComparisonCacheJob`; a custom date range pays one slow GA4 fetch the first time anyone requests it, then serves from the S3 cache. The page includes a CSV export option for offline analysis.
 
 ### Hard-Coded Configuration
 

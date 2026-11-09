@@ -17,25 +17,40 @@ class GaResponsePresenter
     response ? response.total_results : nil
   end
 
-  def start_index
-    response ? response.query.start_index : nil
-  end
-
-  def items_per_page
-    response ? response.items_per_page : nil
-  end
-
-  def end_index
-    if total_results && start_index
-      total_results.to_i < items_per_page.to_i ? total_results : items_per_page
-    end
-  end
-
+  # Falls back to the export pages so CSV survives a failed display fetch.
   def columns
-    response ? response.column_headers.map { |c| c.name } : []
+    resp = response || multi_page_response.first
+    resp ? resp.column_headers.map { |c| c.name } : []
   end
 
   def rows
     response && response.rows ? response.rows : []
+  end
+
+  # nil when the row has no label or the report omits the column.
+  def event_label(row)
+    index = columns.index("ga:eventLabel")
+    row[index] if index
+  end
+
+  # Labels are "id : title". Split once, since a title may contain " : ".
+  # GA has sent labels with CRLF in them, hence the strip.
+  def self.item_id(label)
+    label&.split(" : ", 2)&.first&.strip
+  end
+
+  def id(row)
+    self.class.item_id(event_label(row))
+  end
+
+  def title(row)
+    event_label(row)&.split(" : ", 2)&.last&.strip
+  end
+
+  # Overridden where a table shows curated content.
+  def membership_kind; end
+
+  def memberships(_row)
+    []
   end
 end

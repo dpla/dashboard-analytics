@@ -71,6 +71,8 @@
   <div class="no-data">Wikimedia readiness data not available</div>
 <% end %>
 
-<br/>
+<% if @wikimedia_participant %>
+  <br/>
 
-<p>More data about <%= render_wikimedia_readiness_link(@target) %></p>
+  <p>More data about <%= render_wikimedia_readiness_link(@target) %></p>
+<% end %>

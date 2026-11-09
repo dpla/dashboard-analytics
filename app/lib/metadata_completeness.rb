@@ -113,6 +113,15 @@ class MetadataCompleteness
   end
 
   ##
+  # Files publish during the current month; @end_date caps at the last
+  # completed month (DataWindow). Ranges at the cap walk from the current
+  # month to find the newest file.
+  # @return Date
+  def walk_start_date
+    @end_date >= DataWindow.max_date ? Date.current : @end_date
+  end
+
+  ##
   # Minimum date that data is expected to be available.
   # @return Date
   def min_date

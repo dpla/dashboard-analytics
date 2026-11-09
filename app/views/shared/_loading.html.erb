@@ -1,0 +1,6 @@
+<%# Async-section placeholder; replaced by real content when the fetch resolves.
+    Local: message (optional status text). %>
+<div class="loading-indicator" role="status" aria-live="polite">
+  <span class="spinner" aria-hidden="true"></span>
+  <span><%= local_assigns.fetch(:message, "Loading…") %></span>
+</div>
