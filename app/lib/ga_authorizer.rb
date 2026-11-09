@@ -12,16 +12,4 @@ class GaAuthorizer
       scope: 'https://www.googleapis.com/auth/analytics.readonly'
     )
   end
-
-  ##
-  # Returns an access token string. Used by views that pass GA tokens to
-  # client-side JavaScript (timelines, maps, etc.).
-  def self.token
-    creds = credentials
-    creds.fetch_access_token! if creds.access_token.nil? || creds.expired?
-    creds.access_token
-  rescue => e
-    Rails.logger.error(e)
-    nil
-  end
 end

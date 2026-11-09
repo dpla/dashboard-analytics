@@ -51,12 +51,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :admin_for_all_hubs?
 
-  # Encode literal slashes as %2F so the string passes Rails' [^\/]+ route
-  # constraint during URL generation. Rails' escape_segment then re-encodes
-  # the % to %25, producing %252F in the final URL. normalize_encoded_params
-  # runs a second CGI.unescape on inbound params to reverse that extra layer.
+  # See RouteId.
   def route_id(name)
-    name.to_s.gsub("/", "%2F")
+    RouteId.encode(name)
   end
   helper_method :route_id
 

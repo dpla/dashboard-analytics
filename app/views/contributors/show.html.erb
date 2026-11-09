@@ -1,10 +1,6 @@
 <%= render partial: "shared/sub_navigation",
   locals: { hub: @contributor.hub } %>
 
-<% content_for :head_script do %>
-  <%= javascript_include_tag 'google-analytics', defer: 'defer' %>
-<% end %>
-
 <div class="heading">
 
   <h1><%= @contributor.name %></h1>

@@ -23,6 +23,19 @@ Rails.application.routes.draw do
     post "wikimedia_cache/rebuild", to: "wikimedia_cache#rebuild"
   end
 
+  # Retired timelines and user locations pages: send old bookmarks to the
+  # overview, keeping the date range.
+  retired_page = redirect do |params, request|
+    helpers = Rails.application.routes.url_helpers
+    hub     = RouteId.encode(params[:hub_id])
+    dates   = request.query_parameters.slice("start_date", "end_date").symbolize_keys
+    if params[:contributor_id]
+      helpers.hub_contributor_path(hub, RouteId.encode(params[:contributor_id]), dates)
+    else
+      helpers.hub_path(hub, dates)
+    end
+  end
+
   resources :hubs, id: /[^\/]+/, only: [:index, :show] do
     get :sections
     get :website_overview
@@ -43,14 +56,14 @@ Rails.application.routes.draw do
       get :contributor_metadata_completeness
       get :contributor_wikimedia_overview
       resources :events, only: [:show]
-      resources :locations, only: [:index]
-      resources :timelines, only: [:show]
       resources :wikimedia_preparations, only: [:index]
+      get "timelines/:id", to: retired_page
+      get "locations", to: retired_page
     end
     resources :events, only: [:show]
-    resources :locations, only: [:index]
-    resources :timelines, only: [:show]
     resources :wikimedia_preparations, only: [:index]
+    get "timelines/:id", to: retired_page
+    get "locations", to: retired_page
   end
 
   resources :search_terms, only: [:show]

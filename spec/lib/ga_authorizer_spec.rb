@@ -2,40 +2,21 @@ require 'rails_helper'
 
 describe GaAuthorizer do
 
-  # Stub Google::Auth::ServiceAccountCredentials
-  let(:credentials) { double }
-
-  before do
-    GaAuthorizer.class_variable_set :@@credentials, credentials
-  end
-
-  it 'returns current access token' do
-    allow(credentials).to receive(:expired?).and_return(false)
-    allow(credentials).to receive(:access_token).and_return("abc")
-    expect(GaAuthorizer.token).to eq "abc"
-  end
-
-  it 'renews access token if expired' do
-    allow(credentials).to receive(:expired?).and_return(true)
-    allow(credentials).to receive(:access_token).and_return("abc")
-    expect(credentials).to receive(:fetch_access_token!)
-    GaAuthorizer.token
-  end
-
-  it 'fetches access token if one does not yet exist' do
-    allow(credentials).to receive(:access_token).and_return(nil)
-    expect(credentials).to receive(:fetch_access_token!)
-    GaAuthorizer.token
-  end
-
-  it 'returns nil if the token cannot be fetched' do
-    allow(GaAuthorizer).to receive(:credentials).and_raise(StandardError)
-    expect(GaAuthorizer.token).to be_nil
-  end
-
   after do
     if GaAuthorizer.class_variable_defined? :@@credentials
       GaAuthorizer.remove_class_variable :@@credentials
     end
+  end
+
+  it 'builds read-only credentials once' do
+    allow(File).to receive(:read).and_call_original
+    allow(File).to receive(:read)
+      .with(Settings.google_analytics.service_account_json_key).and_return("{}")
+    expect(Google::Auth::ServiceAccountCredentials).to receive(:make_creds)
+      .once
+      .with(hash_including(scope: 'https://www.googleapis.com/auth/analytics.readonly'))
+      .and_return(double)
+
+    2.times { GaAuthorizer.credentials }
   end
 end
